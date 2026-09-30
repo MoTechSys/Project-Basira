@@ -45,6 +45,9 @@ messages/                  ar.json / en.json — the ONLY user-facing prose
 .intake/                   source package (git-ignored, confidential)
 ```
 
+## First command in any new environment
+`bash scripts/bootstrap.sh && make smoke` — must end with `BOOTSTRAP OK` and `SMOKE OK` before any work.
+
 ## Working conventions
 - Bash always `cd /home/user/webapp && …`.
 - Python: `backend/.venv`; run tests with `pytest`. Node: `frontend/`; `npm run lint && npm run typecheck && npm test`.

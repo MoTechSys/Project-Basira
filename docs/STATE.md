@@ -3,17 +3,20 @@
 **Last updated:** 2026-09-30 (session 2) · **Branch:** `main` · **Last commit:** see `git log -1`
 **Repo:** PRIVATE rehearsal. On **Oct 4** a fresh repo is created and work migrated «as if new» (D-002).
 
-## 0. How to resume in 5 minutes (new agent / new account)
+## 0. How to resume (new agent / new account / new machine) — ONE command
 ```bash
-cd /home/user/webapp
-python3 corpus/fetch.py                       # downloads + sha256-verifies 4 sources (~15 s)
-python3 -m venv backend/.venv && backend/.venv/bin/pip install -e "backend[dev]"
-backend/.venv/bin/python corpus/build_index.py   # ~45 s → corpus/index/records.jsonl (229 MB, git-ignored)
-cd backend && .venv/bin/ruff check app tests && .venv/bin/mypy && .venv/bin/pytest   # all green
+git clone https://github.com/MoTechSys/Project-Basira.git && cd Project-Basira
+bash scripts/bootstrap.sh     # fetch+verify corpora → venv → build index → ruff/mypy/pytest → templates check  (~3 min)
+make smoke                    # 8 canonical cases on the real corpus, incl. the adversarial typo → must print SMOKE OK
 ```
-Then read `AGENTS.md` → this file → `docs/DECISIONS.md` → `docs/adr/` → `docs/internal/AUDIT_HANDOFF_PACKAGE.md §12.5`.
-The confidential source package lives ONLY in `.intake/` on the original sandbox (git-ignored); if it is gone, the
-audit in `docs/internal/` is the complete substitute.
+Verified 2026-09-30 in a clean `/tmp` clone: bootstrap OK, 38/38 tests, SMOKE OK, index sha256 reproducible
+(`3175b625…8488` identical on two machines).
+
+Then read in this order: `AGENTS.md` → this file → `docs/DECISIONS.md` → `docs/adr/` →
+`docs/internal/AUDIT_HANDOFF_PACKAGE.md §12.5`. The confidential source package (`.intake/`) exists ONLY on the
+original sandbox; `docs/internal/` is its complete substitute. Never publish `docs/internal/`.
+
+**Per-session ritual:** `make gates && make smoke` at start; commit after every logical change; update this file at end.
 
 ## 1. Done (verified, committed)
 | Layer | File(s) | Status | Evidence |
@@ -32,6 +35,7 @@ audit in `docs/internal/` is the complete substitute.
 | Messages | `messages/ar.json`, `messages/en.json`, `backend/app/messages.py` | ✅ | rewritten (not copied); forbidden-lexicon scanner; `self_check_templates` = clean |
 | **State machine** | `backend/app/state.py` | ✅ | 9 invariants I1–I9, 14 tests incl. property test; thresholds boundary ±0.002 |
 | **Post-validator** | `backend/app/verify.py` | ✅ | V1–V5, 7 tests (tampered text, wrong ref, grade on wrong record, forbidden label) |
+| Bootstrap / smoke | `scripts/bootstrap.sh`, `scripts/smoke.py`, `Makefile` | ✅ | fresh-clone rehearsal passed; found+fixed missing `numpy` dep |
 | Config / schemas | `backend/app/config.py`, `schemas.py` | ✅ | defaults: LLM_PROVIDER=mock, HADEETHENC_MODE=link, OHD_MODE=display, RETRIEVAL_VECTORS=off |
 
 Quality gates at last commit: `ruff` ✅ · `mypy --strict` ✅ · `pytest` 38/38 ✅.
