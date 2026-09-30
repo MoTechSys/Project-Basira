@@ -42,3 +42,6 @@ Thumbs.db
 playwright-report/
 test-results/
 .pytest_cache/
+
+# --- Intake package (confidential organizer docs, chat logs) — NEVER commit ---
+.intake/
