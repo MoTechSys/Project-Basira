@@ -1,0 +1,44 @@
+# --- Secrets & environment ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.dev.vars
+
+# --- Dependencies ---
+node_modules/
+.pnpm-store/
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# --- Build output ---
+dist/
+build/
+.wrangler/
+.output/
+coverage/
+*.tsbuildinfo
+
+# --- Logs & runtime ---
+logs/
+*.log
+npm-debug.log*
+pm2.log
+.pm2/
+supervisord.log
+supervisord.pid
+*.sock
+
+# --- Editors / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Test artifacts ---
+playwright-report/
+test-results/
+.pytest_cache/
