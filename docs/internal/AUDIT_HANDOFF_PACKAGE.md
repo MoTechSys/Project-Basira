@@ -174,4 +174,53 @@ The package contains organizer materials behind login (scientific annex, PPTX te
 
 ---
 
-*End of BASIRA-AUD-001. Annexes A/B to follow upon agent completion.*
+---
+
+## 11. Triage of Annex B (independent sharia-safety & compliance agent)
+
+Annex B (`docs/internal/ANNEX_B_sharia_compliance_review.md`, 52 KB) is reproduced verbatim. I re-verified its load-bearing claims before accepting them. Verdicts below are **mine**; where Annex B and the package disagree, I say who is right.
+
+### 11.1 Findings I accept and promote to blocking
+
+| Annex B item | My verification | Decision |
+|---|---|---|
+| **Confidentiality leak via our own docs** (clause 15/17): `HANDOFF_MASTER`, `ANNEX_ALIGNMENT`, and annex-quoting passages of `SAFETY_AND_SHARIA` reproduce non-public organizer content. | Confirmed by reading: ANNEX_ALIGNMENT §2–§5 quotes the annex tables nearly in full. | **P0.** Already enforced: entire `.intake/` is git-ignored. Rule added to `CLAUDE.md`: **no organizer-derived text enters the public repo; SAFETY.md is a rewrite, not a copy.** |
+| **A1/A2 — fabricated verse → `needs_review` + «أقرب ما وجدناه»** offers a substitute ayah for text not in the Mushaf; and the qirāʾa caveat lives only in the *second* string of state 4. | Confirmed: SAFETY §7.3 forces `needs_review` for **any** Quran score <1.0 (incl. 0.2), while §2.2 case 1 forces `not_found` for «Quran 9:11». Genuine contradiction. | **P0.** Fix in spec: Quran state machine = `found` (1.0) / `quran_needs_review` (≥T_review, **with** diff + السورة:الآية + qirāʾa caveat as ONE render unit) / `not_found_quran` (<T_review, **no candidates shown**, wording: «لم يوجد هذا النص في المصحف المعتمد في مصادرنا، وهذا ليس حكمًا عليه»). §7.3 test text updated accordingly. |
+| **A5 — hadith `partial_match` has no transmission-variant caveat** (asymmetry with Quran). | Confirmed by reading §1.1-2. | **P0.** Add to `hadith_partial`: «قد يكون الاختلاف روايةً أخرى أو اختلاف نُسخ لا تغطيها مصادرنا». |
+| **A8 — Quran verse framed as hadith → `not_found`** (false statement on screen). | Confirmed: §3.2 says match both corpora, but §3.5 has no arbitration rule. | **P0.** Rule: any span matching Tanzil at 1.0 is `found` in Quran regardless of `kind`/attribution; add `claimed_source_mismatch` note «النص آية في {surah}:{ayah} لا حديثًا». |
+| **Report form stores user text** (clause 9: consent does not cure). | Confirmed; matches my C2. | **P0.** GitHub-Issue route only. |
+| **Forbidden lexicon incomplete** (`مضلل`, `تحريف`, `صحيحة`, `ثابت`…); `صحيح` load-bearing in book names. | Confirmed; matches my C1. | **P1.** Whole-word scan + feminine/plural forms + whitelist of manifest book names and literal fields; **layout test** that `grade` never renders without its attribution prefix. |
+| **Annex-mandated edits not yet applied** in SAFETY (levels ب/ج/د naming, transparency merged into `privacy_notice`, quranpedia/shamela/dorar links, `sahihain` tier string, السورة:الآية in verse string). | Confirmed line-by-line. | **P1.** All are text edits → done in our `messages/*.json` + `SAFETY.md` before Oct 4. |
+| **Refusal detector too narrow** for level (د) phrasing. | Confirmed (§2 lists no lexicon). | **P1.** Deterministic lexicon: `هل يجوز|ما حكم|أفتوني|حكم الشرع|أنا في|زوجتي|راتبي|بلدي` + level tag in response. |
+| **`known_claims.json` includes snopes/factcheck.org** beside Islamic references. | Confirmed in SAFETY §3.3. | **P1.** Restrict to annex-approved Islamic references (dorar, islamqa, islamweb, binbaz). |
+| **ODbL §4.3 produced-work notice + licence URI missing** from results page/PDF/SOURCES. | Confirmed. | **P1.** Add ODbL/DbCL notice line to footer & PDF; `THIRD_PARTY_NOTICES.md` with full licence texts (MIT, CC BY 3.0, ODbL 1.0, DbCL 1.0). |
+| **Tanzil rasm choice**: annex approves King Fahd Complex (Uthmani); default display must be Uthmani. | Confirmed (ANNEX §3). BUILD_SPEC already indexes both rasms; display rasm not fixed. | **P1.** Display **Uthmani** verbatim; Simple used for index only. 100-ayah sample check vs Complex edition documented in SOURCES.md. |
+| **PDPL**: “no storage” is a retention control, not a lawful basis; cross-border LLM call is an Art. 29 transfer. | Legal reasoning is sound; I cannot verify adequacy law here. | **P1 (owner-visible).** Add `/privacy` page (Art. 12/13 content: provider **named**, jurisdiction, purpose, rights), client-side PII blocker (email/phone/@handle/10-digit ID) **before** send, IP logging disabled at edge/host and stated. **Owner decision:** prefer a KSA-resident or zero-retention provider. |
+
+### 11.2 Findings I accept with correction
+
+| Annex B claim | Correction |
+|---|---|
+| “Upstream `hadith-islamware` has **no licence** on the page; plan’s ‘Unlicense’ is unverified.” | **Both partly right.** GitHub API returns `license: Unlicense` (file exists) — so the package was accurate. **But** the README asserts «Copyright (C) 2006-2014 Islam Ware» and the Unlicense was added by a *preserver*, not the rights-holder. → Chain of title is **unresolved**, not negated. Classical hadith matn is public domain; what may be protected is Islam Ware’s digitisation/compilation. **Decision (owner to confirm):** keep OHD (essential for coverage), record the full chain in `SOURCES.md` with `verified: chain-of-title unresolved`, add ODbL notice, and design so OHD text display can be switched to reference-only (`OHD_MODE=display|reference`) in minutes — mirroring `HADEETHENC_MODE`. |
+| “A10 — 4-word sahih hadith `من غشنا فليس منا` → `no_quotes`.” | Partly. Peer item 24 says <5 words *without markers or attribution* is not extracted. Judges will paste bare text. **Decision:** threshold **3** tokens for exact-match-only; <3 not extracted. Add companion line when nothing is extracted from a short input: «إن كان النص اقتباسًا فضعه بين علامتي تنصيص أو أضف نسبته». |
+| “A15 — HadeethEnc grade is an unattributed ruling.” | It **is** attributed — to the encyclopedia (an institutional source), which is what the annex requires («حكم معتمد في البيانات»). The defect is presentational: the grade must never be visually separable from `الحكم كما ورد في موسوعة الأحاديث النبوية`. → covered by the layout test above. |
+| “Ship Uthmani *or the King Fahd text*.” | We cannot ship the Complex’s own digital file (licence unknown). Tanzil Uthmani + documented sample comparison is the defensible path. |
+
+### 11.3 Findings I reject or downgrade
+
+| Annex B claim | Why |
+|---|---|
+| “Index is a Derivative Database → share-alike may be triggered by public use (§4.4c).” | Index is **never conveyed**; built at deploy. ODbL §4.4 obligations attach on *conveying* the Derivative DB or *Publicly Using* it — a server-side index exposing only per-row verbatim text with attribution is the standard reading of “Produced Work”, and we add the §4.3 notice. Residual ambiguity acknowledged in SOURCES.md; **not blocking**. |
+| “Branding as `مدقق`/`للتحقق` contradicts ‘does not judge’.” | Track 4’s own title is «أدوات المعرفة **والتحقق**». Verifying *transmission* (نقل) is exactly the claimed scope; footer already says «للتحقق من **نقل** الآيات والأحاديث». Keep; no change. |
+| “`لا تحكم` is ambiguous imperative/indicative.” | Cosmetic; resolve with «لا تُصدر بصيرة حكمًا على…» in `footer`. P2. |
+
+### 11.4 Net effect on plan
+
+- **New P0 count: +5** (confidentiality of derived docs; Quran state machine; hadith caveat; cross-corpus arbitration; report store) — all **text/spec fixes**, permitted before Oct 4.
+- **New owner decisions: +2** — OHD chain-of-title posture; LLM provider jurisdiction/retention.
+- No change to product scope, stack, or timeline.
+
+
+---
+
+*End of BASIRA-AUD-001 (rev 2 — Annex B triaged). Annex A (technical) to be triaged on arrival.*
