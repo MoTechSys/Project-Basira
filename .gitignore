@@ -45,3 +45,11 @@ test-results/
 
 # --- Intake package (confidential organizer docs, chat logs) — NEVER commit ---
 .intake/
+
+# --- Corpus data & built indexes (downloaded at build time; only manifest.json is committed) ---
+corpus/data/
+corpus/index/
+*.MISMATCH
+.hypothesis/
+.mypy_cache/
+.ruff_cache/
