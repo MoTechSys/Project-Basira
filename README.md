@@ -10,6 +10,7 @@
 .
 ├── docs/
 │   └── ENVIRONMENT_ANALYSIS.md   # Verified baseline of the dev environment, tooling & constraints
+├── CLAUDE.md                     # Operating rules for the AI engineer (ownership, quality bar, git)
 ├── .gitignore
 └── README.md
 ```
@@ -22,9 +23,9 @@
 
 ## Engineering Workflow
 
-- **Branching:** `genspark_ai_developer` → Pull Request → `main`
+- **Branching:** `genspark_ai_developer` → verified → merged directly into `main` by the AI engineer (no PR review cycle — see `CLAUDE.md`)
 - **Commits:** [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, `chore:`, …)
-- **Definition of Done:** lint ✅ · typecheck ✅ · tests ✅ · docs ✅ · PR ✅
+- **Definition of Done:** lint ✅ · typecheck ✅ · tests ✅ · docs ✅ · merged to `main` & verified ✅
 - **Configuration:** 12-Factor — environment variables only, `.env` never committed
 
 ## Roadmap

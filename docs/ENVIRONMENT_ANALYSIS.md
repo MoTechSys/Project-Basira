@@ -230,7 +230,7 @@ Beyond the shell, the engineer has direct access to the following capability cla
 
 | # | Constraint / Risk | Impact | Mitigation |
 |---|---|---|---|
-| R1 | Sandbox filesystem is ephemeral; may reset | Loss of uncommitted work | Commit after every change; push to `genspark_ai_developer`; PR to `main` |
+| R1 | Sandbox filesystem is ephemeral; may reset | Loss of uncommitted work | Commit after every change; push; merge to `main` and verify |
 | R2 | Writes restricted to `/home/user/webapp` | Tooling must be project-local | Use project-local `node_modules`, `.venv`, config files |
 | R3 | No Docker | Cannot run containerized DBs locally | Use SQLite/D1 locally; document production DB via IaC/CI |
 | R4 | Only 127 MiB swap | OOM risk for heavy builds | Limit parallelism; avoid in-memory DB servers; monitor `free -h` |
@@ -265,8 +265,8 @@ Beyond the shell, the engineer has direct access to the following capability cla
 ## 11. Engineering Standards Committed To
 
 1. **Conventional Commits** (`feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `test:`, `ci:`).
-2. **Branch model:** `genspark_ai_developer` → Pull Request → `main`; squash before PR; rebase on `origin/main` first; conflicts resolved favouring remote.
-3. **Definition of Done:** lint ✅, typecheck ✅, tests ✅, docs updated ✅, PR link delivered ✅.
+2. **Branch model:** `genspark_ai_developer` → verified → merged directly into `main` by the AI engineer (owner policy: no PR review cycle); rebase on `origin/main` first; squash to one meaningful commit; conflicts resolved favouring remote.
+3. **Definition of Done:** lint ✅, typecheck ✅, tests ✅, docs updated ✅, merged to `main` and post-merge verified ✅.
 4. **12-Factor configuration:** environment variables only; `.env.example` committed, `.env` ignored.
 5. **Architecture Decision Records** for every significant technical choice.
 6. **Semantic Versioning** and a maintained `CHANGELOG.md`.
