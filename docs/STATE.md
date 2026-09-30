@@ -1,6 +1,6 @@
 # STATE.md — Living status board (read this every session; update at session end)
 
-**Last updated:** 2026-09-30 (session 1, end) · **Branch:** `main` · **Last commit:** see `git log -1`
+**Last updated:** 2026-09-30 (session 2) · **Branch:** `main` · **Last commit:** see `git log -1`
 **Repo:** PRIVATE rehearsal. On **Oct 4** a fresh repo is created and work migrated «as if new» (D-002).
 
 ## 0. How to resume in 5 minutes (new agent / new account)
@@ -30,13 +30,14 @@ audit in `docs/internal/` is the complete substitute.
 | Word diff | `backend/app/match/diff.py` | ✅ | |
 | Rules extractor + detectors | `backend/app/extract/rules.py`, `surahs.py` | ✅ smoke-tested | brackets, introducers, claimed source (books/surah:ayah/Quran 9:11), chain/refusal/PII |
 | Messages | `messages/ar.json`, `messages/en.json`, `backend/app/messages.py` | ✅ | rewritten (not copied); forbidden-lexicon scanner; `self_check_templates` = clean |
+| **State machine** | `backend/app/state.py` | ✅ | 9 invariants I1–I9, 14 tests incl. property test; thresholds boundary ±0.002 |
+| **Post-validator** | `backend/app/verify.py` | ✅ | V1–V5, 7 tests (tampered text, wrong ref, grade on wrong record, forbidden label) |
 | Config / schemas | `backend/app/config.py`, `schemas.py` | ✅ | defaults: LLM_PROVIDER=mock, HADEETHENC_MODE=link, OHD_MODE=display, RETRIEVAL_VECTORS=off |
 
-Quality gates at last commit: `ruff` ✅ · `mypy --strict` ✅ · `pytest` 13/13 ✅.
+Quality gates at last commit: `ruff` ✅ · `mypy --strict` ✅ · `pytest` 38/38 ✅.
 
 ## 2. In progress / next (exact order — do not reorder without a DECISIONS entry)
-1. **`backend/app/state.py`** — the four-state machine (ADR-003): inputs = exact hits, window hits, kind, claimed source, thresholds (`config.Thresholds`). Rules: Quran never `partial_match`; Quran `not_found` returns no candidates; strict-fail exact hit → `needs_review` reason `orthographic_difference` with strict diff; short quote rule; cross-corpus: strict 1.0 Quran wins; `claimed_source_mismatch`; grade only from HadeethEnc direct match (`found`/`partial`), rendered via `notice.grade_line`; ≤5 positions + `total_positions`.
-2. **`backend/app/verify.py`** — post-validator: every `source_text` byte-equals `store.records[...].display`; every ref exists; `scan_forbidden` on all non-literal strings (whitelist `source_text`, `grade.text/takhrij`, `quoted_text`, book names); on failure → quote becomes `needs_review(validator_reject)`, `validator_rejections += 1`.
+1. ~~state.py~~ ✅ done. 2. ~~verify.py~~ ✅ done.
 3. **`backend/app/providers/`** — `base.py` (`LLMClient.extract`, `VisionClient.ocr`), `mock.py` (wraps `rules.extract_spans`), factory by env. Real adapters only on competition day (D-004).
 4. **`backend/app/pipeline.py`** — extract (rules ∪ provider) → validate spans → per quote: exact → (if none) retrieve+window → state → verify; timings.
 5. **`backend/app/main.py`** — FastAPI: lifespan loads store+retriever; `/health` 503 until loaded (E-011) with counts/rss/build_sha; `POST /v1/check`; `GET /v1/sources` from manifest; error envelope `{error:{code,message_ar,message_en}}`; CORS from settings; rate limit 30/min + `X-Eval-Key` bypass (T5).

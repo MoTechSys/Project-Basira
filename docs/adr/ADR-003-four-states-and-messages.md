@@ -12,3 +12,9 @@
 - **Prose:** `messages/ar.json`, `messages/en.json` are the only user-facing text. A forbidden-lexicon scanner (whole-word, incl. feminine/plural forms) runs on every response, whitelisting literal corpus fields and manifest book names.
 - **Refusal detector** (levels ب/ج/د) is a deterministic lexicon; on hit → `refusal` notice, no extraction.
 - Minimum quote length 2 (Quran) / 3 (hadith) tokens unless quote-marked; ≤30 spans; ≤5 positions shown with total.
+
+## Implementation notes (2026-09-30, session 2)
+- Implemented in `backend/app/state.py` as a **pure function** `decide(facts, evidence, thresholds) → Decision`; it returns message KEYS only.
+- Nine invariants I1–I9 are written in the module docstring and each has a test in `backend/tests/test_state.py`, including a Hypothesis property test `found ⇒ every winner is exact ∧ strict_ok` and `quran ⇒ never partial_match`.
+- Fuzzy arbitration: Quran is considered first when its best score ≥ hadith best score (a Quran near-miss is more consequential to surface as «يحتاج مراجعة»).
+- `backend/app/verify.py` re-derives truth from the Store (byte-equal `source_text`, existing ref, grade only from the HadeethEnc record itself, lexicon scan on our strings, `found` without matches impossible). Tests in `tests/test_verify.py`.
