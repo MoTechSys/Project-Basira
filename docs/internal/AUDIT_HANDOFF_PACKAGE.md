@@ -223,4 +223,72 @@ Annex B (`docs/internal/ANNEX_B_sharia_compliance_review.md`, 52 KB) is reproduc
 
 ---
 
-*End of BASIRA-AUD-001 (rev 2 — Annex B triaged). Annex A (technical) to be triaged on arrival.*
+---
+
+## 12. Triage of Annex A (independent hostile technical review)
+
+Annex A (`docs/internal/ANNEX_A_technical_review.md`, 54 KB) instrumented the real Tanzil corpus. I **re-ran its two critical experiments myself** before accepting anything.
+
+### 12.1 Independent re-verification
+
+| Annex A claim | My re-run (Tanzil simple-clean, BUILD_SPEC §3.1 pipeline) | Verdict |
+|---|---|---|
+| §2.1 «إن الله **علي** كل شيء قدير» (typo for على) → exact `found`, 11 verses, empty diff | **11 verses**: 2:20, 2:106, 2:109, 2:148, 2:259 … — score 1.0, diff empty | ✅ **Confirmed. Critical.** |
+| 595 verses exposed to the على/علي collapse | **594** | ✅ (off by one) |
+| Only 6,055 distinct normalized verse strings; 98 collision groups | **6,055 / 6,236; 98 groups** | ✅ exact |
+| §2.2 «قل هو الله واحد» and «الحمد لله رب العالمون» score **exactly 0.750** (knife-edge on `≥0.75`) | **0.75 / 0.75** | ✅ Confirmed |
+| §2.2 «إن الله يحب الصابرين» best ≤0.50 → case unsatisfiable | **0.75 vs 2:153** («إن الله **مع** الصابرين», 1 substitution / 4 tokens). Agent only checked the spec's named candidate 3:146. | ❌ **Corrected** — case is reachable, but on the same knife-edge. The real defect stands: all three category-C examples sit exactly on the threshold. |
+
+### 12.2 Accepted → promoted to blocking (spec/text edits before Oct 4; code on Oct 4)
+
+| # | Finding (Annex A §) | Decision |
+|---|---|---|
+| **T1 P0** | Loose normalization erases the exact evidence the product promises to highlight (§2.1). | **Dual-orthography gate**: loose tokens for retrieval; a **strict** form (keep ة/ه، ى/ي، أإآٱ، ؤ/ئ; drop only diacritics/RLM/tatweel) must also match before `found`. Strict mismatch → `needs_review` with diff on the *strict* tokens. Property test: `found ⇒ strict-equal segment`. This makes `annex_case_11_misquoted_ayah` pass on the exact adversarial input. |
+| **T2 P0** | Threshold rows contradict for <5-token Quran quotes; all category-C examples land on 0.750 (§1.3, §2.2). | Single precedence rule; short-quote row applies **after** corpus row; Quran review band becomes `0.60 ≤ sim < 1.0` (≥3 tokens) so a one-word change in a 4-word ayah (0.75) is safely inside the band; add boundary cases at ±0.002 (R12). Re-calibrate on Oct 4 and publish the curve. |
+| **T3 P0** | RRF top-100 truncation can drop the exact match before exact stage (§2.5). | Exact stage runs on the **full inverted index** (measured <1 s for 6 quotes over 2×6,236). RRF only for fuzzy fallback. |
+| **T4 P0** | Documented misquote-as-`found` via alternative narration (§2.6, BUILD_SPEC L259, cat. F). | Never a clean `found` with empty diff when strict form differs; emit `matched_other_wording` notice + diff vs. the record the user most plausibly meant. Category F expectations rewritten. |
+| **T5 P0** | Eval plan impossible under own rate limits (§1.11); IP limiter behind proxy counts everyone as one client (§2.15). | Eval traffic uses an `X-Eval-Key` header (server-side secret) bypass; limiter trusts exactly one proxy hop; 30/min per IP; CORS `*.pages.dev` + prod. Smoke-test from 2 networks before M2. |
+| **T6 P0** | `/health` returns 200 with empty corpus (§2.11). | `/health` reports `corpus.loaded`, per-corpus doc counts, `rss_mb`, `build_sha`; returns 503 until loaded. |
+| **T7 P1** | Memory estimate omits char-3gram postings (~2.2 GB) (§2.8). | Postings as `numpy.int32` + offsets; char-3gram for **Quran only**; hadith uses BM25 words + (optional) matn-window index. Measure RSS at M3; hard budget 1.5 GB. |
+| **T8 P1** | Vector channel = pure cost in P0 (§2.9). | **Cut from P0** (`RETRIEVAL_VECTORS=off`), documented as P2. Matches my R4. |
+| **T9 P1** | `needs_review` is a 4-in-1 bucket → degenerate F1 (§1.13, §4.5). | Add machine-readable `reason ∈ {near_miss, short_quote, stage_failure, validator_reject, non_arabic, image_unconfirmed}`; headline metric = `found`-precision on A/B/E + FPR; F1 reported second with the degenerate baseline stated. |
+| **T10 P1** | NFC vs NFKC inconsistency (§1.7); presentation forms (ﷲ U+FDF2) unhandled (§2.3). | Display path: **no** normalization (bytes as in corpus). Index path: explicit map for U+FDF0–FDFD → spelled forms *before* NFKC; validator byte-equality on raw corpus bytes. |
+| **T11 P1** | OCR→check binding is client-asserted (§1.14, §2.12); images sent with EXIF (§5.4). | `/v1/ocr` returns HMAC token over (raw_ocr_text, ts); `/v1/check` with `source_modality=image` requires it; server re-encodes image via Pillow (strip metadata, downscale), validates magic bytes. |
+| **T12 P1** | Missing schema fields & response-level notices (§2.11, §1.5); `score` invites reading as confidence. | Folded into §5 schema: `notice_keys[]`, `window_refs[]`, `basmala_token_offset`, `Retry-After`, status↔code map, rename `score`→`similarity`, `grade.source_key`. `503 degraded` removed — degraded is a 200 with `extraction_degraded=true`. |
+| **T13 P1** | Unbounded `rules.py` output → compute DoS (§2.16, §5.1); one-word quotes flood (§2.4). | Min quote length: 2 tokens Quran / 3 hadith unless quote-marked; cap 30 spans total; cap positions returned (5) with count; per-request compute budget → degraded. |
+| **T14 P1** | Calibration provenance is an unpublishable script (§2.17). | Calibration **method** written as text in `eval/PLAN.md` before Oct 4; every «قيمة مبدئية» cites it. Re-run as code on Oct 4. |
+| **T15 P1** | Fixed seed vs «بذرة جديدة» in M9 (§1.12). | Keep seed 20261004; publish before/after on the **same** set; optionally add a second fresh-seed set as extra evidence, never as replacement. |
+| **T16 P1** | `title` field (HadeethEnc) contains grade words and is not exempt from lexicon scan (§2.10-4). | `title` not displayed in v1 (only `hadith_text`, `grade`, `takhrij`, `link`). Consistent with my R8. |
+| **T17 P1** | `claimed_source_mismatch` asserts an unprovable negative (§2.13). | Template → «وُجد في {X}؛ لم نجده في {Y} ضمن المرشحين المسترجَعين» and flag only when the claimed book was searched exhaustively (exact stage on full index makes this provable for exact hits). |
+| **T18 P1** | CI eval cache keyed by reversible hash of user text; no baseline file (§4.7). | Cache only for the **synthetic** fixed case set (allowed); key = HMAC(secret, case_id); `eval/results/baseline.json` committed; CI asserts provider model IDs. |
+| **T19 P2** | Three-run range mislabeled; per-category CIs with n<30 (§4.2, §4.4). | Label «extraction variance only»; CIs only for n≥100; small n marked indicative. |
+| **T20 P2** | No degraded-path test; no boundary tests; sealed-set composition unstated (§4.10, §4.1, §4.9). | Add 3 both-providers-down cases, 12 boundary cases, publish sealed composition. |
+
+### 12.3 Accepted with correction
+
+| Claim | Correction |
+|---|---|
+| Category-C case «إن الله يحب الصابرين» unsatisfiable | Reachable at 0.75 via 2:153. Defect reclassified from *unsatisfiable* to *knife-edge* — remedied by T2. |
+| Total effort R1–R12 ≈ 41 h «more than half the window» | With T8 cut and v0.9 (LLM-free) shipped first (Annex A §3.2 — which I adopt as the **build order**), the irreducible set is ≈24 h — feasible for D1–D2 with AI-assisted coding. |
+
+### 12.4 Rejected / downgraded
+
+| Claim | Why |
+|---|---|
+| `link`-mode HadeethEnc contradicts mandatory grade display (§1.8) | Not a contradiction: in `link` mode the *grade line* still shows `grade`+`takhrij` (short factual fields, quoted with attribution — the annex's «حكم معتمد في البيانات») while the full `hadith_text` is **linked** not embedded. Spec wording will make this explicit. |
+| «No storage» has four exceptions (§1.10) | Demo cache is for **synthetic** fixed inputs; CI cache same; `known_claims` keys a curated list, not user text; report store is **deleted** (C2). After these, the only hash of user-derived text is none. Consistent. |
+| Window docs unjustified (§2.11) | Cross-ayah quotes are common in posts («…الصابرين ۝ الذين إذا أصابتهم…»). Keep 2-verse windows **only**, add `window_refs[]`, and add 5 cross-verse cases to category A. |
+
+### 12.5 Consolidated blocking list (after Annexes A + B)
+
+**P0 — must be in the spec text before Oct 4, implemented Oct 4:**
+C1 lexicon whitelist · C2 report→GitHub Issue · B-Quran state machine (found / needs_review-with-caveat / not_found_quran, no candidates) · B-hadith variant caveat · B-cross-corpus arbitration · B-confidentiality of derived docs · T1 strict gate · T2 thresholds/precedence · T3 exact-on-full-index · T4 no silent alternative-narration `found` · T5 limiter/eval bypass/CORS · T6 health gate · R1 static demo fallback · R2 sanad-aware indexing.
+
+**Owner decisions (8):** licence; HadeethEnc mode; acceptance confirmation; accounts (Render/CF/GitHub/2×LLM/vision with zero-retention); AI_USAGE wording; Guard API stays P2; **OHD chain-of-title posture**; **LLM provider jurisdiction**.
+
+**Build order (adopted from Annex A §3.2):** corpus+manifest → strict/loose Quran index + exact + diff + state machine + validator (gate: adversarial typo case passes) → hadith exact + grade → `rules.py` + `/v1/check` + cards = **v0.9 LLM-free demo** → LLM extraction → OCR → eval → docs/video.
+
+
+---
+
+*End of BASIRA-AUD-001 (rev 3 — Annexes A and B triaged; consolidated blocking list in §12.5).*
