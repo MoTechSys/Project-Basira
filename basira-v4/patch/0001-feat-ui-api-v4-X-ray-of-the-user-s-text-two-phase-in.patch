@@ -1,0 +1,1064 @@
+From b02bd6493676bb4c16d5183e67a3a72f4222ab39 Mon Sep 17 00:00:00 2001
+From: MoTechSys <MoTechSys@users.noreply.github.com>
+Date: Thu, 1 Oct 2026 17:54:20 +0000
+Subject: [PATCH 1/4] =?UTF-8?q?feat(ui+api):=20v4=20=E2=80=94=20X-ray=20of?=
+ =?UTF-8?q?=20the=20user's=20text,=20two-phase=20instant=20check,=20letter?=
+ =?UTF-8?q?-level=20highlight,=20compact=20cards?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- backend: CheckOptions.extract = full|fast; fast never calls the model (rules + corpus anchors only);
+  CheckResponse.phase; matching/decision code unchanged -> statuses identical across phases (test)
+- frontend: components/XRay.tsx + lib/xray.ts (pure pieces() layout; user text byte-exact; status colors
+  with text labels; attribution/isnad dotted underline); lib/ranges.ts letterRanges(); Highlighted() nests
+  <mark.d-letter> inside word marks (textContent byte-exact); DiffView whole= for Quran (an ayah is never
+  shown cut); QuoteCard numbered + id-anchored, first position open, others in <details>; runTwoPhase()
+- i18n: xray_*, more_positions, refining, diff_legend_letters (ar/en parity)
+- gates: ruff/format/mypy clean; pytest 130/130; eval-full 150/150 unsafe 0 FA 0/500; vitest 17/17;
+  oxlint 0 errors; build OK; axe WCAG 2.2 AA 0 violations (mobile/desktop x light/dark)
+---
+ backend/app/pipeline.py               |  33 ++---
+ backend/app/schemas.py                |   4 +
+ backend/tests/test_precision.py       |  41 ++++++
+ frontend/src/Check.test.tsx           |  29 +++++
+ frontend/src/Check.tsx                |  79 +++++++++++-
+ frontend/src/api.ts                   |  18 ++-
+ frontend/src/components/DiffView.tsx  |  54 ++++++--
+ frontend/src/components/QuoteCard.tsx |  31 ++++-
+ frontend/src/components/XRay.test.tsx |  95 ++++++++++++++
+ frontend/src/components/XRay.tsx      |  74 +++++++++++
+ frontend/src/i18n.ts                  |  12 ++
+ frontend/src/index.css                | 178 ++++++++++++++++++++++++++
+ frontend/src/lib/ranges.ts            |  15 +++
+ frontend/src/lib/xray.ts              |  63 +++++++++
+ 14 files changed, 688 insertions(+), 38 deletions(-)
+ create mode 100644 frontend/src/components/XRay.test.tsx
+ create mode 100644 frontend/src/components/XRay.tsx
+ create mode 100644 frontend/src/lib/ranges.ts
+ create mode 100644 frontend/src/lib/xray.ts
+
+diff --git a/backend/app/pipeline.py b/backend/app/pipeline.py
+index 078f956..404c2be 100644
+--- a/backend/app/pipeline.py
++++ b/backend/app/pipeline.py
+@@ -145,21 +145,23 @@ class Pipeline:
+         spans = extract_spans(text)
+         spans = self._augment_spans(text, spans)
+         degraded = False
+-        provider_name = self.llm.name
+-        try:
+-            res = await asyncio.wait_for(self.llm.extract(text), timeout=PROVIDER_TIMEOUT_S)
+-            degraded = res.degraded
+-            for p in res.quotes:
+-                loc = relocate(text, p)
+-                if loc is None:
+-                    continue
+-                spans.append(RuleSpan(loc[0], loc[1], p.kind, False))
+-            spans = merge_overlaps(spans)
+-            for sp in spans:
+-                if sp.claimed_source is None:
+-                    sp.claimed_source = find_claimed_source(text, sp.start, sp.end)
+-        except (ProviderError, TimeoutError):
+-            degraded = True
++        fast = req.options.extract == "fast"
++        provider_name = "rules" if fast else self.llm.name
++        if not fast:  # the fast phase never calls the model
++            try:
++                res = await asyncio.wait_for(self.llm.extract(text), timeout=PROVIDER_TIMEOUT_S)
++                degraded = res.degraded
++                for p in res.quotes:
++                    loc = relocate(text, p)
++                    if loc is None:
++                        continue
++                    spans.append(RuleSpan(loc[0], loc[1], p.kind, False))
++                spans = merge_overlaps(spans)
++                for sp in spans:
++                    if sp.claimed_source is None:
++                        sp.claimed_source = find_claimed_source(text, sp.start, sp.end)
++            except (ProviderError, TimeoutError):
++                degraded = True
+         spans = spans[: self.settings.max_quotes]
+         timings.extract = _ms(t0)
+ 
+@@ -197,6 +199,7 @@ class Pipeline:
+             flags=flags,
+             quotes=quotes,
+             timings_ms=timings,
++            phase="fast" if fast else "full",
+         )
+         resp = validate_response(
+             resp,
+diff --git a/backend/app/schemas.py b/backend/app/schemas.py
+index 460052f..21a2cc9 100644
+--- a/backend/app/schemas.py
++++ b/backend/app/schemas.py
+@@ -23,6 +23,9 @@ CorpusName = Literal["tanzil", "ohd", "hadeethenc"]
+ 
+ class CheckOptions(BaseModel):
+     max_candidates: int = Field(default=3, ge=1, le=5)
++    # "fast": deterministic extraction only (rules + corpus anchors, no model call) — the instant first
++    # phase of the two-phase UI; "full" adds the model's span proposals. Matching is identical in both.
++    extract: Literal["full", "fast"] = "full"
+ 
+ 
+ class CheckRequest(BaseModel):
+@@ -135,6 +138,7 @@ class CheckResponse(BaseModel):
+     quotes: list[QuoteResult]
+     validator_rejections: int = 0
+     timings_ms: Timings
++    phase: Literal["fast", "full"] = "full"  # which extraction produced these spans (two-phase UI)
+     ocr_text: str | None = None  # image path only: the text as read, so the user can verify it (ADR-003)
+ 
+ 
+diff --git a/backend/tests/test_precision.py b/backend/tests/test_precision.py
+index 68b79a2..68e029f 100644
+--- a/backend/tests/test_precision.py
++++ b/backend/tests/test_precision.py
+@@ -122,3 +122,44 @@ async def test_orthographic_typo_gets_letter_level_highlight(pipeline: Pipeline)
+     assert q.status == "needs_review"
+     letters = [lt for m in q.matches for op in m.diff for lt in op.quote_letters]
+     assert letters, "char-by-char highlight expected inside «علي»"
++
++
++# ---------------------------------------------------------------- two-phase: fast extraction
++
++
++class _CountingLLM:
++    """Wraps the pipeline's provider and counts calls (the fast phase must make none)."""
++
++    def __init__(self, inner: object) -> None:
++        self.inner = inner
++        self.name = getattr(inner, "name", "mock")
++        self.calls = 0
++
++    async def extract(self, text: str) -> object:
++        self.calls += 1
++        return await self.inner.extract(text)  # type: ignore[attr-defined]
++
++
++async def test_fast_phase_skips_model_and_keeps_decisions(pipeline: Pipeline) -> None:
++    """`options.extract="fast"` never calls the provider; any quote both phases find gets the same status."""
++    from app.schemas import CheckOptions  # noqa: PLC0415
++
++    text = "قال تعالى: ﴿إن الله علي كل شيء قدير﴾ وقال ﷺ «إنما الأعمال بالنيات» رواه البخاري"
++    orig = pipeline.llm
++    spy = _CountingLLM(orig)
++    pipeline.llm = spy  # type: ignore[assignment]
++    try:
++        fast = await pipeline.check(CheckRequest(text=text, options=CheckOptions(extract="fast")))
++        assert spy.calls == 0
++        full = await pipeline.check(CheckRequest(text=text))
++        assert spy.calls == 1
++    finally:
++        pipeline.llm = orig
++    assert fast.phase == "fast"
++    assert full.phase == "full"
++    assert fast.extraction_provider == "rules"
++    assert not fast.extraction_degraded
++    by_span = {(q.span.start, q.span.end): q.status for q in full.quotes}
++    for q in fast.quotes:
++        assert by_span.get((q.span.start, q.span.end), q.status) == q.status
++    assert len(fast.quotes) >= 1  # marked quotes are found by the rules alone
+diff --git a/frontend/src/Check.test.tsx b/frontend/src/Check.test.tsx
+index 7084051..0f56f8c 100644
+--- a/frontend/src/Check.test.tsx
++++ b/frontend/src/Check.test.tsx
+@@ -123,3 +123,32 @@ describe("Check page", () => {
+     expect(screen.getByRole("button", { name: UI.ar["check"]! })).toBeDisabled();
+   });
+ });
++
++describe("two-phase check", () => {
++  it("asks for the instant fast phase and the full phase, and ends on the full result", async () => {
++    const bodies: string[] = [];
++    vi.stubGlobal(
++      "fetch",
++      vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
++        const url = String(input);
++        if (url.endsWith("/health")) return new Response(JSON.stringify({ status: "ok", corpus_loaded: true, corpus: RESP.corpus, counts: {}, rss_mb: 1, build_sha: "t" }), { status: 200 });
++        if (url.endsWith("/v1/sources")) return new Response(JSON.stringify(SOURCES), { status: 200 });
++        const body = String(init?.body ?? "");
++        bodies.push(body);
++        const fast = body.includes('"extract":"fast"');
++        const r = { ...RESP, phase: fast ? "fast" : "full", quotes: fast ? RESP.quotes.slice(0, 1) : RESP.quotes };
++        return new Response(JSON.stringify(r), { status: 200 });
++      }),
++    );
++    const user = userEvent.setup();
++    render(<Check lang="ar" onLang={() => undefined} />);
++    await screen.findByText(UI.ar["status_ok"]!);
++    await user.type(screen.getByLabelText(UI.ar["input_label"]!), "نص");
++    await user.click(screen.getByRole("button", { name: UI.ar["check"]! }));
++    await screen.findByTestId("xray-text");
++    await vi.waitFor(() => expect(screen.getAllByTestId("quoted-text")).toHaveLength(2));
++    expect(bodies.some((b) => b.includes('"extract":"fast"'))).toBe(true);
++    expect(bodies.some((b) => b.includes('"extract":"full"'))).toBe(true);
++    expect(screen.queryByText(UI.ar["refining"]!)).toBeNull();
++  });
++});
+diff --git a/frontend/src/Check.tsx b/frontend/src/Check.tsx
+index c471fdf..cb100c9 100644
+--- a/frontend/src/Check.tsx
++++ b/frontend/src/Check.tsx
+@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
+ import { BasiraError, check, checkImage, health, type CheckResponse, type Lang } from "./api";
+ import { Icon, LogoMark, type BasiraIconName } from "./brand";
+ import { QuoteCard } from "./components/QuoteCard";
++import { XRay } from "./components/XRay";
+ import { SourcesFooter } from "./components/SourcesFooter";
+ import { MAX_CHARS, msg, ui } from "./i18n";
+ 
+@@ -90,6 +91,10 @@ export default function Check({ lang, onLang }: { lang: Lang; onLang: (l: Lang)
+   const [result, setResult] = useState<CheckResponse | null>(null);
+   const [error, setError] = useState<string | null>(null);
+   const [copied, setCopied] = useState(false);
++  /** the exact text the current result refers to (the textarea may be edited afterwards) */
++  const [checked, setChecked] = useState("");
++  /** true while the full (model-assisted) phase is still running behind an instant fast result */
++  const [refining, setRefining] = useState(false);
+   const [healthState, corpus] = useHealth();
+   const [theme, toggleTheme] = useTheme();
+   const abort = useRef<AbortController | null>(null);
+@@ -122,13 +127,66 @@ export default function Check({ lang, onLang }: { lang: Lang; onLang: (l: Lang)
+     [lang],
+   );
+ 
++  /** Two-phase check: the deterministic fast phase (no model call, ~tens of ms) paints results at once;
++   *  the full phase (rules ∪ model span proposals) replaces them when it lands. Matching/decision code is
++   *  identical in both phases; the full phase can only add quotes or widen a span the rules found. */
++  const runTwoPhase = useCallback(
++    async (t: string) => {
++      abort.current?.abort();
++      const ac = new AbortController();
++      abort.current = ac;
++      setBusy(true);
++      setError(null);
++      setChecked(t);
++      setRefining(true);
++      let painted = false;
++      const fast = check(t, lang, ac.signal, "fast")
++        .then((r) => {
++          if (ac.signal.aborted || painted) return;
++          painted = true;
++          setResult(r);
++          setBusy(false);
++          setTimeout(() => resultsRef.current?.focus(), 0);
++        })
++        .catch(() => undefined);
++      try {
++        const r = await check(t, lang, ac.signal, "full");
++        if (ac.signal.aborted) return;
++        if (!painted) setTimeout(() => resultsRef.current?.focus(), 0);
++        painted = true;
++        setResult(r);
++      } catch (e) {
++        if (e instanceof DOMException && e.name === "AbortError") return;
++        await fast;
++        if (!painted) {
++          if (e instanceof BasiraError) {
++            const b = e.body?.error;
++            setError(b ? (lang === "ar" ? b.message_ar : b.message_en) : msg(lang, "errors", "internal"));
++          } else {
++            setError(ui(lang, "error_network"));
++          }
++        } else {
++          // fast result stays on screen; say honestly that the model pass did not complete
++          setResult((prev) => (prev ? { ...prev, extraction_degraded: true } : prev));
++        }
++      } finally {
++        if (!ac.signal.aborted) {
++          setBusy(false);
++          setRefining(false);
++        }
++      }
++    },
++    [lang],
++  );
++
+   const onSubmit = (e: React.FormEvent) => {
+     e.preventDefault();
+     if (!text.trim() || busy) return;
+-    void run((signal) => check(text, lang, signal));
++    void runTwoPhase(text);
+   };
+   const onFile = (f: File | undefined) => {
+     if (!f) return;
++    setChecked("");
+     void run((signal) => checkImage(f, lang, signal));
+   };
+   const onCopy = async () => {
+@@ -137,7 +195,7 @@ export default function Check({ lang, onLang }: { lang: Lang; onLang: (l: Lang)
+     setCopied(true);
+     setTimeout(() => setCopied(false), 1500);
+   };
+-  const useExample = (t: string) => {
++  const pickExample = (t: string) => {
+     setText(t);
+     setResult(null);
+     setError(null);
+@@ -233,9 +291,13 @@ export default function Check({ lang, onLang }: { lang: Lang; onLang: (l: Lang)
+                 type="button"
+                 className="btn btn--ghost"
+                 onClick={() => {
++                  abort.current?.abort();
+                   setText("");
++                  setChecked("");
+                   setResult(null);
+                   setError(null);
++                  setBusy(false);
++                  setRefining(false);
+                 }}
+                 disabled={busy || (!text && !result)}
+               >
+@@ -258,7 +320,7 @@ export default function Check({ lang, onLang }: { lang: Lang; onLang: (l: Lang)
+             <ul className="examples__list">
+               {EXAMPLES.map((ex) => (
+                 <li key={ex.key}>
+-                  <button type="button" className="example" onClick={() => useExample(ex.text)}>
++                  <button type="button" className="example" onClick={() => pickExample(ex.text)}>
+                     <Icon name={ex.icon} size={20} />
+                     <span className="example__text">
+                       <small>{ui(lang, ex.key)}</small>
+@@ -288,6 +350,12 @@ export default function Check({ lang, onLang }: { lang: Lang; onLang: (l: Lang)
+                   <span>{n === 0 ? ui(lang, "no_quotes_title") : ui(lang, n === 1 ? "summary" : "summary_plural", { n: nf.format(n) })}</span>
+                   <span>·</span>
+                   <span>{ui(lang, "processing_time", { ms: nf.format(result.timings_ms.total) })}</span>
++                  {refining && result.phase === "fast" && (
++                    <span className="refining" role="status">
++                      <Icon name="spinner" size={14} />
++                      {ui(lang, "refining")}
++                    </span>
++                  )}
+                 </span>
+                 {n > 0 && (
+                   <button type="button" className="btn btn--ghost btn--sm" onClick={() => void onCopy()}>
+@@ -321,8 +389,9 @@ export default function Check({ lang, onLang }: { lang: Lang; onLang: (l: Lang)
+                   <span>{msg(lang, "notice", "no_quotes")}</span>
+                 </div>
+               )}
+-              {result.quotes.map((q) => (
+-                <QuoteCard key={q.id} q={q} lang={lang} />
++              <XRay text={result.ocr_text ?? checked} quotes={result.quotes} lang={lang} />
++              {result.quotes.map((q, i) => (
++                <QuoteCard key={q.id} q={q} lang={lang} n={i + 1} />
+               ))}
+             </>
+           )}
+diff --git a/frontend/src/api.ts b/frontend/src/api.ts
+index fd6f325..ffb05e9 100644
+--- a/frontend/src/api.ts
++++ b/frontend/src/api.ts
+@@ -10,6 +10,15 @@ export interface DiffOp {
+   source_range: [number, number];
+   quote_chars: [number, number];
+   source_chars: [number, number];
++  /** letter-level sub-ranges inside a replaced word (absolute char offsets), «حرفًا بحرف» */
++  quote_letters?: [number, number][];
++  source_letters?: [number, number][];
++}
++/** IslamicEval-2026-style typed part of a citation; offsets into the checked text. */
++export interface Segment {
++  type: "Ayah" | "matn" | "isnad" | "claimed_source";
++  start: number;
++  end: number;
+ }
+ export interface Grade {
+   text: string;
+@@ -55,6 +64,7 @@ export interface QuoteResult {
+   matches: Match[];
+   total_positions: number;
+   external_search_links: Link[];
++  segments?: Segment[];
+ }
+ export interface CheckResponse {
+   request_id: string;
+@@ -67,6 +77,8 @@ export interface CheckResponse {
+   quotes: QuoteResult[];
+   validator_rejections: number;
+   timings_ms: { extract: number; retrieve: number; match: number; total: number };
++  /** "fast" = deterministic extraction only (instant first phase); "full" = + model span proposals */
++  phase?: "fast" | "full";
+   ocr_text?: string | null;
+ }
+ export interface ApiError {
+@@ -115,11 +127,13 @@ async function parse<T>(r: Response): Promise<T> {
+   throw new BasiraError(r.status, body);
+ }
+ 
+-export async function check(text: string, ui_lang: Lang, signal?: AbortSignal): Promise<CheckResponse> {
++export type ExtractMode = "full" | "fast";
++
++export async function check(text: string, ui_lang: Lang, signal?: AbortSignal, extract: ExtractMode = "full"): Promise<CheckResponse> {
+   const r = await fetch(`${API_BASE}/v1/check`, {
+     method: "POST",
+     headers: { "Content-Type": "application/json" },
+-    body: JSON.stringify({ text, ui_lang, source_modality: "text", options: { max_candidates: 3 } }),
++    body: JSON.stringify({ text, ui_lang, source_modality: "text", options: { max_candidates: 3, extract } }),
+     ...(signal ? { signal } : {}),
+   });
+   return parse<CheckResponse>(r);
+diff --git a/frontend/src/components/DiffView.tsx b/frontend/src/components/DiffView.tsx
+index 69ddaf4..579bd87 100644
+--- a/frontend/src/components/DiffView.tsx
++++ b/frontend/src/components/DiffView.tsx
+@@ -5,6 +5,7 @@
+ import type { DiffOp, Lang } from "../api";
+ import { Icon } from "../brand";
+ import { ui } from "../i18n";
++import { letterRanges } from "../lib/ranges";
+ 
+ type Range = [number, number];
+ 
+@@ -27,17 +28,49 @@ function ranges(ops: DiffOp[], side: "quote" | "source"): Range[] {
+   return merged;
+ }
+ 
+-export function Highlighted({ text, marks, cls, offset = 0 }: { text: string; marks: Range[]; cls: string; offset?: number }) {
++/** Wraps char ranges in <mark>. `inner` (letter-level ranges) are nested INSIDE the word marks, so
++ *  textContent stays identical to `text` (byte-exact rule) and a word mark still reads as one word. */
++export function Highlighted({
++  text,
++  marks,
++  cls,
++  offset = 0,
++  inner = [],
++}: {
++  text: string;
++  marks: Range[];
++  cls: string;
++  offset?: number;
++  inner?: Range[];
++}) {
+   const parts: React.ReactNode[] = [];
+   let i = 0;
++  const nest = (a: number, b: number): React.ReactNode[] => {
++    const out: React.ReactNode[] = [];
++    let j = a;
++    for (const [x0, y0] of inner) {
++      const x = Math.max(a, x0 - offset);
++      const y = Math.min(b, y0 - offset);
++      if (y <= x || y <= j) continue;
++      if (x > j) out.push(text.slice(j, x));
++      out.push(
++        <mark key={`l${x}-${y}`} className="d-letter">
++          {text.slice(Math.max(x, j), y)}
++        </mark>,
++      );
++      j = y;
++    }
++    if (j < b) out.push(text.slice(j, b));
++    return out;
++  };
+   for (const [a0, b0] of marks) {
+-    const a = Math.max(0, a0 - offset);
++    const a = Math.max(i, Math.max(0, a0 - offset));
+     const b = Math.min(text.length, b0 - offset);
+-    if (b <= i) continue;
++    if (b <= a) continue;
+     if (a > i) parts.push(text.slice(i, a));
+     parts.push(
+       <mark key={`${a}-${b}`} className={cls}>
+-        {text.slice(a, b)}
++        {nest(a, b)}
+       </mark>,
+     );
+     i = b;
+@@ -52,17 +85,20 @@ export function DiffView({
+   sourceRange,
+   diff,
+   lang,
++  whole = false,
+ }: {
+   quote: string;
+   source: string;
+   sourceRange: [number, number] | null;
+   diff: DiffOp[];
+   lang: Lang;
++  /** never window the source (Quran: an ayah is never shown cut in the middle) */
++  whole?: boolean;
+ }) {
+-  // Show the matched window of a long hadith with some context; show whole ayat.
++  // Show the matched window of a long hadith with some context; ayat are always shown whole.
+   let shown = source;
+   let offset = 0;
+-  if (sourceRange && source.length > 400) {
++  if (!whole && sourceRange && source.length > 400) {
+     const pad = 120;
+     offset = Math.max(0, sourceRange[0] - pad);
+     const end = Math.min(source.length, sourceRange[1] + pad);
+@@ -76,7 +112,7 @@ export function DiffView({
+           {ui(lang, "your_text")} <span style={{ fontWeight: 400 }}>— {ui(lang, "your_text_hint")}</span>
+         </h4>
+         <p className="diff-text" dir="auto">
+-          <Highlighted text={quote} marks={ranges(diff, "quote")} cls="d-quote" />
++          <Highlighted text={quote} marks={ranges(diff, "quote")} cls="d-quote" inner={letterRanges(diff, "quote")} />
+         </p>
+       </section>
+       <section className="diff-pane diff-pane--source" aria-label={ui(lang, "source_text")}>
+@@ -86,14 +122,14 @@ export function DiffView({
+         </h4>
+         <p className="diff-text source-text" dir="rtl" lang="ar" data-testid="source-text">
+           {offset > 0 ? "… " : ""}
+-          <Highlighted text={shown} marks={ranges(diff, "source")} cls="d-source" offset={offset} />
++          <Highlighted text={shown} marks={ranges(diff, "source")} cls="d-source" offset={offset} inner={letterRanges(diff, "source")} />
+           {offset + shown.length < source.length ? " …" : ""}
+         </p>
+       </section>
+       {diff.some((o) => o.op !== "equal") && (
+         <p className="diff-legend">
+           <Icon name="diff-words" size={16} />
+-          {ui(lang, "diff_legend")}
++          {ui(lang, diff.some((o) => (o.quote_letters?.length ?? 0) > 0) ? "diff_legend_letters" : "diff_legend")}
+         </p>
+       )}
+     </div>
+diff --git a/frontend/src/components/QuoteCard.tsx b/frontend/src/components/QuoteCard.tsx
+index 66e1790..925ce81 100644
+--- a/frontend/src/components/QuoteCard.tsx
++++ b/frontend/src/components/QuoteCard.tsx
+@@ -75,7 +75,7 @@ function MatchView({ m, q, lang }: { m: Match; q: QuoteResult; lang: Lang }) {
+       </div>
+       {m.source_text.length > 0 &&
+         (showDiff ? (
+-          <DiffView quote={q.quoted_text} source={m.source_text} sourceRange={m.source_text_range} diff={m.diff} lang={lang} />
++          <DiffView quote={q.quoted_text} source={m.source_text} sourceRange={m.source_text_range} diff={m.diff} lang={lang} whole={m.corpus === "tanzil"} />
+         ) : (
+           <p className="diff-text source-text" dir="rtl" lang="ar" data-testid="source-text">
+             {m.source_text}
+@@ -98,12 +98,19 @@ function MatchView({ m, q, lang }: { m: Match; q: QuoteResult; lang: Lang }) {
+   );
+ }
+ 
+-export function QuoteCard({ q, lang }: { q: QuoteResult; lang: Lang }) {
++export function QuoteCard({ q, lang, n }: { q: QuoteResult; lang: Lang; n?: number }) {
+   const notices = q.notice_keys.filter((k) => k !== "grade_line" && has(lang, "notice", k));
+   return (
+-    <section className="card quote" data-status={q.status} aria-labelledby={`${q.id}-h`}>
++    <section id={q.id} tabIndex={-1} className="card quote" data-status={q.status} aria-labelledby={`${q.id}-h`}>
+       <div className="quote__head">
+-        <StatusBadge status={q.status} lang={lang} />
++        <span className="quote__lead">
++          {n !== undefined && (
++            <span className="quote__n" aria-hidden="true">
++              {n}
++            </span>
++          )}
++          <StatusBadge status={q.status} lang={lang} />
++        </span>
+         <span className="kind">
+           <Icon name={q.kind === "quran" ? "quran" : "hadith"} size={16} />
+           {ui(lang, `kind_${q.kind}`)}
+@@ -130,9 +137,19 @@ export function QuoteCard({ q, lang }: { q: QuoteResult; lang: Lang }) {
+             ))}
+           </ul>
+         )}
+-        {q.matches.map((m, i) => (
+-          <MatchView key={`${m.corpus}-${JSON.stringify(m.ref)}-${i}`} m={m} q={q} lang={lang} />
+-        ))}
++        {q.matches[0] && <MatchView m={q.matches[0]} q={q} lang={lang} />}
++        {q.matches.length > 1 && (
++          // other positions of the same text: collapsed by default (one decision per card, not N)
++          <details className="more">
++            <summary>
++              <Icon name="diff-words" size={16} />
++              {ui(lang, "more_positions", { n: q.matches.length - 1, total: q.total_positions })}
++            </summary>
++            {q.matches.slice(1).map((m, i) => (
++              <MatchView key={`${m.corpus}-${JSON.stringify(m.ref)}-${i}`} m={m} q={q} lang={lang} />
++            ))}
++          </details>
++        )}
+         {q.external_search_links.length > 0 && (
+           <div className="links">
+             {q.external_search_links.map((l) => (
+diff --git a/frontend/src/components/XRay.test.tsx b/frontend/src/components/XRay.test.tsx
+new file mode 100644
+index 0000000..1b17a86
+--- /dev/null
++++ b/frontend/src/components/XRay.test.tsx
+@@ -0,0 +1,95 @@
++import { fireEvent, render, screen } from "@testing-library/react";
++import { describe, expect, it } from "vitest";
++import type { CheckResponse, QuoteResult } from "../api";
++import fixture from "../__fixtures__/check_response.json";
++import { letterRanges } from "../lib/ranges";
++import { pieces } from "../lib/xray";
++import { Highlighted } from "./DiffView";
++import { QuoteCard } from "./QuoteCard";
++import { XRay } from "./XRay";
++
++const RESP = fixture as unknown as CheckResponse;
++const TEXT = "قال تعالى: ﴿إن الله علي كل شيء قدير﴾ وقال ﷺ «إنما الأعمال بالنيات» رواه البخاري";
++
++function q(id: string, start: number, end: number, extra: QuoteResult["segments"] = []): QuoteResult {
++  return { ...RESP.quotes[0]!, id, span: { start, end }, segments: [{ type: "Ayah", start, end }, ...(extra ?? [])] };
++}
++
++describe("XRay.pieces", () => {
++  it("covers the text exactly once, in order, with no overlap", () => {
++    const qs = [q("a", 12, 35), q("b", 47, 67, [{ type: "claimed_source", start: 69, end: 79 }])];
++    const ps = pieces(TEXT.length, qs);
++    expect(ps[0]!.start).toBe(0);
++    expect(ps[ps.length - 1]!.end).toBe(TEXT.length);
++    for (let i = 1; i < ps.length; i++) expect(ps[i]!.start).toBe(ps[i - 1]!.end);
++    expect(ps.map((p) => TEXT.slice(p.start, p.end)).join("")).toBe(TEXT);
++    expect(ps.filter((p) => p.role === "quote").map((p) => p.q)).toEqual([0, 1]);
++    expect(ps.find((p) => p.role === "claimed_source")).toMatchObject({ start: 69, end: 79, q: 1 });
++  });
++
++  it("an annotation never paints over a quote body (quote wins, annotation is clipped)", () => {
++    const qs = [q("a", 10, 20, [{ type: "claimed_source", start: 15, end: 30 }])];
++    const ps = pieces(40, qs);
++    expect(ps.find((p) => p.role === "claimed_source")).toMatchObject({ start: 20, end: 30 });
++  });
++
++  it("clamps out-of-range offsets defensively", () => {
++    const ps = pieces(10, [q("a", 5, 99)]);
++    expect(ps[ps.length - 1]!.end).toBe(10);
++  });
++});
++
++describe("XRay view", () => {
++  it("renders the user's text byte-exact and links each quote to its card", () => {
++    const qs = [q("qa", 12, 35)];
++    render(<XRay text={TEXT} quotes={qs} lang="ar" />);
++    const p = screen.getByTestId("xray-text");
++    // only the superscript index is added; everything else is the user's text unchanged
++    const clone = p.cloneNode(true) as HTMLElement;
++    clone.querySelectorAll("sup").forEach((s) => s.remove());
++    expect(clone.textContent).toBe(TEXT);
++    const a = p.querySelector("a.xray__q")!;
++    expect(a.getAttribute("href")).toBe("#qa");
++    expect(a.getAttribute("data-status")).toBe(qs[0]!.status);
++    fireEvent.click(a); // no card in DOM → falls back to the anchor without throwing
++  });
++
++  it("renders nothing without quotes", () => {
++    const { container } = render(<XRay text={TEXT} quotes={[]} lang="ar" />);
++    expect(container.innerHTML).toBe("");
++  });
++});
++
++describe("letter-level highlight", () => {
++  it("nests the differing letter inside the word mark and keeps textContent byte-exact", () => {
++    const text = "إن الله علي كل";
++    const { container } = render(
++      <p>
++        <Highlighted text={text} marks={[[8, 11]]} cls="d-quote" inner={letterRanges([{ op: "replace", quote_range: [2, 3], source_range: [2, 3], quote_chars: [8, 11], source_chars: [0, 0], quote_letters: [[10, 11]] }], "quote")} />
++      </p>,
++    );
++    expect(container.textContent).toBe(text);
++    const word = container.querySelector("mark.d-quote")!;
++    expect(word.textContent).toBe("علي");
++    expect(word.querySelector("mark.d-letter")!.textContent).toBe("ي");
++  });
++
++  it("respects the display offset for windowed sources", () => {
++    const { container } = render(<Highlighted text="abcdef" marks={[[12, 15]]} cls="d-source" offset={10} inner={[[13, 14]]} />);
++    expect(container.querySelector("mark.d-source")!.textContent).toBe("cde");
++    expect(container.querySelector("mark.d-letter")!.textContent).toBe("d");
++  });
++});
++
++describe("compact card", () => {
++  it("shows the first position open and collapses the others", () => {
++    const qr = RESP.quotes[0]!;
++    expect(qr.matches.length).toBeGreaterThan(1);
++    const { container } = render(<QuoteCard q={qr} lang="ar" n={1} />);
++    const details = container.querySelector("details.more")!;
++    expect(details).not.toBeNull();
++    expect(details.hasAttribute("open")).toBe(false);
++    expect(details.querySelectorAll("article.match")).toHaveLength(qr.matches.length - 1);
++    expect(container.querySelector("section.quote")!.id).toBe(qr.id);
++  });
++});
+diff --git a/frontend/src/components/XRay.tsx b/frontend/src/components/XRay.tsx
+new file mode 100644
+index 0000000..d799558
+--- /dev/null
++++ b/frontend/src/components/XRay.tsx
+@@ -0,0 +1,74 @@
++/** «الأشعة» — the user's whole text, once, with every detected quotation marked in place by its status.
++ *
++ *  Why: a da'i checks a *post*, not a list of snippets. Seeing the post itself light up (green / amber /
++ *  violet / grey) answers "is this post safe to forward?" in one glance, before reading any card.
++ *
++ *  Integrity rules:
++ *  - only the USER's text is rendered here (never corpus text); nothing is rewritten — <mark>/<a> wrappers only;
++ *  - colors carry no judgment on the text: they mirror the four matcher states, each with a text label for
++ *    screen readers and color-blind users (WCAG 1.4.1), and a link to the full card;
++ *  - attribution ("رواه البخاري") and isnad segments get a neutral underline, never a status color.
++ */
++
++import type { Lang, QuoteResult, Status } from "../api";
++import { msg, ui } from "../i18n";
++import { pieces } from "../lib/xray";
++
++const ORDER: Status[] = ["found", "partial_match", "needs_review", "not_found"];
++
++export function XRay({ text, quotes, lang }: { text: string; quotes: QuoteResult[]; lang: Lang }) {
++  if (!text || quotes.length === 0) return null;
++  const ps = pieces(text.length, quotes);
++  const counts = ORDER.map((s) => [s, quotes.filter((q) => q.status === s).length] as const).filter(([, n]) => n > 0);
++  return (
++    <section className="card card--pad xray" aria-labelledby="xray-h">
++      <div className="xray__head">
++        <h2 id="xray-h">{ui(lang, "xray_title")}</h2>
++        <ul className="xray__legend" aria-label={ui(lang, "xray_legend")}>
++          {counts.map(([s, n]) => (
++            <li key={s} data-status={s}>
++              <span className="xray__dot" aria-hidden="true" />
++              {msg(lang, "labels", s)} <b>{n}</b>
++            </li>
++          ))}
++        </ul>
++      </div>
++      <p className="xray__text" dir="auto" lang="ar" data-testid="xray-text">
++        {ps.map((p) => {
++          const s = text.slice(p.start, p.end);
++          if (p.role === "plain") return s;
++          const q = quotes[p.q]!;
++          if (p.role !== "quote") {
++            return (
++              <span key={`${p.start}`} className={`xray__ann xray__ann--${p.role}`}>
++                {s}
++              </span>
++            );
++          }
++          return (
++            <a
++              key={`${p.start}`}
++              href={`#${q.id}`}
++              className="xray__q"
++              data-status={q.status}
++              aria-label={`${msg(lang, "labels", q.status)}: ${s}`}
++              onClick={(e) => {
++                const el = document.getElementById(q.id);
++                if (!el) return;
++                e.preventDefault();
++                el.scrollIntoView({ behavior: "smooth", block: "start" });
++                el.focus({ preventScroll: true });
++              }}
++            >
++              {s}
++              <sup className="xray__n" aria-hidden="true">
++                {p.q + 1}
++              </sup>
++            </a>
++          );
++        })}
++      </p>
++      <p className="xray__hint">{ui(lang, "xray_hint")}</p>
++    </section>
++  );
++}
+diff --git a/frontend/src/i18n.ts b/frontend/src/i18n.ts
+index e73e744..6a543a4 100644
+--- a/frontend/src/i18n.ts
++++ b/frontend/src/i18n.ts
+@@ -91,6 +91,12 @@ export const UI: Record<Lang, Record<string, string>> = {
+     api_link: "واجهة البرمجة",
+     github_link: "الشيفرة المصدرية",
+     limits_link: "حدودنا",
++    xray_title: "نصك تحت الفحص",
++    xray_legend: "دليل الألوان",
++    xray_hint: "كل اقتباس ملوَّن بحالته؛ اضغطه للانتقال إلى تفاصيله. اللون حالة مطابقة مع مصادرنا، وليس حكمًا على النص.",
++    more_positions: "مواضع أخرى للنص نفسه ({n} من {total})",
++    refining: "نتيجة أولية — نكمل البحث عن اقتباسات غير معلَّمة…",
++    diff_legend_letters: "الكلمات المظلّلة مواضع الاختلاف، والحرف المؤطَّر داخلها هو الحرف المختلف بعينه.",
+   },
+   en: {
+     app_name: "Basira",
+@@ -170,6 +176,12 @@ export const UI: Record<Lang, Record<string, string>> = {
+     api_link: "API",
+     github_link: "Source code",
+     limits_link: "Our limits",
++    xray_title: "Your text, checked",
++    xray_legend: "Color key",
++    xray_hint: "Each quotation is colored by its status; tap it to jump to its details. The color is a match status against our sources — not a judgment on the text.",
++    more_positions: "Other positions of the same text ({n} of {total})",
++    refining: "Preliminary result — still looking for unmarked quotations…",
++    diff_legend_letters: "Highlighted words differ; the outlined letter inside is the exact letter that differs.",
+   },
+ };
+ 
+diff --git a/frontend/src/index.css b/frontend/src/index.css
+index 5567744..fe1c528 100644
+--- a/frontend/src/index.css
++++ b/frontend/src/index.css
+@@ -858,3 +858,181 @@ mark.d-source {
+     }
+   }
+ }
++
++/* ---------- v4: X-ray of the user's text (status marks in place) ---------- */
++.xray__head {
++  display: flex;
++  align-items: center;
++  justify-content: space-between;
++  gap: var(--bs-sp-3);
++  flex-wrap: wrap;
++  margin-block-end: var(--bs-sp-3);
++}
++.xray__head h2 {
++  margin: 0;
++  font-size: 1rem;
++}
++.xray__legend {
++  display: flex;
++  flex-wrap: wrap;
++  gap: var(--bs-sp-3);
++  margin: 0;
++  padding: 0;
++  list-style: none;
++  font-size: var(--bs-fs-caption);
++  color: var(--bs-text-muted);
++}
++.xray__legend li {
++  display: inline-flex;
++  align-items: center;
++  gap: 6px;
++}
++.xray__dot {
++  inline-size: 10px;
++  block-size: 10px;
++  border-radius: 50%;
++  background: var(--xs, var(--bs-state-notfound));
++}
++.xray__text {
++  margin: 0;
++  font-size: 1.15rem;
++  line-height: 2.3;
++  white-space: pre-wrap;
++}
++[data-status="found"] {
++  --xs: var(--bs-state-found);
++}
++[data-status="partial_match"] {
++  --xs: var(--bs-state-partial);
++}
++[data-status="needs_review"] {
++  --xs: var(--bs-state-review);
++}
++[data-status="not_found"] {
++  --xs: var(--bs-state-notfound);
++}
++.xray__q {
++  color: inherit;
++  text-decoration: none;
++  border-radius: 6px;
++  padding: 2px 4px;
++  background: color-mix(in srgb, var(--xs) 16%, transparent);
++  box-shadow: inset 0 -2px 0 var(--xs);
++  box-decoration-break: clone;
++  -webkit-box-decoration-break: clone;
++  transition: background 0.15s;
++}
++.xray__q:hover,
++.xray__q:focus-visible {
++  background: color-mix(in srgb, var(--xs) 30%, transparent);
++}
++/* not_found: dashed, never alarming — absence from our sources is not a verdict */
++.xray__q[data-status="not_found"] {
++  box-shadow: none;
++  outline: 1px dashed var(--xs);
++  outline-offset: -1px;
++}
++.xray__n {
++  font-size: 0.65em;
++  font-weight: 700;
++  color: var(--bs-text-muted);
++  margin-inline-start: 2px;
++}
++.xray__ann {
++  text-decoration: underline dotted var(--bs-text-muted);
++  text-underline-offset: 6px;
++}
++.xray__hint {
++  margin: var(--bs-sp-3) 0 0;
++  font-size: var(--bs-fs-caption);
++  color: var(--bs-text-muted);
++}
++.quote {
++  scroll-margin-block-start: 80px;
++}
++.quote:focus-visible {
++  outline: 3px solid var(--bs-violet);
++  outline-offset: 2px;
++}
++.quote__lead {
++  display: inline-flex;
++  align-items: center;
++  gap: var(--bs-sp-2);
++}
++.quote__n {
++  display: inline-grid;
++  place-items: center;
++  inline-size: 26px;
++  block-size: 26px;
++  border-radius: 50%;
++  font-size: 0.8rem;
++  font-weight: 700;
++  color: var(--bs-text);
++  background: var(--bs-surface);
++  box-shadow: inset 0 0 0 2px var(--xs, var(--bs-state-notfound));
++}
++
++/* letter-level difference inside a highlighted word: outlined, not a second color (no red inside an ayah) */
++mark.d-letter {
++  background: transparent;
++  color: inherit;
++  border-radius: 3px;
++  box-shadow: 0 0 0 2px currentColor;
++  padding: 0;
++}
++.d-source mark.d-letter {
++  box-shadow: 0 0 0 2px var(--bs-teal-700);
++}
++
++/* other positions: collapsed */
++.more {
++  margin-block-start: var(--bs-sp-4);
++  border-block-start: 1px solid var(--bs-border);
++  padding-block-start: var(--bs-sp-3);
++}
++.more > summary {
++  cursor: pointer;
++  display: inline-flex;
++  align-items: center;
++  gap: var(--bs-sp-2);
++  min-block-size: 44px;
++  color: var(--bs-link);
++  font-size: var(--bs-fs-caption);
++  font-weight: 600;
++  list-style: none;
++}
++.more > summary::-webkit-details-marker {
++  display: none;
++}
++.more > summary::after {
++  content: "▾";
++  transition: transform 0.15s;
++}
++.more[open] > summary::after {
++  transform: rotate(180deg);
++}
++
++.refining {
++  display: inline-flex;
++  align-items: center;
++  gap: 6px;
++  color: var(--bs-violet);
++}
++@media (prefers-reduced-motion: reduce) {
++  .xray__q,
++  .more > summary::after {
++    transition: none;
++  }
++}
++@media (max-width: 520px) {
++  .quote__body {
++    padding-inline: var(--bs-sp-4);
++  }
++  .source-text,
++  .bs-mushaf {
++    font-size: 1.3rem;
++  }
++  .diff-text {
++    font-size: 1.1rem;
++  }
++}
+diff --git a/frontend/src/lib/ranges.ts b/frontend/src/lib/ranges.ts
+new file mode 100644
+index 0000000..8ce0bcb
+--- /dev/null
++++ b/frontend/src/lib/ranges.ts
+@@ -0,0 +1,15 @@
++/** Pure range helpers for diff highlighting (no React). */
++
++import type { DiffOp } from "../api";
++
++export type Range = [number, number];
++
++/** Letter-level ranges, already absolute offsets, sorted. */
++export function letterRanges(ops: DiffOp[], side: "quote" | "source"): Range[] {
++  const out: Range[] = [];
++  for (const o of ops) {
++    const ls = side === "quote" ? o.quote_letters : o.source_letters;
++    for (const r of ls ?? []) if (r[1] > r[0]) out.push([r[0], r[1]]);
++  }
++  return out.sort((a, b) => a[0] - b[0]);
++}
+diff --git a/frontend/src/lib/xray.ts b/frontend/src/lib/xray.ts
+new file mode 100644
+index 0000000..ba9523f
+--- /dev/null
++++ b/frontend/src/lib/xray.ts
+@@ -0,0 +1,63 @@
++/** Pure layout for the X-ray view (no React). */
++
++import type { QuoteResult } from "../api";
++
++export interface Piece {
++  start: number;
++  end: number;
++  /** quote index in `quotes`, or -1 for plain text */
++  q: number;
++  /** "quote" body, attribution/isnad annotation, or plain */
++  role: "quote" | "claimed_source" | "isnad" | "plain";
++}
++
++/** Pure, O(n log n): flattens quote spans + typed segments into non-overlapping ordered pieces covering
++ *  [0, text.length). Quote bodies win over annotations; earlier quotes win ties (spans never overlap
++ *  after backend merge, this is defensive). Exported for tests. */
++export function pieces(textLength: number, quotes: QuoteResult[]): Piece[] {
++  type Iv = { start: number; end: number; q: number; role: Piece["role"]; rank: number };
++  const ivs: Iv[] = [];
++  quotes.forEach((q, i) => {
++    const body = q.segments?.find((s) => s.type === "Ayah" || s.type === "matn");
++    const a = body?.start ?? q.span.start;
++    const b = body?.end ?? q.span.end;
++    if (b > a) ivs.push({ start: a, end: b, q: i, role: "quote", rank: 0 });
++    for (const s of q.segments ?? []) {
++      if (s.type === "claimed_source" || s.type === "isnad") {
++        if (s.end > s.start) ivs.push({ start: s.start, end: s.end, q: i, role: s.type, rank: 1 });
++      }
++    }
++  });
++  ivs.sort((x, y) => x.rank - y.rank || x.start - y.start || x.q - y.q);
++  // paint into an ownership array of interval boundaries (sweep, no per-char allocation)
++  const taken: Iv[] = [];
++  const overlaps = (a: number, b: number) => taken.some((t) => t.start < b && a < t.end);
++  for (const iv of ivs) {
++    const a = Math.max(0, iv.start);
++    const b = Math.min(textLength, iv.end);
++    if (b <= a) continue;
++    if (!overlaps(a, b)) {
++      taken.push({ ...iv, start: a, end: b });
++      continue;
++    }
++    // annotation partially covered: keep the uncovered sub-ranges only
++    if (iv.rank === 0) continue;
++    let cur = a;
++    const cuts = taken.filter((t) => t.start < b && a < t.end).sort((x, y) => x.start - y.start);
++    for (const c of cuts) {
++      if (c.start > cur) taken.push({ ...iv, start: cur, end: c.start });
++      cur = Math.max(cur, c.end);
++    }
++    if (cur < b) taken.push({ ...iv, start: cur, end: b });
++  }
++  taken.sort((x, y) => x.start - y.start);
++  const out: Piece[] = [];
++  let i = 0;
++  for (const t of taken) {
++    if (t.start > i) out.push({ start: i, end: t.start, q: -1, role: "plain" });
++    out.push({ start: t.start, end: t.end, q: t.q, role: t.role });
++    i = t.end;
++  }
++  if (i < textLength) out.push({ start: i, end: textLength, q: -1, role: "plain" });
++  return out;
++}
+-- 
+2.47.3
+

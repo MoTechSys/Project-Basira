@@ -1,0 +1,67 @@
+From 1d90156ec5333924ca63432b23005fe31bc3bf56 Mon Sep 17 00:00:00 2001
+From: MoTechSys <MoTechSys@users.noreply.github.com>
+Date: Thu, 1 Oct 2026 17:58:18 +0000
+Subject: [PATCH 3/4] feat(api): separate 4x rate bucket for the model-free
+ fast phase (one two-phase check = one unit of the main limit)
+
+---
+ backend/app/main.py       | 10 +++++++---
+ backend/tests/test_api.py |  4 ++++
+ 2 files changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/backend/app/main.py b/backend/app/main.py
+index 3c4c769..c36e171 100644
+--- a/backend/app/main.py
++++ b/backend/app/main.py
+@@ -103,6 +103,9 @@ def _error(status: int, code: str, messages_dir: Path, **vars: Any) -> JSONRespo
+ def create_app(cfg: Settings | None = None) -> FastAPI:
+     cfg = cfg or default_settings
+     limiter = RateLimiter(cfg.rate_limit_per_min)
++    # the fast phase (options.extract="fast") never calls the model — the cost the limit protects — so it
++    # has its own, wider bucket; one two-phase check therefore spends exactly one unit of the main limit.
++    fast_limiter = RateLimiter(cfg.rate_limit_per_min * 4)
+ 
+     @asynccontextmanager
+     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+@@ -166,11 +169,12 @@ def create_app(cfg: Settings | None = None) -> FastAPI:
+         ip = fwd.split(",")[0].strip() if fwd else (request.client.host if request.client else "?")
+         return ip
+ 
+-    def _guard(request: Request) -> Pipeline:
++    def _guard(request: Request, *, fast: bool = False) -> Pipeline:
+         if not getattr(request.app.state, "ready", False) or request.app.state.pipeline is None:
+             raise ApiError(503, "degraded")
+         eval_key = request.headers.get("x-eval-key", "")
+-        if not (cfg.eval_key and eval_key == cfg.eval_key) and not limiter.allow(_client_key(request)):
++        bucket = fast_limiter if fast else limiter
++        if not (cfg.eval_key and eval_key == cfg.eval_key) and not bucket.allow(_client_key(request)):
+             raise ApiError(429, "rate_limited")
+         pipeline: Pipeline = request.app.state.pipeline
+         return pipeline
+@@ -215,7 +219,7 @@ def create_app(cfg: Settings | None = None) -> FastAPI:
+         },
+     )
+     async def check(req: CheckRequest, request: Request) -> CheckResponse:
+-        pipeline = _guard(request)
++        pipeline = _guard(request, fast=req.options.extract == "fast")
+         if len(req.text) > cfg.max_text_chars:
+             raise ApiError(413, "text_too_long", max=cfg.max_text_chars)
+         if not req.text.strip():
+diff --git a/backend/tests/test_api.py b/backend/tests/test_api.py
+index 18de8ca..b9f3043 100644
+--- a/backend/tests/test_api.py
++++ b/backend/tests/test_api.py
+@@ -119,6 +119,10 @@ async def test_rate_limit_http_and_eval_key(test_settings) -> None:  # type: ign
+         assert r.status_code == 200
+         r = await c.post("/v1/check", json=payload, headers={"X-Eval-Key": "wrong"})
+         assert r.status_code == 429
++        # the model-free fast phase has its own wider bucket: not blocked by the exhausted main one
++        fast = {**payload, "options": {"extract": "fast"}}
++        r = await c.post("/v1/check", json=fast)
++        assert r.status_code == 200 and r.json()["phase"] == "fast"
+ 
+ 
+ async def test_cors_preflight(client: AsyncClient) -> None:
+-- 
+2.47.3
+

@@ -1,0 +1,39 @@
+From 55bf7a9acf68db96f2b38987b1a9c4bc4797d288 Mon Sep 17 00:00:00 2001
+From: MoTechSys <MoTechSys@users.noreply.github.com>
+Date: Thu, 1 Oct 2026 18:00:06 +0000
+Subject: [PATCH 4/4] =?UTF-8?q?fix(ui):=20X-ray=20hint=20states=20that=20u?=
+ =?UTF-8?q?ncolored=20text=20was=20not=20checked=20and=20'found'=20?=
+ =?UTF-8?q?=E2=89=A0=20authentic?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ frontend/src/i18n.ts | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/frontend/src/i18n.ts b/frontend/src/i18n.ts
+index 6a543a4..e4ab9d4 100644
+--- a/frontend/src/i18n.ts
++++ b/frontend/src/i18n.ts
+@@ -93,7 +93,7 @@ export const UI: Record<Lang, Record<string, string>> = {
+     limits_link: "حدودنا",
+     xray_title: "نصك تحت الفحص",
+     xray_legend: "دليل الألوان",
+-    xray_hint: "كل اقتباس ملوَّن بحالته؛ اضغطه للانتقال إلى تفاصيله. اللون حالة مطابقة مع مصادرنا، وليس حكمًا على النص.",
++    xray_hint: "كل اقتباس تعرّفنا عليه ملوَّن بحالته؛ اضغطه للانتقال إلى تفاصيله. اللون حالة مطابقة مع مصادرنا وليس حكمًا على النص، و«وُجد» لا يعني صحة الحديث. ما لم يُلوَّن لم نتعرّف فيه على اقتباس فلم يُفحص.",
+     more_positions: "مواضع أخرى للنص نفسه ({n} من {total})",
+     refining: "نتيجة أولية — نكمل البحث عن اقتباسات غير معلَّمة…",
+     diff_legend_letters: "الكلمات المظلّلة مواضع الاختلاف، والحرف المؤطَّر داخلها هو الحرف المختلف بعينه.",
+@@ -178,7 +178,7 @@ export const UI: Record<Lang, Record<string, string>> = {
+     limits_link: "Our limits",
+     xray_title: "Your text, checked",
+     xray_legend: "Color key",
+-    xray_hint: "Each quotation is colored by its status; tap it to jump to its details. The color is a match status against our sources — not a judgment on the text.",
++    xray_hint: "Each quotation we recognised is colored by its status; tap it to jump to its details. The color is a match status against our sources, not a judgment on the text, and “found” does not mean a hadith is authentic. Uncolored text was not recognised as a quotation, so it was not checked.",
+     more_positions: "Other positions of the same text ({n} of {total})",
+     refining: "Preliminary result — still looking for unmarked quotations…",
+     diff_legend_letters: "Highlighted words differ; the outlined letter inside is the exact letter that differs.",
+-- 
+2.47.3
+
