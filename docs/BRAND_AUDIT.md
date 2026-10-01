@@ -53,6 +53,6 @@ corrections listed in §3. Live screenshots: light / dark / mobile, home + resul
 
 ## 5. Open items
 
-* Run `npm run e2e` (axe WCAG 2.2 AA sweep now possible) and record results in `docs/UX_LOG.md`.
+* ~~Run `npm run e2e` (axe WCAG 2.2 AA sweep now possible) and record results in `docs/UX_LOG.md`.~~ **Done** — 1/1 passed, axe 0 violations on light/dark × desktop/mobile; one real SC 2.5.8 defect (18 px footer links) fixed. See `docs/UX_LOG.md`.
 * Production domain → canonical/hreflang/OG absolute URLs (WP-10).
 * `/docs` footer link points at the backend's OpenAPI page; needs a reverse-proxy rule in production (see `docs/INTEGRATIONS.md`).

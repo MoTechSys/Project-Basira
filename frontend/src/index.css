@@ -775,6 +775,14 @@ mark.d-source {
   display: block;
   color: var(--bs-text);
 }
+/* WCAG 2.2 SC 2.5.8: inline licence/source links keep a ≥24px hit area without widening the line */
+.source a {
+  display: inline-block;
+  min-block-size: 24px;
+  padding-inline: 2px;
+  line-height: 24px;
+  vertical-align: baseline;
+}
 .footer__bottom {
   margin-block-start: var(--bs-sp-8);
   padding-block-start: var(--bs-sp-4);

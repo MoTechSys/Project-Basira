@@ -11,7 +11,8 @@ test("rtl shell, real check against the backend, axe clean", async ({ page }) =>
   await page.locator("#text").fill(TYPO);
   await page.getByRole("button", { name: "افحص" }).click();
   const badges = page.getByRole("status");
-  await expect(badges).toHaveCount(2);
+  // real providers (LLM extraction + OCR fallback) can take >5 s; the backend caps at PROVIDER_TIMEOUT
+  await expect(badges).toHaveCount(2, { timeout: 45_000 });
   await expect(badges.nth(0)).toContainText("يحتاج مراجعة");
   await expect(badges.nth(1)).toContainText("وُجد");
   // the user's typo is highlighted, and the source pane is byte-exact Uthmani text (no transform)
