@@ -28,6 +28,9 @@ original sandbox; `docs/internal/` is its complete substitute. Never publish `do
 ## 0.5 Team & models (D-008/D-009)
 **New agent? Read `docs/agent/README.md` then `docs/AGENT_PLAYBOOK.md`.** Risk register: `docs/RISKS.md`. Multi-model team charter: `docs/TEAM.md`. Experiments log: `docs/experiments/`. Sub-agent runner: `scripts/agents/orchestrator.py --selftest`. Evidence-based model selection: `docs/model-analysis/` (README = verdict; 01–06 = axes, weaknesses, roster). Live proxy capacity: `docs/CAPABILITIES.md`.
 
+## 0.7 Competition (read before building anything user-facing)
+**`docs/COMPETITION.md`** = public-safe master analysis (dates, deliverables, judging weights 25/20/15/15/10/10/5, rubric→features, idea-deck commitments, conflicts C1–C5, win plan). Official files + private digest: `docs/internal/competition/` (never publish). **Open: D-012 (C1 baseline transparency) — ask the owner once per session until answered.**
+
 ## 1. Done (verified, committed)
 | Layer | File(s) | Status | Evidence |
 |---|---|---|---|
@@ -46,6 +49,7 @@ original sandbox; `docs/internal/` is its complete substitute. Never publish `do
 | **State machine** | `backend/app/state.py` | ✅ | 9 invariants I1–I9, 14 tests incl. property test; thresholds boundary ±0.002 |
 | **Post-validator** | `backend/app/verify.py` | ✅ | V1–V5, 7 tests (tampered text, wrong ref, grade on wrong record, forbidden label) |
 | Bootstrap / smoke | `scripts/bootstrap.sh`, `scripts/smoke.py`, `Makefile` | ✅ | fresh-clone rehearsal passed; found+fixed missing `numpy` dep |
+| Competition study | `docs/COMPETITION.md`, `docs/internal/competition/` | ✅ | 4 official files archived + analysed; E-014 |
 | Config / schemas | `backend/app/config.py`, `schemas.py` | ✅ | defaults: LLM_PROVIDER=mock, HADEETHENC_MODE=link, OHD_MODE=display, RETRIEVAL_VECTORS=off |
 
 Quality gates at last commit: `ruff` ✅ · `mypy --strict` ✅ · `pytest` 38/38 ✅.
