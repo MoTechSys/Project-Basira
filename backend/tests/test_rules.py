@@ -34,7 +34,10 @@ def spans_of(text: str) -> list[tuple[str, str, bool]]:
             [(f"{H} وإنما لكل امرئ ما نوى", "hadith_matn", False)],
         ),
         (f"اليوم جميل. {H} رواه البخاري. انشرها", [(H, "hadith_matn", False)]),
-        (f"قال رسول الله ﷺ: «{H}» رواه البخاري", [(H, "hadith_matn", True)]),  # bracket wins; kind from context (E-029)
+        (
+            f"قال رسول الله ﷺ: «{H}» رواه البخاري",
+            [(H, "hadith_matn", True)],
+        ),  # bracket wins; kind from context (E-029)
         (f'قال تعالى: "{Q}"', [(Q, "quran", True)]),  # plain quotes + introducer → quran (E-029)
         (f'"{Q}" [البقرة: 153]', [(Q, "quran", True)]),  # plain quotes + claimed surah:ayah → quran (E-029)
         (f'"{H}"', [(H, "unknown", True)]),  # no context → unknown
@@ -112,7 +115,15 @@ def test_bare_qala_is_not_an_introducer_without_saws() -> None:
 
 @pytest.mark.parametrize(
     "inner",
-    ["رواه مسلم", "رواه البخاري ومسلم", "متفق عليه", "سورة البقرة, آية 257", "البقرة: 255", "عليه الصلاة والسلام", "2:255"],
+    [
+        "رواه مسلم",
+        "رواه البخاري ومسلم",
+        "متفق عليه",
+        "سورة البقرة, آية 257",
+        "البقرة: 255",
+        "عليه الصلاة والسلام",
+        "2:255",
+    ],
 )
 def test_bracketed_attribution_is_not_a_quote(inner: str) -> None:
     """E-030: a bracketed reference/attribution is never checked as a quotation; the quote next to it is."""

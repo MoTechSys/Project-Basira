@@ -2,14 +2,19 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
+const BACKEND = "http://127.0.0.1:8000";
+const BACKEND_PROXY = { "/v1": BACKEND, "/health": BACKEND, "/docs": BACKEND, "/openapi.json": BACKEND };
+
 export default defineConfig({
   plugins: [react()],
   server: {
     host: true,
     port: 5173,
     allowedHosts: true, // sandbox preview hosts (dev only; prod is a static build)
-    proxy: { "/v1": "http://127.0.0.1:8000", "/health": "http://127.0.0.1:8000", "/docs": "http://127.0.0.1:8000", "/openapi.json": "http://127.0.0.1:8000" },
+    proxy: BACKEND_PROXY,
   },
+  // `vite preview` serves the production bundle with the same proxy → Lighthouse measures real output
+  preview: { host: true, port: 4173, allowedHosts: true, proxy: BACKEND_PROXY },
   build: { sourcemap: false, target: "es2022" },
   test: {
     environment: "jsdom",

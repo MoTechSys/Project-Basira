@@ -63,3 +63,4 @@ frontend/test-results/
 frontend/playwright-report/
 frontend/e2e/*.png
 docs/manual-test/images/05_too_big.png
+frontend/.lighthouse/

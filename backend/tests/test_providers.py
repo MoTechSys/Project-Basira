@@ -9,7 +9,7 @@ import pytest
 from app.normalize import loose_tokens
 from app.providers import MockLLM, MockVision, ProviderError, make_llm, make_vision, relocate
 from app.providers.base import ProposedQuote
-from app.providers.openai_compat import _parse_quotes
+from app.providers.openai_compat import OpenAICompatLLM, _parse_quotes
 
 TEXT = "قال تعالى: ﴿إن الله مع الصابرين﴾ ثم قال: إن الله مع الصابرين."
 
@@ -77,3 +77,16 @@ def test_parse_quotes_schema_hardening() -> None:
         _parse_quotes("not json")
     with pytest.raises(ProviderError):
         _parse_quotes('{"nope":[]}')
+
+
+def test_reasoning_effort_passthrough() -> None:
+    """E-035: the value is forwarded verbatim only when set; absent → key absent (older models reject unknown fields)."""
+    plain = OpenAICompatLLM(base_url="http://x", api_key="k", model="m")
+    assert "reasoning_effort" not in plain.request_body("t")
+    fast = OpenAICompatLLM(base_url="http://x", api_key="k", model="m", reasoning_effort="none")
+    body = fast.request_body("t")
+    assert body["reasoning_effort"] == "none"
+    assert body["response_format"] == {"type": "json_object"}
+    assert body["messages"][1] == {"role": "user", "content": "t"}
+    blank = OpenAICompatLLM(base_url="http://x", api_key="k", model="m", reasoning_effort="  ")
+    assert "reasoning_effort" not in blank.request_body("t")

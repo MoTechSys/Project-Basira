@@ -267,7 +267,11 @@ _HONORIFICS: tuple[tuple[str, ...], ...] = (  # loose-token sequences that may f
 _GENERIC_VERBS = frozenset({"قال", "قوله", "لقوله", "يقول"})
 _INTRO_LOOSE: tuple[tuple[str, ...], ...] = tuple(
     sorted(
-        {t for t in (tuple(loose_tokens(i)) for i in _INTRODUCERS) if not (len(t) == 1 and t[0] in _GENERIC_VERBS)},
+        {
+            t
+            for t in (tuple(loose_tokens(i)) for i in _INTRODUCERS)
+            if not (len(t) == 1 and t[0] in _GENERIC_VERBS)
+        },
         key=len,
         reverse=True,
     )
@@ -275,7 +279,9 @@ _INTRO_LOOSE: tuple[tuple[str, ...], ...] = tuple(
 _SAWS = "\ufdfa"  # ﷺ
 
 
-def _intro_positions(text: str, toks: list[Token], loose: list[str]) -> list[tuple[int, int, tuple[str, ...]]]:
+def _intro_positions(
+    text: str, toks: list[Token], loose: list[str]
+) -> list[tuple[int, int, tuple[str, ...]]]:
     """Yield (first_token, token_after_introducer_and_honorifics, introducer) for every introducer
     occurrence, longest introducer first, overlapping shorter matches skipped («قال الله تعالى» must
     not also fire as «قال الله»). A bare generic verb («قال», «قوله») counts only when the ﷺ ligature —

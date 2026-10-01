@@ -68,9 +68,7 @@ def find_exact(store: Store, loose: list[str], strict: list[str]) -> list[ExactH
     for g in cand.tolist():
         # E-024: each token passes the strict gate if it equals the record's spelling in EITHER
         # Quran rasm at that position (GS2 == GS outside the Quran, so hadith is unaffected).
-        strict_ok = (
-            all_known and bool(((store.GS[g : g + n] == sids) | (store.GS2[g : g + n] == sids)).all())
-        )
+        strict_ok = all_known and bool(((store.GS[g : g + n] == sids) | (store.GS2[g : g + n] == sids)).all())
         rec = store.record_of_pos(g)
         if rec.corpus == "tanzil" and rec.g2_start <= g < rec.g2_start + rec.g2_len:
             if g - rec.g2_start < rec.offset:
@@ -135,7 +133,12 @@ def mixed_rasm_hit(store: Store, loose: list[str], strict: list[str], gpos: int)
     loose token in one of the two rasms; the strict gate is then applied the same way. Quran only
     (``G2 == G`` elsewhere, so hadith windows can only pass if they were exact already)."""
     n = len(loose)
-    if n == 0 or gpos < 0 or gpos + n > len(store.G) or int(store.g_doc[gpos]) != int(store.g_doc[gpos + n - 1]):
+    if (
+        n == 0
+        or gpos < 0
+        or gpos + n > len(store.G)
+        or int(store.g_doc[gpos]) != int(store.g_doc[gpos + n - 1])
+    ):
         return None
     rec = store.record_of_pos(gpos)
     ids = np.asarray([store.token_id(t) for t in loose], dtype=np.int64)
@@ -152,4 +155,8 @@ def mixed_rasm_hit(store: Store, loose: list[str], strict: list[str], gpos: int)
     ts = gpos - (rec.g2_start if variant2 else rec.g_start)
     if ts < rec.offset:
         return None  # window starts inside the display-only basmala
-    return ExactHit(rec, -1, -1, strict_ok, gpos, 1) if variant2 else ExactHit(rec, ts, ts + n, strict_ok, gpos, 0)
+    return (
+        ExactHit(rec, -1, -1, strict_ok, gpos, 1)
+        if variant2
+        else ExactHit(rec, ts, ts + n, strict_ok, gpos, 0)
+    )

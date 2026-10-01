@@ -43,7 +43,23 @@ OCR_SYSTEM = (
 
 
 class OpenAICompatLLM(LLMClient):
-    def __init__(self, *, base_url: str, api_key: str, model: str, timeout_s: float = 20.0) -> None:
+    """``reasoning_effort`` matters for latency, not quality, in this task: span location is
+    copy-work, and reasoning models spend 5–15 s "thinking" before emitting ~50 tokens of JSON
+    (measured 2026-10-01 on the proxy: gpt-5.4 default 8.7–14.9 s, ``low`` 4.5–6.9 s,
+    ``none`` 2.0–2.8 s with identical spans). The value is passed through verbatim only when
+    set, because the allowed vocabulary differs per model (gpt-5.4: none/low/…; gpt-5-mini:
+    minimal/low/…). An unsupported value → HTTP 400 → ``ProviderError`` → rules-only, visibly.
+    """
+
+    def __init__(
+        self,
+        *,
+        base_url: str,
+        api_key: str,
+        model: str,
+        timeout_s: float = 20.0,
+        reasoning_effort: str | None = None,
+    ) -> None:
         if not api_key:
             raise ProviderError("LLM_API_KEY missing")
         self.name = f"openai-compatible:{model}"
@@ -51,9 +67,9 @@ class OpenAICompatLLM(LLMClient):
         self._headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
         self._model = model
         self._timeout = timeout_s
+        self._reasoning_effort = (reasoning_effort or "").strip() or None
 
-    async def extract(self, text: str) -> ExtractionResult:
-        t0 = time.perf_counter()
+    def request_body(self, text: str) -> dict[str, Any]:
         body: dict[str, Any] = {
             "model": self._model,
             "temperature": 0,
@@ -63,6 +79,13 @@ class OpenAICompatLLM(LLMClient):
                 {"role": "user", "content": text},
             ],
         }
+        if self._reasoning_effort is not None:
+            body["reasoning_effort"] = self._reasoning_effort
+        return body
+
+    async def extract(self, text: str) -> ExtractionResult:
+        t0 = time.perf_counter()
+        body = self.request_body(text)
         content = await _post(self._url, self._headers, body, self._timeout)
         quotes = _parse_quotes(content)
         return ExtractionResult(self.name, quotes, False, int((time.perf_counter() - t0) * 1000))

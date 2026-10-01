@@ -15,8 +15,17 @@ export function LogoMark({ size = 40, variant = 'tile', title = 'بصيرة — 
   const star = variant === 'mono' ? 'currentColor' : '#2EF2C2';
   const check = variant === 'mono' ? '#fff' : '#12183F';
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width={size} height={size} role="img" aria-label={title} {...rest}>
-      <title>{title}</title>
+    // Basira correction (BRAND_AUDIT §2.9): an empty `title` makes the mark decorative — no <title>, no
+    // role="img", aria-hidden — so a parent link's visible wordmark stays its only accessible name.
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 64 64"
+      width={size}
+      height={size}
+      {...(title ? { role: 'img', 'aria-label': title } : { 'aria-hidden': true, focusable: false })}
+      {...rest}
+    >
+      {title ? <title>{title}</title> : null}
       {variant === 'tile' && (
         <>
           <defs>

@@ -1,0 +1,6 @@
+# Basira - public, stateless tool. User-submitted text is never stored, so there is nothing of it to index.
+User-agent: *
+Allow: /
+Disallow: /v1/
+Disallow: /docs
+Disallow: /openapi.json

@@ -6,6 +6,7 @@ Env (all optional, see ``.env.example``)::
     LLM_BASE_URL     = https://api.openai.com/v1   (any OpenAI-compatible endpoint)
     LLM_API_KEY      = …                            (absent → factory falls back to mock, logged)
     LLM_MODEL        = gpt-4o-mini
+    LLM_REASONING_EFFORT = (unset) | none | minimal | low | …   (passed through verbatim; see openai_compat)
     VISION_PROVIDER  = mock | openai-compatible
     VISION_BASE_URL / VISION_API_KEY / VISION_MODEL  (default to the LLM_* values)
 """
@@ -58,6 +59,7 @@ def make_llm(provider: str | None = None) -> LLMClient:
             base_url=os.environ.get("LLM_BASE_URL", "https://api.openai.com/v1"),
             api_key=key,
             model=os.environ.get("LLM_MODEL", "gpt-4o-mini"),
+            reasoning_effort=os.environ.get("LLM_REASONING_EFFORT") or None,
         )
     log.warning("unknown LLM_PROVIDER=%r → using mock", name)
     return MockLLM()

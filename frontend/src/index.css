@@ -162,6 +162,37 @@ textarea {
   display: flex;
   align-items: center;
   gap: var(--bs-sp-2);
+  flex-shrink: 0;
+}
+/* ≤ 400px: the row (logo 40 + wordmark + health + theme + language) does not fit; the health pill
+   becomes a dot (text stays for screen readers) and the language button becomes icon-only. */
+@media (max-width: 400px) {
+  .topbar__inner {
+    gap: var(--bs-sp-2);
+  }
+  .health {
+    padding-inline: 10px;
+    gap: 0;
+  }
+  .health__label {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .lang__label {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .btn--lang {
+    padding-inline: 10px;
+  }
 }
 .health {
   display: inline-flex;
@@ -262,6 +293,12 @@ textarea {
   margin: 0 0 var(--bs-sp-3);
   font-weight: 700;
   color: var(--bs-text);
+  text-wrap: balance; /* no orphan word on the second line; progressive enhancement */
+}
+.hero p,
+.card__title,
+.summary {
+  text-wrap: pretty;
 }
 .hero p {
   margin: 0 auto;

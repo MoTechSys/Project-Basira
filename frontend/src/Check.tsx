@@ -156,8 +156,9 @@ export default function Check({ lang, onLang }: { lang: Lang; onLang: (l: Lang) 
 
       <header className="topbar">
         <div className="container container--wide topbar__inner">
-          <a className="brand" href="/" aria-label={ui(lang, "app_name")}>
-            <LogoMark size={40} />
+          <a className="brand" href="/">
+            {/* decorative: the visible wordmark next to it is the link's accessible name */}
+            <LogoMark size={40} title="" />
             <span className="brand__name">
               <strong>{ui(lang, "app_name")}</strong>
               <span lang="en">Basira</span>
@@ -165,14 +166,16 @@ export default function Check({ lang, onLang }: { lang: Lang; onLang: (l: Lang) 
           </a>
           <div className="topbar__actions">
             <span className="health" data-state={healthState} aria-live="polite">
-              {ui(lang, healthState === "ok" ? "status_ok" : healthState === "loading" ? "status_loading" : "status_down")}
+              <span className="health__label">
+                {ui(lang, healthState === "ok" ? "status_ok" : healthState === "loading" ? "status_loading" : "status_down")}
+              </span>
             </span>
             <button type="button" className="btn btn--ghost btn--icon" onClick={toggleTheme} aria-label={ui(lang, "theme_toggle")} aria-pressed={theme === "dark"}>
               <Icon name="theme" />
             </button>
-            <button type="button" className="btn btn--ghost btn--sm" lang={lang === "ar" ? "en" : "ar"} onClick={() => onLang(lang === "ar" ? "en" : "ar")}>
+            <button type="button" className="btn btn--ghost btn--sm btn--lang" lang={lang === "ar" ? "en" : "ar"} onClick={() => onLang(lang === "ar" ? "en" : "ar")}>
               <Icon name="language" size={18} />
-              {ui(lang, "lang_switch")}
+              <span className="lang__label">{ui(lang, "lang_switch")}</span>
             </button>
           </div>
         </div>
