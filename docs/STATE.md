@@ -136,3 +136,8 @@ Quality gates at last commit: `ruff` ✅ · `mypy --strict` ✅ (24 files) · `p
 ## 4. Open owner questions (defaults applied; see DECISIONS Q1–Q4)
 Q1 licence (Apache-2.0 default) · Q2 HadeethEnc mode (`link`) · Q3 Guard API stays P2 · Q4 OHD posture (`display` + kill-switch).
 Plain-language explanations were given to the owner on 2026-09-30 (see GLOSSARY.md); awaiting yes/no.
+
+### 2026-10-01 (آخر الجلسة) — أرشفة نواتج الوكلاء الخارجيين
+- أُنشئ `handoff_agents/` على `main` (456 ملف، 30 MB): حزمة التدقيق الداخلي `Basira-Internal-Audit-20261001@33f823f` (B01–B13، محرك تشكيل تجريبي) + حزمة `Project-Basira2@63dfda6` (E-037 حركات ضد مصحف مشكول، E-038 اقتباس مركّب — **غير مدموجين**) + برومتا المالك حرفياً + فهرس لكل حزمة + حالة كل عيب على `main` + القائمة المجمَّعة لما لم يُنجَز + 6 قرارات معلّقة عند المالك. الحزمة الثالثة لم تصل بعد (مجلد محجوز).
+- أُضيف `START_HERE_NEXT_AGENT.md` في الجذر كنقطة دخول لجلسة جديدة.
+- **لم يُدمج شيء من الحزمتين في الكود في هذه الخطوة.**
