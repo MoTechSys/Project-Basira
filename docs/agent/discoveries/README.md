@@ -31,6 +31,9 @@
 | `make lint` لا يغطي `corpus/` و`scripts/` | مهمة STATE #11 |
 | `pip install -e backend[dev]` يُنشئ `backend/basira_backend.egg-info/` | أُضيف لـ `.gitignore` |
 | الـ sandbox الجديد بلا venv/data | `bootstrap.sh` يستعيد كل شيء في ~2 دقيقة |
+| **`/mnt/aidrive` is NOT a mount here** — empty root-owned local dir (`mount | grep aidrive` = nothing); `cp` there dies with the sandbox. Real AI Drive = `gsk aidrive upload --local_file` (verified: 2.4 MB archive listed in My Drive) | SK-12 run 2026-10-01 |
+| Genspark guide says Python services «تُدار بـ Supervisor» — **not installed here**; use `run_in_background`/pm2 or `pip install supervisor` | research/09 §4 |
+| Official guide confirms: sandbox idle-stop after 1h, deletion within hours → explains why today started from zero | research/09 §1 |
 | بصمة الفهرس `3175b625…8488` | متطابقة على 3 آلات — البناء حتمي |
 
 ## D4. أخطاء وقعنا فيها (حتى لا تتكرر)

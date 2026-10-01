@@ -62,12 +62,15 @@ Quality gates at last commit: `ruff` ✅ · `mypy --strict` ✅ · `pytest` 38/3
 12. Test that `docs/agent/context/RED_LINES.md` code block == `orchestrator.RED_LINES` (drift guard).
 13. `orchestrator.py`: treat HTTP 524 like 429 (retry w/ backoff); default long reviews to `high` not `xhigh` (R-O2).
 14. Review owner's template from yesterday's agent (SK-09) when provided; merge best parts into TEAM.md.
+15. Package agent memory as an installable Genspark skill via official `skill-creator` (SK-13) so a new account bootstraps with one command.
 11. Widen `make lint` to cover `corpus/*.py` and `scripts/*.py` (currently backend-only). `build_index.py` has one `PLC0415`
     (lazy `import openpyxl` — intentional, keep stdlib-only import path for fetch; add a targeted `# noqa: PLC0415` with reason).
 
 ## 3. Known facts discovered (not in the package)
 - **2026-10-01:** tanzil.net TLS certificate expired (Let's Encrypt, notAfter 2026-09-30 11:47 UTC). Files served are byte-identical
   to the pinned sha256 (both rasms re-downloaded and re-hashed). Mitigated in `fetch.py` (E-013). Re-check with `--strict-tls` later.
+- **2026-10-01:** `/mnt/aidrive` is **not a mount** in this sandbox (empty root dir). Real AI Drive only via `gsk aidrive upload --local_file` → `scripts/backup_to_aidrive.sh` (SK-12). Two backups now in My Drive `/basira_backups/`.
+- **2026-10-01:** Owner supplied the official *Genspark Code* guide: sandbox idle-stop 1h, deletion within hours → push ≤30 min; Supervisor **not** installed despite guide. Audited line-by-line in `docs/agent/research/09`.
 - **2026-10-01:** `corpus/*.py` and `scripts/*.py` are **not** covered by `make lint` (which only runs inside `backend/`). They were
   linted manually this session with the backend ruff/mypy config and are clean. → added to §2 as a small gate-widening task.
 

@@ -17,6 +17,9 @@
 | E10 | 2026-10-01 | هل المنسّق يصل لكل الأدوار التسعة متزامنة؟ | `python3 scripts/agents/orchestrator.py --selftest` | `9/9 roles OK` · أول تشغيل: reviewer أعاد جدولًا فارغًا بدل `ROLE_OK` (التزم ببرومبت الدور) | البنية تعمل؛ **برومبت الدور يتغلب على brief بسيط** — متوقع ومرغوب | selftest يقيس الوصول لا الصيغة |
 | E11 | 2026-10-01 | هل النموذج يعرف هويته؟ هل الـ proxy يعيد الاسم المطلوب؟ | curl ×2 | `requested=claude-fable-5-1 → response.model=claude-fable-5-1`؛ النموذج نفسه: «I don't have reliable access to my exact model ID»؛ وفي E10 أجاب `evalgen` (Fable) بـ `claude-sonnet-4-5` | **لا تسأل النموذج عن هويته — إجابته غير موثوقة.** الـ proxy يعيد `model` = ما طلبت؛ هذا هو مصدر الحقيقة المتاح | `AGENT_PLAYBOOK.md §7` خطأ #2 |
 
+| E12 | 2026-10-01 | هل `/mnt/aidrive` تخزين دائم كما تقول وثائق البيئة؟ | `cp` → `Permission denied`؛ `mount \| grep aidrive` = لا شيء؛ `ls -ld` = `drwxr-xr-x root root` فارغ؛ `sudo cp` نجح **محليًا فقط** | **ليس mount** — مجلد محلي وهمي؛ النسخ إليه يضيع | `ENVIRONMENT_ANALYSIS §3.2` **مُصحَّح**؛ SK-12 يستخدم `gsk aidrive` |
+| E13 | 2026-10-01 | هل `gsk aidrive upload` يصل إلى My Drive الحقيقي؟ | `--file_url` → خطأ واضح يشرح البديل؛ `--local_file` → `item.id=3f469c5c…`؛ `gsk aidrive ls` يُظهر 2.4 MB | **نعم** — الطريقة الصحيحة الوحيدة | `scripts/backup_to_aidrive.sh` |
+
 ## قواعد مشتقة من التجارب (ملزِمة)
 1. **اقرأ نص الخطأ** قبل تفسيره (E3→E4).
 2. **كل وكيل فرعي يمر عبر `Semaphore(18)`** في عملية واحدة (E5).
@@ -24,3 +27,4 @@
 4. **لا نموذج «لا يغلط»** — الثقة مع التحقق (E7).
 5. **هوية النموذج تُؤخذ من `response.model`** لا من إجابته (E11).
 6. **كل بوابة حتمية** (ruff/mypy/pytest/smoke/sha256) تتفوق على أي رأي نموذج (E8, E9).
+7. **لا تثق بوثيقة بيئة سابقة بلا إعادة قياس** — `/mnt/aidrive` كان موثّقًا كـ«دائم» وكان وهمًا (E12).

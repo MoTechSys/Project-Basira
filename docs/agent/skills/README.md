@@ -1,5 +1,7 @@
 # skills/ — مهارات الوكيل (إجراءات مُجرَّبة قابلة لإعادة الاستخدام)
 
+> **جرد مهارات المنصة** (2026-10-01): مفعّلة 2 (`gsk-hosted-deploy`, `gsk-hosted-identity`) · معلنة +2 (`cf-byok-deploy`, `designer-handoff`) · رسمية 1 (**`skill-creator`** ← مهمة للذاكرة المحمولة) · مجتمع 222 (إبداعية، لا هندسية) · مثبّتة/خاصة 0. التفاصيل: `../research/09-genspark-code-environment.md §8`.
+
 > صيغة كل مهارة: **متى** · **الخطوات** · **معيار النجاح** · **الدليل أنها تعمل**. المهارات هنا مكمّلة لـ Genspark skills الأربع (`gsk-hosted-deploy`, `gsk-hosted-identity`, `cf-byok-deploy`, `designer-handoff`) التي تُفعَّل بـ `activate_ai_developer_skill`.
 
 | ID | المهارة | متى | الخطوات | النجاح | الدليل |
@@ -14,4 +16,6 @@
 | SK-08 | **إصلاح فشل تحميل خارجي بأمان** | شهادة/خادم خارجي معطّل | `openssl s_client -dates`؛ `curl -k` + `sha256sum` مقابل المثبّت؛ fallback **فقط** للملفات المثبّتة + تحذير + `--strict-tls` | sha مطابق + قرار E-xxx موثّق | E8 / E-013 |
 | SK-09 | **مراجعة قالب/برومبت خارجي** | المالك يرسل قالبًا | اقرأ سطرًا سطرًا؛ جدول: قوة/ثغرة/تعارض مع D-xxx أو الخطوط الحمراء؛ ادمج الأفضل في `TEAM.md` موثقًا المصدر | جدول مراجعة + diff على TEAM.md | (معلّق — قالب الأمس) |
 | SK-10 | **نشر مُستضاف عبر Genspark** | عند طلب المالك النشر | فعّل `gsk-hosted-deploy`؛ preflight bindings (D1×1, R2×1 فقط)؛ `gsk hosted deploy` → `pending_approval` → موافقة المالك → `action_wait` → `code=ok`؛ اقرأ `first_error_line` عند الفشل | `deployment_url` يعمل | وثائق المهارة (S-G skill) |
+| SK-12 | **نسخة احتياطية مضغوطة إلى AI Drive** | نهاية كل جلسة (الدليل الرسمي: الصندوق يُحذف خلال ساعات) | `bash scripts/backup_to_aidrive.sh` (tar → `gsk aidrive upload --local_file`) | `BACKUP OK` + الملف ظاهر في `gsk aidrive ls /basira_backups` | **مُنفَّذ 2026-10-01** (2.4 MB). ⚠️ `/mnt/aidrive` مجلد محلي فارغ **ليس mount** — النسخ إليه يضيع مع الصندوق (D3) |
+| SK-13 | **تغليف الذاكرة كمهارة Genspark** | عند الانتقال لحساب جديد | فعّل `skill-creator` الرسمية (`gsk skills info system-pipeline/skill-creator`)؛ غلّف `AGENT_PLAYBOOK §1–4` + `docs/agent/context/*` كـ `SKILL.md`؛ انشر؛ `gsk skills install` في الحساب الجديد | وكيل جديد «يعرف من هو» بأمر واحد | research/09 §8 (مهمة STATE #15) |
 | SK-11 | **بوابة التسريب قبل النشر العام** | يوم 4 أكتوبر | قائمة عبارات محظورة من `docs/internal/` (لا تُنشر)؛ `grep -rF` على الشجرة العامة؛ orphan branch؛ لا `docs/internal/` ولا `.intake/` | 0 تطابقات | (مهمة قادمة) |

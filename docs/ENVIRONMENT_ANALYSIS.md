@@ -68,7 +68,7 @@ This document is the authoritative baseline of the development environment, tool
 |---|---|---|
 | `/home/user/webapp` | **Sole permitted write location for project code** | Persisted only via `git push` |
 | `/home/user/node_modules` | Pre-seeded global-ish Node modules (`docx`, `jszip`, `nanoid`, `xml-js`, …) via `NODE_PATH` | Sandbox lifetime |
-| `/mnt/aidrive` | User's Genspark AI Drive (remote, slow) | Persistent — use only for single-archive backups |
+| `/mnt/aidrive` | ⚠️ **Corrected 2026-10-01:** in this sandbox it is an *empty root-owned local directory, not a mount* — files copied here are lost with the sandbox. The real AI Drive is reached via `gsk aidrive upload --local_file` (see `scripts/backup_to_aidrive.sh`) | Persistent **only via gsk** |
 | `$HOME/sb-git-refs/` | Sanctioned clone location for SB-Git reference repos | Sandbox lifetime |
 | `/tmp` | Scratch space | Volatile |
 

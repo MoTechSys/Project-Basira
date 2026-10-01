@@ -20,3 +20,4 @@
 | F14 | **Religious-text generation** | الخط الأحمر 1 | أي نص عربي ديني في مخرجات وكيل | `verify.py` byte-equality؛ lexicon scan؛ safety auditor | `backend/app/verify.py` |
 | F15 | **Confidential leak on Oct-4 public repo** | CLAUDE.md §15 | عبارة من الملحق في الشجرة العامة | grep gate قبل الرفع؛ orphan branch؛ `docs/internal/` لا يُنسخ | مهمة `scripts/leak_gate.sh` |
 | F16 | **AI amplifies what's there** (DORA 2025) | S-D1 | جودة متذبذبة رغم السرعة | البوابات الحتمية ثابتة؛ المراجعة المتقاطعة؛ لا دمج بلا اختبار | كل WP |
+| F17 | **Sandbox idle-stop (1h) / deletion (hours)** | Genspark Code guide (research/09 §1) | unpushed work in `git status`; sandbox gone next session | push every ≤30 min during long work; SK-12 archive to AI Drive at session end; `bootstrap.sh` restores in ~2 min (E9) | `SESSION_PROTOCOL.md`, SK-12 |

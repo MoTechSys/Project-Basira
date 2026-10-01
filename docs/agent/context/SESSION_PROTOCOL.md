@@ -30,8 +30,12 @@ WP brief (docs/work-packages/WP-NN.md: goal · files · acceptance · constraint
 - الوكلاء الفرعيون يعيدون **ملخصًا ≤2k رمز** + مسار الملف؛ التفاصيل في `.scratch/agents/`.
 - إن شعرت بـ context rot (تكرار، نسيان قرار سابق): أعد قراءة `STATE.md` و`DECISIONS.md` بدل الاعتماد على الذاكرة.
 
+## أثناء العمل الطويل
+- **ادفع إلى GitHub كل ≤30 دقيقة** — الدليل الرسمي: الصندوق يتوقف بعد ساعة خمول ويُحذف خلال ساعات (F17).
+
 ## نهاية الجلسة (إلزامي)
 1. `git status --short` فارغ. كل شيء في `main` ومدفوع.
+1b. **SK-12:** `bash scripts/backup_to_aidrive.sh` → أرشيف واحد في AI Drive الحقيقي (`gsk aidrive`). **ليس** `cp` إلى `/mnt/aidrive` (مجلد محلي وهمي).
 2. `docs/STATE.md`: التاريخ، ما تم، الترتيب التالي، الحقائق المكتشفة.
 3. `docs/agent/discoveries/` إن وُجد اكتشاف جديد؛ `docs/experiments/` إن أُجريت تجربة.
 4. سطر واحد للمالك: ما أُنجز، ما التالي، ما يحتاج قراره.

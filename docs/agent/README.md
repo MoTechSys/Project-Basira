@@ -30,6 +30,7 @@
 | S-A5 | Anthropic — *Writing tools for AI agents with AI agents* (2025) | أدوات قليلة عميقة، namespacing، concise/detailed، أخطاء قابلة للتنفيذ، 25k token cap |
 | S-O1 | OpenAI — *A practical guide to building agents* (2025, PDF 34p) | model/tools/instructions، single-agent first، manager vs decentralized، layered guardrails، human-in-the-loop triggers |
 | S-G1 | Genspark Help Center — *Genspark Code* | L4 autonomous coding agent، Projects tab، 5 فئات مشاريع |
+| S-G2 | **Genspark Code — دليل إصدار التطوير العام** (من المالك 2026-10-01) | **إيقاف بعد 1h خمول، حذف خلال ساعات**؛ GitHub/نسخة احتياطية؛ PM2/Supervisor؛ URLs عامة — **مُدقَّق سطرًا سطرًا** في `research/09` |
 | S-K1 | Karpathy — *Software 3.0* (Jun 2025, via latent.space / YC) | autonomy slider، keep human in verify loop، «Iron-Man suit» |
 | S-R1 | Shinn et al. — *Reflexion* (NeurIPS 2023) · Yang et al. — *SWE-agent* (NeurIPS 2024) | verbal self-reflection in episodic memory؛ agent-computer interface design |
 | S-D1 | Google Cloud — *2025 DORA Report* | «AI amplifies what's already there»؛ 30% لا يثقون بكود AI؛ code review time +91% |
