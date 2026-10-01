@@ -13,3 +13,4 @@ eval:      ; $(PY) eval/run_eval.py --repeats 3 --fail-on-unsafe
 eval-full: ; $(PY) eval/run_eval.py --index corpus/index --repeats 3 --false-alarm 500 --fail-on-unsafe
 islamiceval: ; $(PY) eval/islamiceval/run_1b.py
 islamiceval-1a: ; $(PY) eval/islamiceval/run_1a.py
+scholar:   ; $(PY) eval/scholar_probe.py $${BASIRA_URL:-http://localhost:8000}

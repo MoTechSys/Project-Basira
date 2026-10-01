@@ -17,6 +17,8 @@ Nothing from the user text is logged. Timings are per stage in ms.
 from __future__ import annotations
 
 import asyncio
+import hashlib
+import json
 import logging
 import time
 import uuid
@@ -26,6 +28,7 @@ from typing import Any
 from app.config import Settings
 from app.extract.rules import (
     RuleSpan,
+    asserted_kind,
     detect_chain_message,
     detect_pii,
     detect_refusal,
@@ -34,6 +37,7 @@ from app.extract.rules import (
     language_of,
     merge_overlaps,
 )
+from app.extract.scan import scan_quran_unmarked
 from app.links import hadeethenc_url, hadith_search_links, ohd_url, quran_search_links, quran_url
 from app.match.diff import DiffOp, diff_kinds, word_diff
 from app.match.exact import ExactHit, dedupe_hits, find_exact, mixed_rasm_hit, records_covering
@@ -155,6 +159,7 @@ class Pipeline:
                     sp.claimed_source = find_claimed_source(text, sp.start, sp.end)
         except (ProviderError, TimeoutError):
             degraded = True
+        spans = self._quran_sweep(text, spans)
         spans = spans[: self.settings.max_quotes]
         timings.extract = _ms(t0)
 
@@ -168,17 +173,27 @@ class Pipeline:
         quotes: list[QuoteResult] = []
         t_retr = 0.0
         t_match = 0.0
+        seen_loose: dict[tuple[str, ...], int] = {}  # N-1: identical quote repeated in the same text
         for i, sp in enumerate(spans):
             q = self._prepare(text, sp)
             if q is None:
                 continue
+            key = tuple(t.loose for t in q.tokens)
+            if key in seen_loose:
+                prev = quotes[seen_loose[key]]
+                prev.repeated_spans.append(Span(start=sp.start, end=sp.end))
+                if "repeated_in_text" not in prev.notice_keys:
+                    prev.notice_keys.append("repeated_in_text")
+                continue
             tr0 = time.perf_counter()
-            evidence, carriers, t_retr_i = self._gather_evidence(q)
+            evidence, carriers, t_retr_i, rasm0_only = self._gather_evidence(q)
             t_retr += t_retr_i
-            facts = self._facts(q, req.source_modality)
+            facts = self._facts(q, req.source_modality, text, evidence)
             d = decide(facts, evidence, self.th)
+            self._quran_context_notices(d, q, carriers, rasm0_only)
             qr = self._render(i, q, d, carriers, req, extra_notices or [])
             t_match += (time.perf_counter() - tr0) - t_retr_i
+            seen_loose[key] = len(quotes)
             quotes.append(qr)
         timings.retrieve = int(t_retr * 1000)
         timings.match = int(t_match * 1000)
@@ -198,10 +213,39 @@ class Pipeline:
             self.settings.messages_dir,
             hadeethenc_link=self.settings.hadeethenc_mode == "link",
         )
+        resp.determinism_hash = self._determinism_hash(text, resp)
         resp.timings_ms.total = _ms(t_start)
         return resp
 
+    def _determinism_hash(self, text: str, resp: CheckResponse) -> str:
+        """E-032 — sha256 over (index records sha, normalized input, ordered verdicts). Stable across
+        restarts and across snapshot/build boots; changes iff the corpus build or the verdicts change."""
+        h = hashlib.sha256()
+        h.update(str(self.store.meta.get("records_sha256", "")).encode())
+        h.update(b"\x00")
+        h.update(" ".join(t.loose for t in tokenize(text)).encode("utf-8"))
+        for q in resp.quotes:
+            h.update(b"\x00")
+            h.update(f"{q.span.start}:{q.span.end}:{q.status}:{q.message_key}".encode())
+            for m in q.matches:
+                h.update(f"|{m.corpus}:{json.dumps(m.ref, sort_keys=True)}".encode())
+        return h.hexdigest()
+
     # ------------------------------------------------------------------ stages
+
+    def _quran_sweep(self, text: str, spans: list[RuleSpan]) -> list[RuleSpan]:
+        """1b. Deterministic whole-text Quran scan (E-030): catches ayat quoted with no introducer and
+        no brackets («اللهم ربنا آتنا في الدنيا حسنة …»). Pure index lookup; never a model."""
+        if not self.settings.quran_scan:
+            return spans
+        extra = scan_quran_unmarked(self.store, text, spans, min_tokens=self.settings.quran_scan_min_tokens)
+        if not extra:
+            return spans
+        spans = merge_overlaps(spans + extra)
+        for sp in spans:
+            if sp.claimed_source is None:
+                sp.claimed_source = find_claimed_source(text, sp.start, sp.end)
+        return spans
 
     def _prepare(self, text: str, sp: RuleSpan) -> _Quote | None:
         seg = text[sp.start : sp.end]
@@ -217,15 +261,23 @@ class Pipeline:
             return None
         return _Quote(sp, seg, toks, lang)
 
-    def _gather_evidence(self, q: _Quote) -> tuple[list[Evidence], dict[int, ExactHit | WindowHit], float]:
-        """Exact on the full index first; fuzzy only when there is no exact hit at all."""
+    def _gather_evidence(
+        self, q: _Quote
+    ) -> tuple[list[Evidence], dict[int, ExactHit | WindowHit], float, set[int]]:
+        """Exact on the full index first; fuzzy only when there is no exact hit at all.
+
+        The 4th item is the set of Quran record indices whose strict gate passed through the
+        Uthmani display rasm only (not through the simple rasm) — see ``_quran_context_notices``."""
         loose = [t.loose for t in q.tokens]
         strict = [t.strict for t in q.tokens]
         carriers: dict[int, ExactHit | WindowHit] = {}
         evidence: list[Evidence] = []
+        rasm0_only: set[int] = set()
         if q.language != "ar" or not loose:
-            return evidence, carriers, 0.0
-        hits = dedupe_hits(find_exact(self.store, loose, strict))
+            return evidence, carriers, 0.0, rasm0_only
+        raw_hits = find_exact(self.store, loose, strict)
+        rasm0_only = self._rasm0_only(raw_hits)
+        hits = dedupe_hits(raw_hits)
         if hits:
             for h in hits:
                 if self.settings.ohd_mode == "off" and h.rec.corpus == "ohd":
@@ -236,11 +288,26 @@ class Pipeline:
                 carriers.setdefault(h.rec.idx, h)
             if evidence:
                 self._order(evidence)
-                return evidence, carriers, 0.0
+                return evidence, carriers, 0.0, rasm0_only
         tr0 = time.perf_counter()
         self._fuzzy_evidence(loose, strict, evidence, carriers)
         self._order(evidence)
-        return evidence, carriers, time.perf_counter() - tr0
+        return evidence, carriers, time.perf_counter() - tr0, rasm0_only
+
+    def _rasm0_only(self, raw_hits: list[ExactHit]) -> set[int]:
+        """Quran records whose strict gate passed via the Uthmani display rasm but NOT via the simple rasm."""
+        s0: dict[int, bool] = {}
+        s1: dict[int, bool] = {}
+        for h in raw_hits:
+            if h.rec.corpus != "tanzil":
+                continue
+            bucket = s0 if h.variant == 0 else s1
+            bucket[h.rec.idx] = bucket.get(h.rec.idx, False) or h.strict_ok
+        return {
+            idx
+            for idx, ok0 in s0.items()
+            if ok0 and self.store.records[idx].g2_len > 0 and not s1.get(idx, False)
+        }
 
     def _fuzzy_evidence(
         self,
@@ -290,13 +357,24 @@ class Pipeline:
             )
         )
 
-    def _facts(self, q: _Quote, modality: str) -> QuoteFacts:
+    def _facts(
+        self, q: _Quote, modality: str, text: str = "", evidence: list[Evidence] | None = None
+    ) -> QuoteFacts:
         cs = q.span.claimed_source or {}
         parsed = cs.get("parsed", {}) if isinstance(cs, dict) else {}
         books = tuple(parsed.get("books", ())) if isinstance(parsed, dict) else ()
         qref = None
+        ayah_to = None
         if isinstance(parsed, dict) and "surah" in parsed and "ayah" in parsed:
             qref = (int(parsed["surah"]), int(parsed["ayah"]))
+            ayah_to = int(parsed["ayah_to"]) if parsed.get("ayah_to") else None
+        # I10 — first ayah of the best strict-exact Quran winner (evidence is already ordered)
+        mref = None
+        for e in evidence or ():
+            if e.corpus == "tanzil" and e.is_exact and e.strict_ok:
+                r = self.store.records[e.rec_idx]
+                mref = (r.surah, r.ayah)
+                break
         return QuoteFacts(
             n_tokens=len(q.tokens),
             language=q.language,
@@ -305,7 +383,54 @@ class Pipeline:
             claimed_books=books,
             claimed_quran_ref=qref,
             source_modality=modality,
+            asserted=asserted_kind(text, q.span) if text else "",
+            claimed_ayah_to=ayah_to,
+            matched_quran_ref=mref,
         )
+
+    def _quran_context_notices(
+        self, d: Decision, q: _Quote, carriers: dict[int, ExactHit | WindowHit], rasm0_only: set[int]
+    ) -> None:
+        """Descriptive Quran notices (never a judgment):
+
+        * ``partial_ayah_context`` (G-4): the quote is a strict sub-span of a longer ayah — the full
+          ayah is shown so the reader does not take a clipped fragment as the whole statement.
+        * ``qiraah_note`` (G-3): the only strict difference is the dagger-alif (U+0670) family, which is
+          how a canonical reading other than Ḥafṣ is usually written («مَلِكِ»/«مَٰلِكِ»).
+        * ``basmala_note`` (N-3): the quote is the basmala and matched both 1:1 and 27:30.
+        """
+        if d.corpus_scope != "quran" or not d.winners:
+            return
+        best = d.winners[0]
+        rec = self.store.records[best.rec_idx]
+        c = carriers.get(best.rec_idx)
+        n_q = len(q.tokens)
+        n_rec = rec.g_len - rec.offset
+        if d.status in ("found", "needs_review") and n_q < n_rec and n_q >= 2:
+            crosses = isinstance(c, ExactHit) and c.tok_start >= 0 and c.tok_end > rec.g_len
+            if not crosses and "partial_ayah_context" not in d.notice_keys:
+                d.notice_keys.append("partial_ayah_context")
+        if (
+            d.status == "found"
+            and best.rec_idx in rasm0_only
+            and isinstance(c, ExactHit)
+            and c.tok_start >= 0
+        ):
+            # The strict gate passed ONLY through the Uthmani display rasm with its vowel-letters
+            # (dagger alif) stripped — e.g. user «مَلِكِ» vs Ḥafṣ «مَٰلِكِ» (simple rasm «مالك»). If the user's
+            # own token carries no dagger alif where the Mushaf has one, their text is written the way a
+            # canonical reading other than Ḥafṣ is written → descriptive note, status unchanged.
+            src_spans = self.store.spans_of(rec)[c.tok_start : c.tok_end]
+            raw_src = [rec.display[a:b] for a, b in src_spans]
+            raw_usr = [q.text[t.start : t.end] for t in q.tokens]
+            if any("\u0670" in a and "\u0670" not in b for a, b in zip(raw_src, raw_usr, strict=False)):
+                d.notice_keys.append("qiraah_note")
+        if d.status == "found" and len(d.winners) == 2:
+            refs = {
+                (self.store.records[w.rec_idx].surah, self.store.records[w.rec_idx].ayah) for w in d.winners
+            }
+            if refs == {(1, 1), (27, 30)}:
+                d.notice_keys.append("basmala_note")
 
     # ------------------------------------------------------------------ rendering
 
@@ -319,6 +444,8 @@ class Pipeline:
         extra_notices: list[str],
     ) -> QuoteResult:
         notices = list(d.notice_keys) + list(extra_notices)
+        if q.span.extras.get("via") == "quran_scan" and d.status in ("found", "needs_review"):
+            notices.append("quran_scan_found")
         matches: list[Match] = []
         total = 0
         if d.show_candidates and d.winners:

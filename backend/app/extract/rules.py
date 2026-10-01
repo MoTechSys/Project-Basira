@@ -76,6 +76,31 @@ _TRAILERS = ("صدق الله العظيم", "صدق الله", "رواه", "أ�
 _SENTENCE_START = re.compile(r"[.!?؟\n؛:]")
 _SENTENCE_END = re.compile(r"[.!?؟\n؛]|(?=\s+(?:رواه|أخرجه|متفق|صدق الله|سورة|\[|\(|«|﴿))")
 
+# English introducers (G-6): captured so the quote is *reported* as ``needs_review_non_arabic`` with
+# referral links instead of silently ignored. Our corpora are Arabic-only; nothing is matched.
+_INTRO_EN = re.compile(
+    r"(?:the\s+)?(?:prophet|messenger(?:\s+of\s+allah)?)\s*(?:\(?(?:pbuh|saw|saws|ﷺ|peace\s+be\s+upon\s+him)\)?)?\s+said\s*[:,]?\s*"
+    r"|allah\s+(?:says|said)\s*(?:in\s+the\s+qur'?an)?\s*[:,]?\s*"
+    r"|(?:the\s+)?qur'?an\s+(?:says|states)\s*[:,]?\s*"
+    r"|hadith\s*[:,]\s*",
+    re.IGNORECASE,
+)
+_SENTENCE_END_EN = re.compile(
+    r"[.!?\n]|(?=\s*[\[(]\s*(?:quran|qur'an|sahih|bukhari|muslim|tirmidhi|\d+:\d+))", re.IGNORECASE
+)
+
+# I11 — attribution asserted by the wording around the quote (not by retrieval).
+_ASSERT_HADITH = re.compile(
+    r"رسول الله|النبي|صلى الله عليه|ﷺ|عليه الصلاة والسلام|في الحديث|رواه|أخرجه|متفق عليه|الصحيحين"
+    r"|prophet|messenger|hadith|bukhari|muslim\b",
+    re.IGNORECASE,
+)
+_ASSERT_QURAN = re.compile(
+    r"قال تعالى|قال الله|يقول تعالى|قوله تعالى|قال سبحانه|قال عز وجل|صدق الله|سورة|الآية|آية"
+    r"|allah\s+says|qur'?an",
+    re.IGNORECASE,
+)
+
 # --- claimed source dictionaries -------------------------------------------------------------
 
 BOOK_ALIASES: dict[str, tuple[str, ...]] = {
@@ -183,7 +208,9 @@ def extract_spans(text: str, *, min_tokens_marked: int = 2, min_tokens_intro: in
     _bracketed(text, spans, min_tokens_marked)
     _introduced(text, spans, min_tokens_intro)
     _trailed(text, spans, min_tokens_intro)
+    _introduced_en(text, spans)
     spans = merge_overlaps(spans)
+    spans = [sp for sp in spans if not _is_noise(text, sp)]
     for sp in spans:
         sp.claimed_source = find_claimed_source(text, sp.start, sp.end)
         if sp.kind == "unknown":
@@ -210,6 +237,71 @@ def _kind_from_context(text: str, sp: RuleSpan) -> str:
         if parsed.get("books"):
             return "hadith_matn"
     return "unknown"
+
+
+def _is_noise(text: str, sp: RuleSpan) -> bool:
+    """N-4 — drop pseudo-quotes that are only a label («في الحديث القدسي:») or that end in a colon
+    with < 3 tokens. Marked spans (explicit brackets) are never dropped."""
+    if sp.marked:
+        return False
+    seg = text[sp.start : sp.end].strip()
+    toks = loose_tokens(seg)
+    if seg.endswith((":", "：")) and len(toks) < 4:
+        return True
+    label_only = {"في", "الحديث", "القدسي", "الشريف", "النبوي", "الصحيح", "قال", "وقال", "ايضا"}
+    return bool(toks) and all(t in label_only for t in toks)
+
+
+def _introduced_en(text: str, spans: list[RuleSpan]) -> None:
+    for m in _INTRO_EN.finditer(text):
+        start = m.end()
+        if start >= len(text):
+            continue
+        if text[start] in {o for o, _ in _BRACKET_PAIRS}:
+            continue  # bracket rule already caught it (latin_words >= 3)
+        end_m = _SENTENCE_END_EN.search(text, start)
+        end = end_m.start() if end_m else len(text)
+        seg = text[start:end]
+        if len(re.findall(r"[A-Za-z]{2,}", seg)) >= 3 and _arabic_token_count(seg) == 0:
+            while end > start and text[end - 1].isspace():
+                end -= 1
+            if not any(sp.start < end and start < sp.end for sp in spans):
+                spans.append(
+                    RuleSpan(
+                        start,
+                        end,
+                        "hadith_matn"
+                        if "said" in m.group(0).lower() and "allah" not in m.group(0).lower()
+                        else "quran",
+                        False,
+                    )
+                )
+
+
+def asserted_kind(text: str, sp: RuleSpan, window: int = 60) -> str:
+    """I11 — what the surrounding wording asserts about the quote: "quran", "hadith" or "".
+
+    Looks at the text immediately BEFORE the span (introducer side) and, for trailers, immediately
+    AFTER it («رواه …» / «صدق الله العظيم»). Quranic brackets ﴿﴾ assert Quran. If both are asserted
+    (e.g. a hadith qudsi introduced with «قال الله تعالى في الحديث القدسي») nothing is asserted."""
+    before = text[max(0, sp.start - window) : sp.start]
+    after = text[sp.end : min(len(text), sp.end + window)]
+    # cut `before` at the previous sentence boundary so an earlier quote's introducer does not leak
+    cut = max((m.end() for m in _SENTENCE_START.finditer(before)), default=0)
+    # but keep a trailing «:» that belongs to this introducer («قال تعالى: …»)
+    if cut and before[cut - 1] == ":":
+        prev = max((m.end() for m in _SENTENCE_START.finditer(before[: cut - 1])), default=0)
+        cut = prev
+    before = before[cut:]
+    after_cut = _SENTENCE_START.search(after)
+    after = after[: after_cut.start()] if after_cut else after
+    q = bool(_ASSERT_QURAN.search(before)) or (sp.start > 0 and text[sp.start - 1] == "﴿")
+    h = bool(_ASSERT_HADITH.search(before)) or bool(re.search(r"رواه|أخرجه|متفق عليه", after))
+    if q and not h:
+        return "quran"
+    if h and not q:
+        return "hadith"
+    return ""
 
 
 def _bracketed(text: str, spans: list[RuleSpan], min_tokens: int) -> None:

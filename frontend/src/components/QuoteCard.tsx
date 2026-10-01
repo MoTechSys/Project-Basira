@@ -48,6 +48,11 @@ function noticeVars(key: string, q: QuoteResult, lang: Lang): Record<string, str
     v["found_in"] = m ? sourceName(m, lang) : "";
     v["claimed"] = books.map((b) => BOOK_NAMES[b]?.[lang] ?? b).join(lang === "ar" ? " و" : " & ") || (q.claimed_source?.raw ?? "");
   }
+  if (key === "claimed_ayah_mismatch") {
+    const p = q.claimed_source?.parsed as { surah?: number; ayah?: number; ayah_to?: number | null } | undefined;
+    v["found_ref"] = m ? refLabel(m, lang) : "";
+    v["claimed_ref"] = q.claimed_source?.raw ?? (p?.surah !== undefined ? `${p.surah}:${p.ayah}${p.ayah_to ? "-" + p.ayah_to : ""}` : "");
+  }
   if (key === "arabic_text_at_ref") {
     const p = q.claimed_source?.parsed as { surah?: number; ayah?: number } | undefined;
     v["ref"] = p?.surah !== undefined ? `${p.surah}:${p.ayah}` : "";

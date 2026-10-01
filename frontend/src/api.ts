@@ -52,6 +52,7 @@ export interface QuoteResult {
   score: number;
   message_key: string;
   notice_keys: string[];
+  repeated_spans?: { start: number; end: number }[];
   matches: Match[];
   total_positions: number;
   external_search_links: Link[];

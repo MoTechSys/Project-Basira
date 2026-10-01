@@ -36,7 +36,6 @@ from app.config import settings as default_settings
 from app.messages import load_messages, self_check_templates
 from app.pipeline import CorpusMeta, Pipeline
 from app.providers import ProviderError, make_llm, make_vision
-from app.retrieve.index import Retriever
 from app.schemas import (
     CheckRequest,
     CheckResponse,
@@ -45,7 +44,7 @@ from app.schemas import (
     HealthResponse,
     SourceInfo,
 )
-from app.store import load_store
+from app.snapshot import LAST_BOOT, load_or_build
 
 log = logging.getLogger("basira")
 
@@ -112,8 +111,8 @@ def create_app(cfg: Settings | None = None) -> FastAPI:
         if problems:
             raise RuntimeError(f"forbidden lexicon in message templates: {problems}")
         t0 = time.time()
-        store = load_store(cfg.index_dir)
-        retriever = Retriever(store)
+        # E-031: binary snapshot (mmap) → ~1 s boot, ~300 MB RSS; falls back to a full build + writes it
+        store, retriever = load_or_build(cfg.index_dir, write=cfg.snapshot_write)
         manifest = json.loads(cfg.manifest_path.read_text(encoding="utf-8"))
         meta = CorpusMeta.from_manifest(manifest, store.meta)
         app.state.llm = make_llm(cfg.llm_provider)
@@ -140,6 +139,40 @@ def create_app(cfg: Settings | None = None) -> FastAPI:
         allow_headers=["Content-Type", "X-Eval-Key"],
         max_age=600,
     )
+
+    # ------------------------------------------------------------- security headers (E-033)
+    # OWASP Secure Headers baseline. CSP allows only same-origin assets + inline styles (Vite
+    # injects none at runtime, but the brand tokens use CSS custom properties inline in preview).
+    _CSP = (
+        "default-src 'self'; "
+        "img-src 'self' data: blob:; "
+        "font-src 'self' data:; "
+        "style-src 'self' 'unsafe-inline'; "
+        "script-src 'self'; "
+        "connect-src 'self'; "
+        "frame-ancestors 'none'; "
+        "base-uri 'self'; "
+        "form-action 'self'; "
+        "object-src 'none'; "
+        "upgrade-insecure-requests"
+    )
+
+    @app.middleware("http")
+    async def security_headers(request: Request, call_next: Any) -> Any:
+        resp = await call_next(request)
+        h = resp.headers
+        h.setdefault("X-Content-Type-Options", "nosniff")
+        h.setdefault("X-Frame-Options", "DENY")
+        h.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+        h.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=(), usb=()")
+        h.setdefault("Cross-Origin-Opener-Policy", "same-origin")
+        h.setdefault("Cross-Origin-Resource-Policy", "same-origin")
+        h.setdefault("Content-Security-Policy", _CSP)
+        if request.url.scheme == "https" or request.headers.get("x-forwarded-proto") == "https":
+            h.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+        if request.url.path.startswith("/v1/"):
+            h.setdefault("Cache-Control", "no-store")
+        return resp
 
     # ------------------------------------------------------------- error envelope
 
@@ -203,6 +236,9 @@ def create_app(cfg: Settings | None = None) -> FastAPI:
             counts=store.counts,
             rss_mb=_rss_mb(),
             providers={"llm": request.app.state.llm.name, "vision": request.app.state.vision.name},
+            index_sha256=str(LAST_BOOT["index_sha256"]),
+            boot=LAST_BOOT["mode"],
+            boot_seconds=float(LAST_BOOT["seconds"]),
         )
 
     @app.post(
@@ -300,6 +336,26 @@ def create_app(cfg: Settings | None = None) -> FastAPI:
         raw = json.loads((cfg.messages_dir / f"{lang}.json").read_text(encoding="utf-8"))
         raw.pop("$comment", None)
         return dict(raw)
+
+    # ------------------------------------------------------------- static frontend (E-034)
+    # When `frontend/dist` exists (Docker image), serve it from the same origin: no CORS, one URL,
+    # SPA fallback to index.html for client routes. API/health keep priority (registered first).
+    static_dir = cfg.static_dir
+    if static_dir is not None and (static_dir / "index.html").exists():
+        from fastapi.responses import FileResponse  # noqa: PLC0415
+        from fastapi.staticfiles import StaticFiles  # noqa: PLC0415
+
+        app.mount("/assets", StaticFiles(directory=static_dir / "assets"), name="assets")
+        if (static_dir / "brand").exists():
+            app.mount("/brand", StaticFiles(directory=static_dir / "brand"), name="brand")
+
+        @app.get("/{full_path:path}", include_in_schema=False)
+        async def spa(full_path: str) -> Any:
+            candidate = (static_dir / full_path).resolve()
+            if full_path and candidate.is_file() and static_dir.resolve() in candidate.parents:
+                headers = {"Cache-Control": "public, max-age=31536000, immutable"} if "." in full_path else {}
+                return FileResponse(candidate, headers=headers)
+            return FileResponse(static_dir / "index.html", headers={"Cache-Control": "no-cache"})
 
     return app
 

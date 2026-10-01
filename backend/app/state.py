@@ -21,6 +21,11 @@ Religious-safety invariants enforced here (each has a test in tests/test_state.p
       the Arabic text at that ref is offered with ``arabic_text_at_ref`` (display, no judgment).
   I8  ``claimed_source_mismatch`` never changes the status; it only adds a notice.
   I9  Message keys used here must exist in messages/*.json (checked by a test).
+  I10 A claimed Quran reference («[البقرة: 5]») that differs from the matched ayah sets
+      ``claimed_source_mismatch`` + notice ``claimed_ayah_mismatch`` (status unchanged — I8 applies).
+  I11 Attribution cross-notice: a strict-exact QURAN hit introduced as a hadith («قال رسول الله»,
+      «رواه …») adds ``attribution_quran_not_hadith``; a strict-exact HADITH hit introduced as Quran
+      («قال تعالى», ﴿…﴾) adds ``attribution_hadith_not_quran``. Descriptive, never a judgment.
 """
 
 from __future__ import annotations
@@ -55,6 +60,12 @@ class QuoteFacts:
     claimed_books: tuple[str, ...] = ()
     claimed_quran_ref: tuple[int, int] | None = None
     source_modality: str = "text"
+    # I11 — what the *introducer/brackets* asserted, independent of the retrieval kind:
+    #   "quran" (﴿…﴾ / قال تعالى …), "hadith" (قال رسول الله / ﷺ / رواه …) or "" (nothing asserted)
+    asserted: str = ""
+    claimed_ayah_to: int | None = None  # end of a claimed range «[البقرة: 1-5]»
+    # I10 — the ayah actually matched (surah, ayah) for winners; filled by the pipeline when known
+    matched_quran_ref: tuple[int, int] | None = None
 
 
 @dataclass(slots=True)
@@ -111,11 +122,15 @@ def decide(facts: QuoteFacts, evidence: list[Evidence], th: Thresholds) -> Decis
         d = Decision("found", 1.0, "found", "quran", winners=quran_strict)
         if facts.kind not in ("quran", "unknown") or facts.claimed_books:
             d.notice_keys.append("quran_wins")
+        if facts.asserted == "hadith":  # I11
+            d.notice_keys.append("attribution_quran_not_hadith")
         return _apply_claim_checks(d, facts)
 
     # hadith strict exact
     if hadith_strict:
         d = Decision("found", 1.0, "found", "hadith", winners=hadith_strict, attach_grade=True)
+        if facts.asserted == "quran":  # I11
+            d.notice_keys.append("attribution_hadith_not_quran")
         return _apply_claim_checks(d, facts)
 
     # I2 — loose-exact but strict-different: an orthographic difference, never `found`
@@ -210,17 +225,37 @@ def _decide_hadith_fuzzy(
 
 
 def _apply_claim_checks(d: Decision, facts: QuoteFacts) -> Decision:
-    """I8 — claimed-source comparison adds a notice only; it never changes the status."""
-    if not facts.claimed_books or not d.winners:
+    """I8/I10 — claimed-source comparison adds a notice only; it never changes the status."""
+    if not d.winners:
         return d
-    found_books = {e.book for e in d.winners if e.corpus == "ohd" and e.book}
     if d.corpus_scope == "quran":
+        # I10 — a claimed ayah reference that points elsewhere. ``matched_quran_ref`` is the FIRST
+        # ayah of the best winner; a quote that *starts* at the claimed ayah (or a claimed range that
+        # contains it) is consistent. Everything else is a mismatch notice.
+        c = facts.claimed_quran_ref
+        m = facts.matched_quran_ref
+        if c is not None and m is not None and not _ref_consistent(c, m, facts):
+            d.claimed_source_mismatch = True
+            d.notice_keys.append("claimed_ayah_mismatch")
+            d.extra["claimed_ref"] = c
         # claimed a hadith book, found a Quran verse — quran_wins notice already covers it
         return d
+    if not facts.claimed_books:
+        return d
+    found_books = {e.book for e in d.winners if e.corpus == "ohd" and e.book}
     if found_books and not (found_books & set(facts.claimed_books)):
         d.claimed_source_mismatch = True
         d.notice_keys.append("claimed_source_mismatch")
     return d
+
+
+def _ref_consistent(claimed: tuple[int, int], matched: tuple[int, int], facts: QuoteFacts) -> bool:
+    """Same surah and the matched first ayah lies within [claimed.ayah, claimed.ayah_to or ayah]."""
+    if claimed[0] != matched[0]:
+        return False
+    lo = claimed[1]
+    hi = facts.claimed_ayah_to or lo
+    return lo <= matched[1] <= hi
 
 
 def collection_tier(corpus: Corpus, book: str, sahihain: frozenset[str]) -> str:

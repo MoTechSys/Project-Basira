@@ -34,7 +34,15 @@
     "hadeethenc_link_only": "This hadith is listed in the Prophetic Hadiths Encyclopedia; you can read it there.",
     "many_positions": "Found at {total} places; the first {shown} are shown.",
     "ocr_mock": "Demo mode: the image text was NOT actually read; a fixed sample text was used because no vision provider is configured.",
-    "quran_fragment": "The quoted text is part of the ayah, not the whole ayah; the full ayah text is shown next to yours."
+    "quran_fragment": "The quoted text is part of the ayah, not the whole ayah; the full ayah text is shown next to yours.",
+    "claimed_ayah_mismatch": "The ayah is at {found_ref}, not at the reference given in your text ({claimed_ref}).",
+    "attribution_quran_not_hadith": "This text is an ayah of the Quran ({ref}); your text attributes it to a hadith.",
+    "attribution_hadith_not_quran": "This text is a hadith from {source_name}; your text attributes it to the Quran.",
+    "partial_ayah_context": "Your text is part of a longer ayah; the full ayah is shown so the fragment is not read out of context.",
+    "qiraah_note": "Your text matches another orthography of the word; the Hafs orthography used by our sources is shown beside it. The difference may be another canonical reading; consult a certified mushaf.",
+    "basmala_note": "The basmala is an ayah in Al-Fatihah and part of an ayah in An-Naml.",
+    "repeated_in_text": "This quote appears more than once in your text; its result is shown once.",
+    "quran_scan_found": "Detected by the deterministic Mushaf scan — your text had no quotation marks around it."
   },
   "labels": {
     "found": "Found",

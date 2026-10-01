@@ -132,3 +132,18 @@ async def test_cors_preflight(client: AsyncClient) -> None:
     )
     assert r.status_code == 200
     assert r.headers.get("access-control-allow-origin") == "http://localhost:5173"
+
+
+async def test_security_headers_present(client) -> None:  # type: ignore[no-untyped-def]
+    r = await client.get("/health")
+    for h in (
+        "x-content-type-options",
+        "x-frame-options",
+        "referrer-policy",
+        "permissions-policy",
+        "content-security-policy",
+        "cross-origin-opener-policy",
+    ):
+        assert h in r.headers, h
+    assert r.headers["x-frame-options"] == "DENY"
+    assert r.json()["index_sha256"]
