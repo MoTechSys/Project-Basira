@@ -6,6 +6,7 @@
 
 ## Reading order (mandatory)
 1. `AGENTS.md` (this) — role, rules, map.
+1b. **`docs/AGENT_PLAYBOOK.md` — how to discover your own capabilities in 10 min (machine, 300 gsk tools, model proxies, measured concurrency cap, sub-agent orchestrator). Run its §1 before touching anything.**
 2. `docs/STATE.md` — **where we are right now**: done / in progress / next. Updated at the end of every session.
 3. `docs/DECISIONS.md` — every owner decision and every engineering decision, dated, with reason. Never re-ask a decided question.
 4. `docs/GLOSSARY.md` — project terms (AR/EN) so you speak the same language as the owner.
@@ -37,6 +38,12 @@ docs/GLOSSARY.md           terminology
 docs/adr/                  architecture decision records
 docs/internal/             audits & annex triage — NEVER PUBLISH
 docs/ENVIRONMENT_ANALYSIS.md
+docs/AGENT_PLAYBOOK.md     self-discovery + sub-agent playbook (read 2nd)
+docs/CAPABILITIES.md       measured proxy/model/concurrency facts
+docs/TEAM.md               multi-model team charter + protocol
+docs/model-analysis/       evidence-based model selection (تحليل النماذج العالمية)
+docs/experiments/          probe scripts + raw results (E1..E11)
+scripts/agents/            orchestrator.py — role→model runner, Semaphore(18)
 backend/                   FastAPI service (Python 3.13)
 frontend/                  React + Vite + TS (AR/EN, RTL)
 corpus/                    manifest.json, fetch + index build scripts (data/ and index/ git-ignored)

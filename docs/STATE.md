@@ -25,7 +25,7 @@ original sandbox; `docs/internal/` is its complete substitute. Never publish `do
 **Per-session ritual:** `make gates && make smoke` at start; commit after every logical change; update this file at end.
 
 ## 0.5 Team & models (D-008/D-009)
-Multi-model team charter: `docs/TEAM.md`. Evidence-based model selection: `docs/model-analysis/` (README = verdict; 01–06 = axes, weaknesses, roster). Live proxy capacity: `docs/CAPABILITIES.md`.
+**New agent? Read `docs/AGENT_PLAYBOOK.md` first.** Multi-model team charter: `docs/TEAM.md`. Experiments log: `docs/experiments/`. Sub-agent runner: `scripts/agents/orchestrator.py --selftest`. Evidence-based model selection: `docs/model-analysis/` (README = verdict; 01–06 = axes, weaknesses, roster). Live proxy capacity: `docs/CAPABILITIES.md`.
 
 ## 1. Done (verified, committed)
 | Layer | File(s) | Status | Evidence |
