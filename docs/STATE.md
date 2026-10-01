@@ -22,6 +22,7 @@ Then read in this order: `AGENTS.md` → this file → `docs/DECISIONS.md` → `
 `docs/internal/AUDIT_HANDOFF_PACKAGE.md §12.5`. The confidential source package (`.intake/`) exists ONLY on the
 original sandbox; `docs/internal/` is its complete substitute. Never publish `docs/internal/`.
 
+**Owner model (D-011): every day = new account + new sandbox + new agent → recovery from GitHub only.**
 **Per-session ritual:** `make gates && make smoke` at start; commit after every logical change; update this file at end.
 
 ## 0.5 Team & models (D-008/D-009)
@@ -69,7 +70,7 @@ Quality gates at last commit: `ruff` ✅ · `mypy --strict` ✅ · `pytest` 38/3
 ## 3. Known facts discovered (not in the package)
 - **2026-10-01:** tanzil.net TLS certificate expired (Let's Encrypt, notAfter 2026-09-30 11:47 UTC). Files served are byte-identical
   to the pinned sha256 (both rasms re-downloaded and re-hashed). Mitigated in `fetch.py` (E-013). Re-check with `--strict-tls` later.
-- **2026-10-01:** `/mnt/aidrive` is **not a mount** in this sandbox (empty root dir). Real AI Drive only via `gsk aidrive upload --local_file` → `scripts/backup_to_aidrive.sh` (SK-12). Two backups now in My Drive `/basira_backups/`.
+- **2026-10-01:** `/mnt/aidrive` is **not a mount** in this sandbox (empty root dir). AI Drive is **out of scope by owner decision (D-011)** — GitHub only.
 - **2026-10-01:** Owner supplied the official *Genspark Code* guide: sandbox idle-stop 1h, deletion within hours → push ≤30 min; Supervisor **not** installed despite guide. Audited line-by-line in `docs/agent/research/09`.
 - **2026-10-01:** `corpus/*.py` and `scripts/*.py` are **not** covered by `make lint` (which only runs inside `backend/`). They were
   linted manually this session with the backend ruff/mypy config and are clean. → added to §2 as a small gate-widening task.

@@ -1,5 +1,8 @@
 # SESSION_PROTOCOL.md — طقس الجلسة (مشتق من S-A1, S-A2, S-A4)
 
+## الافتراض الأساسي (D-011)
+**كل يوم: حساب جديد، sandbox جديد، وكيل جديد.** لا شيء يُورَّث إلا ما في GitHub. الاستعادة = `git clone` + `bash scripts/bootstrap.sh && make smoke` + قراءة هذا المجلد.
+
 ## بداية الجلسة (≤10 دقائق)
 1. `cd /home/user/webapp && git status -sb && git log --oneline -3` — أين نحن.
 2. اقرأ: `AGENTS.md` → `docs/agent/README.md` → `context/IDENTITY.md` → `context/OWNER.md` → `docs/STATE.md §2`.
@@ -35,7 +38,7 @@ WP brief (docs/work-packages/WP-NN.md: goal · files · acceptance · constraint
 
 ## نهاية الجلسة (إلزامي)
 1. `git status --short` فارغ. كل شيء في `main` ومدفوع.
-1b. **SK-12:** `bash scripts/backup_to_aidrive.sh` → أرشيف واحد في AI Drive الحقيقي (`gsk aidrive`). **ليس** `cp` إلى `/mnt/aidrive` (مجلد محلي وهمي).
+1b. **لا نسخ احتياطية خارج GitHub** (D-011). الدفع إلى `main` هو الحفظ الوحيد.
 2. `docs/STATE.md`: التاريخ، ما تم، الترتيب التالي، الحقائق المكتشفة.
 3. `docs/agent/discoveries/` إن وُجد اكتشاف جديد؛ `docs/experiments/` إن أُجريت تجربة.
 4. سطر واحد للمالك: ما أُنجز، ما التالي، ما يحتاج قراره.
