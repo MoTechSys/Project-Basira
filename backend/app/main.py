@@ -254,10 +254,12 @@ def create_app(cfg: Settings | None = None) -> FastAPI:
             return resp
         text = ocr.text.strip()[: cfg.max_text_chars] or " "
         req = CheckRequest(text=text, ui_lang="ar" if ui_lang != "en" else "en", source_modality="image")
-        notices = ["image_extracted"]
+        notices: list[str] = []
         if request.app.state.vision.name == "mock":
             notices.append("ocr_mock")  # never present fixture text as if it were read from the image
-        return await pipeline.check(req, extra_notices=notices)
+        resp = await pipeline.check(req, extra_notices=notices)
+        resp.ocr_text = text.strip() or None
+        return resp
 
     @app.get("/v1/sources", response_model=list[SourceInfo])
     async def sources(request: Request) -> list[SourceInfo]:

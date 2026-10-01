@@ -81,3 +81,18 @@ def test_language_of() -> None:
     assert language_of(Q) == "ar"
     assert language_of("Verily Allah is with the patient") == "en"
     assert language_of("...") == "other"
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        f"قال رسول الله صلَّى اللهُ عَلَيْهِ وسلَّمَ:\n«{H}»\nرواه البخاري",  # OCR output with tashkeel honorific
+        f"قال رسول الله صلى الله عليه وسلم {H} وإنما لكل امرئ ما نوى",
+        f"قال النبي عليه الصلاة والسلام {H} وإنما لكل امرئ ما نوى",
+    ],
+)
+def test_honorific_never_becomes_a_quote(text: str) -> None:
+    for s in extract_spans(text):
+        seg = text[s.start : s.end]
+        assert "صل" not in seg[:4] and "عليه" not in seg[:6], seg
+        assert seg.startswith(H)

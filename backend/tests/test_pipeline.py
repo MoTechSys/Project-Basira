@@ -147,9 +147,16 @@ async def test_no_quotes_yields_empty_list(pipeline: Pipeline) -> None:
     assert r.quotes == []
 
 
-async def test_image_modality_adds_notice(pipeline: Pipeline) -> None:
+async def test_image_modality_never_confirms_found(pipeline: Pipeline) -> None:
+    """OCR can silently normalise the user's text, so an image-sourced exact hit is `needs_review`
+    (image_unconfirmed) with the match still shown for comparison — never a confirmed `found`."""
     r = await run(pipeline, "﴿إن الله مع الصابرين﴾", source_modality="image")
-    assert "image_extracted" in r.quotes[0].notice_keys
+    q = r.quotes[0]
+    assert "image_extracted" in q.notice_keys
+    assert q.status == "needs_review" and q.review_reason == "image_unconfirmed"
+    assert q.message_key == "needs_review_image"
+    assert q.matches and q.matches[0].ref == {"surah": 2, "ayah": 153}
+    assert r.validator_rejections == 0
 
 
 # ---- provider interplay -----------------------------------------------------------------------

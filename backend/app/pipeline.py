@@ -315,8 +315,17 @@ class Pipeline:
                     matches.append(m)
             notices.extend(self._hadith_notices(matches, d))
         msg_key = "found_multi" if d.status == "found" and len(d.winners) > 1 else d.message_key
-        if req.source_modality == "image" and d.status != "not_found":
+        status = d.status
+        review_reason = d.review_reason
+        if req.source_modality == "image":
             notices.append("image_extracted")
+            if status == "found":
+                # ADR-003: OCR may silently "correct" the user's text (observed: «علي» → «على»), so a
+                # verbatim-looking match from an image is never a confirmed `found`. The user must read
+                # the extracted text and confirm; the match itself is still shown for comparison.
+                status = "needs_review"
+                review_reason = "image_unconfirmed"
+                msg_key = "needs_review_image"
         # referral links for anything not `found`
         ext: list[Link] = []
         if d.status != "found":
@@ -340,8 +349,8 @@ class Pipeline:
             source_modality=req.source_modality,
             claimed_source=claimed,
             claimed_source_mismatch=d.claimed_source_mismatch,
-            status=d.status,
-            review_reason=d.review_reason,  # type: ignore[arg-type]
+            status=status,
+            review_reason=review_reason,  # type: ignore[arg-type]
             score=round(d.score, 4),
             message_key=msg_key,
             notice_keys=_dedupe(notices),

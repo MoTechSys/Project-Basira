@@ -76,6 +76,9 @@ async def test_image_endpoint_mock_ocr(client: AsyncClient) -> None:
     body = r.json()
     assert body["quotes"] and body["quotes"][0]["source_modality"] == "image"
     assert "image_extracted" in body["quotes"][0]["notice_keys"]
+    assert body["quotes"][0]["status"] == "needs_review"
+    assert "ocr_mock" in body["quotes"][0]["notice_keys"]  # mock vision must say so
+    assert body["ocr_text"]  # extracted text is returned so the user can verify it
 
 
 async def test_image_endpoint_rejects_bad_mime_and_degrades_on_ocr_failure(

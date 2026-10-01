@@ -122,6 +122,7 @@ class CheckResponse(BaseModel):
     quotes: list[QuoteResult]
     validator_rejections: int = 0
     timings_ms: Timings
+    ocr_text: str | None = None  # image path only: the text as read, so the user can verify it (ADR-003)
 
 
 class ErrorBody(BaseModel):

@@ -67,6 +67,7 @@ export interface CheckResponse {
   quotes: QuoteResult[];
   validator_rejections: number;
   timings_ms: { extract: number; retrieve: number; match: number; total: number };
+  ocr_text?: string | null;
 }
 export interface ApiError {
   error: { code: string; message_ar: string; message_en: string };

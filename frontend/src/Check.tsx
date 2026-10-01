@@ -199,6 +199,14 @@ export default function Check({ lang, onLang }: { lang: Lang; onLang: (l: Lang) 
                   {result.extraction_degraded && <span dir="auto">{msg(lang, "notice", "extraction_degraded")}</span>}
                 </div>
               )}
+              {result.ocr_text && (
+                <section className="card" aria-label={ui(lang, "ocr_title")}>
+                  <h3 style={{ margin: "0 0 6px", fontSize: 14, color: "var(--ink-soft)" }}>{ui(lang, "ocr_title")}</h3>
+                  <p className="diff-text arabic" dir="auto" data-testid="ocr-text" style={{ margin: 0 }}>
+                    {result.ocr_text}
+                  </p>
+                </section>
+              )}
               {n === 0 && (
                 <div className="banner banner-info" dir="auto">
                   {msg(lang, "notice", "no_quotes")}

@@ -56,6 +56,7 @@ export const UI: Record<Lang, Record<string, string>> = {
     reason_non_arabic: "نص غير عربي",
     reason_image_unconfirmed: "نص من صورة",
     grade_source: "موسوعة الأحاديث النبوية",
+    ocr_title: "النص كما قُرئ من الصورة — تأكد منه قبل الاعتماد على النتيجة",
   },
   en: {
     app_name: "Basira",
@@ -100,6 +101,7 @@ export const UI: Record<Lang, Record<string, string>> = {
     reason_non_arabic: "non-Arabic text",
     reason_image_unconfirmed: "text from image",
     grade_source: "Prophetic Hadiths Encyclopedia",
+    ocr_title: "Text as read from the image — verify it before relying on the result",
   },
 };
 

@@ -166,10 +166,13 @@ def _arabic_token_count(s: str) -> int:
 
 
 def _kind_from_introducer(intro: str) -> str:
+    """``intro`` may be raw or loose-joined."""
     if (
-        any(w in intro for w in ("تعالى", "الله", "سبحانه", "عز وجل"))
+        any(w in intro for w in ("تعالى", "تعالي", "الله", "سبحانه", "عز وجل"))
         and "رسول" not in intro
         and "النبي" not in intro
+        and "الحديث" not in intro
+        and "الصحيحين" not in intro
     ):
         return "quran"
     return "hadith_matn"
@@ -205,25 +208,63 @@ def _bracketed(text: str, spans: list[RuleSpan], min_tokens: int) -> None:
             i = b + 1
 
 
+_HONORIFICS: tuple[tuple[str, ...], ...] = (  # loose-token sequences that may follow an introducer
+    ("صلي", "الله", "عليه", "وسلم"),
+    ("صلي", "الله", "عليه", "واله", "وسلم"),
+    ("عليه", "الصلاه", "والسلام"),
+    ("عليه", "السلام"),
+    ("رضي", "الله", "عنه"),
+    ("رضي", "الله", "عنها"),
+    ("عز", "وجل"),
+    ("سبحانه", "وتعالي"),
+    ("تعالي",),
+    ("جل", "جلاله"),
+)
+_INTRO_LOOSE: tuple[tuple[str, ...], ...] = tuple(
+    sorted({tuple(loose_tokens(i)) for i in _INTRODUCERS}, key=len, reverse=True)
+)
+
+
 def _introduced(text: str, spans: list[RuleSpan], min_tokens: int) -> None:
-    """Longest introducer first; a shorter one overlapping an already matched longer one is skipped
-    («قال الله تعالى» must not also fire as «قال الله» and swallow «تعالى»)."""
-    taken: list[tuple[int, int]] = []
-    for intro in sorted(_INTRODUCERS, key=len, reverse=True):
-        for m in re.finditer(re.escape(intro) + r"(?:\s*ﷺ)?\s*[:،,]?\s*", text):
-            if any(a < m.end() and m.start() < b for a, b in taken):
+    """Introducers are matched on LOOSE TOKENS (so tashkeel, «صلَّى اللهُ عَلَيْهِ وسلَّمَ», ﷺ or an
+    honorific after the introducer never leak into the quote). Longest introducer first; a shorter one
+    overlapping an already matched longer one is skipped («قال الله تعالى» must not also fire as «قال الله»)."""
+    toks = tokenize(text)
+    loose = [t.loose for t in toks]
+    taken: list[tuple[int, int]] = []  # token ranges
+    for intro in _INTRO_LOOSE:
+        n = len(intro)
+        for i in range(len(loose) - n + 1):
+            if tuple(loose[i : i + n]) != intro:
                 continue
-            taken.append((m.start(), m.end()))
-            start = m.end()
-            # if a bracket opens right here, the bracket rule already caught it
-            if start < len(text) and text[start] in {o for o, _ in _BRACKET_PAIRS}:
+            j = i + n
+            # swallow trailing honorifics («ﷺ» is dropped by the normalizer already)
+            progressed = True
+            while progressed:
+                progressed = False
+                for h in _HONORIFICS:
+                    if tuple(loose[j : j + len(h)]) == h:
+                        j += len(h)
+                        progressed = True
+                        break
+            if any(a < j and i < b for a, b in taken):
                 continue
+            taken.append((i, j))
+            if j >= len(toks):
+                continue
+            start = toks[j].start
+            if text[start] in {o for o, _ in _BRACKET_PAIRS}:
+                continue
+            # a bracket may open between the introducer and the next token («قال ﷺ: «…»»)
+            between = text[toks[j - 1].end : start]
+            if any(o in between for o, _ in _BRACKET_PAIRS):
+                continue  # the bracket rule already caught it
             end_m = _SENTENCE_END.search(text, start)
             end = end_m.start() if end_m else len(text)
             if _arabic_token_count(text[start:end]) >= min_tokens:
                 while end > start and text[end - 1].isspace():
                     end -= 1
-                spans.append(RuleSpan(start, end, _kind_from_introducer(intro), False))
+                spans.append(RuleSpan(start, end, _kind_from_introducer(" ".join(intro)), False))
 
 
 def _trailed(text: str, spans: list[RuleSpan], min_tokens: int) -> None:
