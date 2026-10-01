@@ -1,0 +1,147 @@
+/* Basira — verification report via the browser's own print engine (E-046).
+   Zero cost on screen (everything is inside @media print), zero kB of PDF libraries, full Arabic
+   shaping (every in-browser PDF library breaks ligatures or rasterises the page).
+   Corpus text stays byte-identical: we only hide chrome and force colours. */
+.print-only {
+  display: none;
+}
+@media print {
+  @page {
+    size: A4;
+    margin: 18mm 16mm 24mm;
+  }
+  html {
+    color-scheme: light;
+  }
+  body {
+    background: #fff !important;
+    color: #12183f !important;
+    font-size: 11pt;
+  }
+  * {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  /* hide interactive chrome */
+  .topbar,
+  .skip-link,
+  .hero,
+  .composer,
+  .examples,
+  .progress,
+  .summary__actions,
+  .strip,
+  .legend,
+  .panel__nav,
+  .sheet-backdrop,
+  .btn,
+  .file-btn,
+  .site-footer .sources,
+  .links a[target="_blank"]::after {
+    display: none !important;
+  }
+  .print-only {
+    display: block;
+  }
+  /* report header */
+  .print-header {
+    border-block-end: 2px solid #6150ea;
+    padding-block-end: 6mm;
+    margin-block-end: 6mm;
+  }
+  .print-header h1 {
+    font-size: 18pt;
+    margin: 0;
+  }
+  .print-header dl {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 2pt 10pt;
+    font-size: 9.5pt;
+    color: #3b4270;
+    margin: 4mm 0 0;
+  }
+  .print-header dt {
+    font-weight: 600;
+  }
+  .print-header dd {
+    margin: 0;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    word-break: break-all;
+  }
+  /* workspace: text first, then every card in full (no sticky, no sheet) */
+  .workspace__grid {
+    display: block !important;
+  }
+  .panel {
+    position: static !important;
+    max-block-size: none !important;
+    overflow: visible !important;
+  }
+  .annotated-wrap,
+  .quote {
+    break-inside: avoid;
+    border: 1px solid #d9dcf2;
+    margin-block: 4mm;
+    box-shadow: none !important;
+  }
+  /* status colours AND an underline so a monochrome printer still shows the status */
+  .hl {
+    box-shadow: none !important;
+  }
+  .hl[data-status="found"] {
+    text-decoration: underline solid #0f7b5f 2px;
+  }
+  .hl[data-status="partial_match"] {
+    text-decoration: underline dashed #8a5a00 2px;
+  }
+  .hl[data-status="needs_review"] {
+    text-decoration: underline dotted #6150ea 2px;
+  }
+  .hl[data-status="not_found"] {
+    text-decoration: underline wavy #5c6080 1.5px;
+  }
+  /* open every <details>; show long sources in full */
+  details > summary {
+    display: none;
+  }
+  details > * {
+    display: block;
+  }
+  .source-window {
+    display: none !important;
+  }
+  .source-full {
+    position: static !important;
+    inline-size: auto !important;
+    block-size: auto !important;
+    clip: auto !important;
+    clip-path: none !important;
+    overflow: visible !important;
+    white-space: normal !important;
+  }
+  .diff-text {
+    font-size: 12.5pt;
+  }
+  /* fixed disclaimer on every page */
+  .print-footer {
+    position: fixed;
+    inset-block-end: 0;
+    inset-inline: 0;
+    font-size: 8.5pt;
+    color: #3b4270;
+    border-block-start: 1px solid #d9dcf2;
+    padding-block-start: 2mm;
+    background: #fff;
+    margin: 0;
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .links a::after {
+    content: " (" attr(href) ")";
+    font-size: 8pt;
+    color: #3b4270;
+  }
+}

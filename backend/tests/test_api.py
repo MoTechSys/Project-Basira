@@ -122,6 +122,14 @@ async def test_rate_limit_http_and_eval_key(test_settings) -> None:  # type: ign
         assert r.status_code == 200
         r = await c.post("/v1/check", json=payload, headers={"X-Eval-Key": "wrong"})
         assert r.status_code == 429
+        # E-044: the model-free rules stage has its own wider bucket — not blocked by the exhausted main one
+        rules = {**payload, "options": {"stage": "rules"}}
+        r = await c.post("/v1/check", json=rules)
+        assert r.status_code == 200 and r.json()["extraction_stage"] == "rules"
+        # ... but it is bounded too (4x), never exempt
+        for _ in range(7):
+            await c.post("/v1/check", json=rules)
+        assert (await c.post("/v1/check", json=rules)).status_code == 429
 
 
 async def test_cors_preflight(client: AsyncClient) -> None:

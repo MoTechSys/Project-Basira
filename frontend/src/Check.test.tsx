@@ -99,7 +99,7 @@ describe("Check page", () => {
     await screen.findAllByRole("status");
     expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("/v1/check"), expect.objectContaining({ method: "POST" }));
     expect(screen.getByRole("note").textContent).toContain(ar.notice.refusal);
-    expect(screen.getByText(ar.fixed.footer)).toBeInTheDocument();
+    expect(screen.getAllByText(ar.fixed.footer).length).toBeGreaterThan(0); // screen + print block
     expect(screen.getByText(ar.fixed.transparency_notice)).toBeInTheDocument();
     const results = screen.getByRole("main");
     // E-042 workspace: every quote is highlighted inside the user's own text (jsdom has no matchMedia →

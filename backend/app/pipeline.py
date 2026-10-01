@@ -145,24 +145,9 @@ class Pipeline:
 
         # --- 1. extraction (rules always; provider may add spans; never blocks the answer)
         t0 = time.perf_counter()
-        spans = extract_spans(text)
-        spans = self._augment_spans(text, spans)
-        degraded = False
-        provider_name = self.llm.name
-        try:
-            res = await asyncio.wait_for(self.llm.extract(text), timeout=PROVIDER_TIMEOUT_S)
-            degraded = res.degraded
-            for p in res.quotes:
-                loc = relocate(text, p)
-                if loc is None:
-                    continue
-                spans.append(RuleSpan(loc[0], loc[1], p.kind, False))
-            spans = merge_overlaps(spans)
-            for sp in spans:
-                if sp.claimed_source is None:
-                    sp.claimed_source = find_claimed_source(text, sp.start, sp.end)
-        except (ProviderError, TimeoutError):
-            degraded = True
+        stage = req.options.stage
+        spans, degraded = await self._extract(text, stage)
+        provider_name = "rules" if stage == "rules" else self.llm.name
         spans = spans[: self.settings.max_quotes]
         timings.extract = _ms(t0)
 
@@ -210,6 +195,7 @@ class Pipeline:
             flags=flags,
             quotes=quotes,
             timings_ms=timings,
+            extraction_stage=stage,
         )
         resp = validate_response(
             resp,
@@ -220,6 +206,32 @@ class Pipeline:
         resp.determinism_hash = self._determinism_hash(text, resp)
         resp.timings_ms.total = _ms(t_start)
         return resp
+
+    async def _extract(self, text: str, stage: str) -> tuple[list[RuleSpan], bool]:
+        """Deterministic spans always (explicit markers, model tags, corpus anchors); the provider may
+        ADD spans when ``stage == "full"`` and never blocks the answer.
+
+        ``stage == "rules"`` (E-044) skips the provider entirely: the instant first phase of the
+        two-phase UI. Skipping on purpose is not a degradation. Returns (spans, extraction_degraded).
+        """
+        spans = extract_spans(text)
+        spans = self._augment_spans(text, spans)
+        if stage != "full":
+            return spans, False
+        try:
+            res = await asyncio.wait_for(self.llm.extract(text), timeout=PROVIDER_TIMEOUT_S)
+        except (ProviderError, TimeoutError):
+            return spans, True
+        for p in res.quotes:
+            loc = relocate(text, p)
+            if loc is None:
+                continue
+            spans.append(RuleSpan(loc[0], loc[1], p.kind, False))
+        spans = merge_overlaps(spans)
+        for sp in spans:
+            if sp.claimed_source is None:
+                sp.claimed_source = find_claimed_source(text, sp.start, sp.end)
+        return spans, res.degraded
 
     def _augment_spans(self, text: str, spans: list[RuleSpan]) -> list[RuleSpan]:
         """Explicit model tags (authoritative) + corpus-anchored unmarked quotes, then boundary tightening.

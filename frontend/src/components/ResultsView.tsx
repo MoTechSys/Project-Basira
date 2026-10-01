@@ -29,8 +29,28 @@ function useIsDesktop(): boolean {
   return d;
 }
 
-export function ResultsView({ text, result, lang }: { text: string; result: CheckResponse; lang: Lang }) {
+export function ResultsView({
+  text,
+  result,
+  lang,
+  changed,
+  ruleSpans,
+}: {
+  text: string;
+  result: CheckResponse;
+  lang: Lang;
+  /** E-044: quote ids whose status changed between the preliminary and the final response */
+  changed?: Set<string>;
+  /** E-044: "start-end" keys the deterministic stage found; others were added by the model pass */
+  ruleSpans?: Set<string>;
+}) {
   const quotes = result.quotes;
+  // stable 1-based numbers in text order (E-045): the highlight and its card carry the same number
+  const numbers = useMemo(() => new Map(quotes.map((q, i) => [q.id, i + 1])), [quotes]);
+  const tagsFor = (q: QuoteResult) => ({
+    updated: changed?.has(q.id) ?? false,
+    addedByLlm: (ruleSpans?.size ?? 0) > 0 && !ruleSpans!.has(`${q.span.start}-${q.span.end}`),
+  });
   const [selected, setSelected] = useState<string | null>(null);
   const [filter, setFilter] = useState<Status | null>(null);
   const isDesktop = useIsDesktop();
@@ -92,8 +112,8 @@ export function ResultsView({ text, result, lang }: { text: string; result: Chec
   if (!placeable) {
     return (
       <div className="results-list">
-        {quotes.map((q) => (
-          <QuoteCard key={q.id} q={q} lang={lang} />
+        {quotes.map((q, i) => (
+          <QuoteCard key={q.id} q={q} lang={lang} n={i + 1} {...tagsFor(q)} />
         ))}
       </div>
     );
@@ -123,7 +143,7 @@ export function ResultsView({ text, result, lang }: { text: string; result: Chec
             {ui(lang, "annotated_title")}
             <small>{ui(lang, "annotated_hint")}</small>
           </h3>
-          <AnnotatedText text={text} quotes={visible} selected={selected} onSelect={select} lang={lang} />
+          <AnnotatedText text={text} quotes={visible} numbers={numbers} selected={selected} onSelect={select} lang={lang} />
           <ul className="legend" aria-hidden="true">
             {ORDER.filter((s) => counts[s]).map((s) => (
               <li key={s} data-status={s}>
@@ -131,6 +151,7 @@ export function ResultsView({ text, result, lang }: { text: string; result: Chec
               </li>
             ))}
           </ul>
+          <p className="annotated__scope">{ui(lang, "annotated_scope")}</p>
         </section>
 
         {isDesktop ? (
@@ -150,7 +171,7 @@ export function ResultsView({ text, result, lang }: { text: string; result: Chec
                     </button>
                   </span>
                 </div>
-                <QuoteCard key={current.id} q={current} lang={lang} />
+                <QuoteCard key={current.id} q={current} lang={lang} n={idx + 1} {...tagsFor(current)} />
               </>
             ) : (
               <p className="panel__empty">{ui(lang, "panel_empty")}</p>
@@ -186,7 +207,7 @@ export function ResultsView({ text, result, lang }: { text: string; result: Chec
                   </div>
                 </div>
                 <div className="sheet__body">
-                  <QuoteCard key={current.id} q={current} lang={lang} />
+                  <QuoteCard key={current.id} q={current} lang={lang} n={idx + 1} {...tagsFor(current)} />
                 </div>
               </div>
             </div>

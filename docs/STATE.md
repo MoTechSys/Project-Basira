@@ -136,3 +136,8 @@ Quality gates at last commit: `ruff` ✅ · `mypy --strict` ✅ (24 files) · `p
 ## 4. Open owner questions (defaults applied; see DECISIONS Q1–Q4)
 Q1 licence (Apache-2.0 default) · Q2 HadeethEnc mode (`link`) · Q3 Guard API stays P2 · Q4 OHD posture (`display` + kill-switch).
 Plain-language explanations were given to the owner on 2026-09-30 (see GLOSSARY.md); awaiting yes/no.
+
+### 2026-10-01 — branch `v4-ui` (PR, not merged): packs v4 + v2.1 ported file-by-file (E-044..E-046)
+- Gates: ruff/format/mypy clean · pytest **167/167** · eval-full **150/150 · unsafe 0 · variance 0 · FA 0/500** (REPORT.md restored) · tsc clean · oxlint 0 errors (5 pre-existing warnings) · vitest **18/18** · build OK (JS 91.77 kB gz, CSS 6.85 kB gz, share chunk 0.73 kB gz).
+- Live (gpt-5.4 none): first result 55 ms (short) / 131 ms (1,600 chars); full 2.2 s / 7.4 s.
+- **Not yet measured on this branch:** Lighthouse and axe on the results page, Playwright E2E (budget ran out before the browser passes). Must be run before merge. Also pending: `baseline-2026-10-04` tag (to be created on Oct 4 before the first commit), BASELINE.md/RUNBOOK.md (v2.1 drafts in /tmp/basira2 — not yet copied), SOURCES.md date/purpose columns, dark-mode contrast check of `.hl`/`.d-letter`, live homepage from fixtures, QR chunk, D-6.
