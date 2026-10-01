@@ -1,11 +1,47 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="بصيرة — تحقّق من نقل الآيات والأحاديث في نصك، بلا حكم وبلا توليد." />
-    <meta name="theme-color" content="#12183F" />
-    <title>بصيرة — Basira</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>بصيرة | التحقق من نقل الآيات والأحاديث</title>
+    <meta name="description" content="تحقّق من نقل الآيات والأحاديث في نصك: مطابقة حرفية مع مصادر موثّقة بإصدارها، بلا توليد وبلا حكم فقهي." />
+    <meta name="theme-color" content="#12183F" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#F2F4FF" media="(prefers-color-scheme: light)" />
+    <meta name="color-scheme" content="light dark" />
+
+    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+    <link rel="icon" href="/brand/favicon/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/brand/favicon/apple-touch-icon.png" />
+    <link rel="mask-icon" href="/brand/favicon/safari-pinned-tab.svg" color="#6150EA" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <link rel="preload" href="/fonts/ReadexPro.woff2" as="font" type="font/woff2" crossorigin />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="بصيرة — Basira" />
+    <meta property="og:locale" content="ar_SA" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:title" content="بصيرة — التحقق من نقل الآيات والأحاديث" />
+    <meta property="og:description" content="مطابقة حرفية مع المصادر الموثّقة · بلا توليد · بلا حكم" />
+    <meta property="og:image" content="/brand/og/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="شعار بصيرة: عين كمصحف مفتوح وبداخلها نجمة ثمانية تحمل علامة تحقق" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="/brand/og/twitter-square.jpg" />
+
+    <script type="application/ld+json">
+      {"@context":"https://schema.org","@type":"WebApplication","name":"بصيرة","alternateName":"Basira","applicationCategory":"EducationalApplication","operatingSystem":"Any","inLanguage":["ar","en"],"offers":{"@type":"Offer","price":"0","priceCurrency":"SAR"},"description":"التحقق من نقل الآيات والأحاديث عبر المطابقة الحرفية مع المصادر الموثّقة."}
+    </script>
+    <!-- theme before first paint (no flash) -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("basira.theme");
+          if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -8,7 +8,7 @@ export default defineConfig({
     host: true,
     port: 5173,
     allowedHosts: true, // sandbox preview hosts (dev only; prod is a static build)
-    proxy: { "/v1": "http://127.0.0.1:8000", "/health": "http://127.0.0.1:8000" },
+    proxy: { "/v1": "http://127.0.0.1:8000", "/health": "http://127.0.0.1:8000", "/docs": "http://127.0.0.1:8000", "/openapi.json": "http://127.0.0.1:8000" },
   },
   build: { sourcemap: false, target: "es2022" },
   test: {

@@ -3,6 +3,7 @@
  *  are added around character ranges supplied by the backend diff. Nothing is re-ordered or normalized. */
 
 import type { DiffOp, Lang } from "../api";
+import { Icon } from "../brand";
 import { ui } from "../i18n";
 
 type Range = [number, number];
@@ -70,20 +71,31 @@ export function DiffView({
   return (
     <div className="diff">
       <section className="diff-pane" aria-label={ui(lang, "your_text")}>
-        <h4>{ui(lang, "your_text")}</h4>
-        <p className="diff-text arabic" dir="auto">
+        <h4>
+          <Icon name="paste-text" size={14} />
+          {ui(lang, "your_text")} <span style={{ fontWeight: 400 }}>— {ui(lang, "your_text_hint")}</span>
+        </h4>
+        <p className="diff-text" dir="auto">
           <Highlighted text={quote} marks={ranges(diff, "quote")} cls="d-quote" />
         </p>
       </section>
-      <section className="diff-pane" aria-label={ui(lang, "source_text")}>
-        <h4>{ui(lang, "source_text")}</h4>
-        <p className="diff-text arabic" dir="rtl" lang="ar" data-testid="source-text">
+      <section className="diff-pane diff-pane--source" aria-label={ui(lang, "source_text")}>
+        <h4>
+          <Icon name="byte-exact" size={14} />
+          {ui(lang, "source_text")} <span style={{ fontWeight: 400 }}>— {ui(lang, "source_text_hint")}</span>
+        </h4>
+        <p className="diff-text source-text" dir="rtl" lang="ar" data-testid="source-text">
           {offset > 0 ? "… " : ""}
           <Highlighted text={shown} marks={ranges(diff, "source")} cls="d-source" offset={offset} />
           {offset + shown.length < source.length ? " …" : ""}
         </p>
       </section>
-      {diff.some((o) => o.op !== "equal") && <p className="diff-legend">{ui(lang, "diff_legend")}</p>}
+      {diff.some((o) => o.op !== "equal") && (
+        <p className="diff-legend">
+          <Icon name="diff-words" size={16} />
+          {ui(lang, "diff_legend")}
+        </p>
+      )}
     </div>
   );
 }

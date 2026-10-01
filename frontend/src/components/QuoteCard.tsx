@@ -1,4 +1,5 @@
 import type { Lang, Match, QuoteResult } from "../api";
+import { Icon } from "../brand";
 import { has, msg, ui } from "../i18n";
 import { DiffView } from "./DiffView";
 import { StatusBadge } from "./StatusBadge";
@@ -65,15 +66,18 @@ function MatchView({ m, q, lang }: { m: Match; q: QuoteResult; lang: Lang }) {
   const showDiff = m.source_text.length > 0 && (q.status !== "found" || m.diff.length > 0);
   return (
     <article className="match">
-      <div className="match-ref">
-        <span dir="auto">{refLabel(m, lang)}</span>
-        <span className="tier">{m.collection_tier}</span>
+      <div className="match__ref">
+        <span dir="auto" style={{ display: "inline-flex", gap: 8, alignItems: "center" }}>
+          <Icon name={m.corpus === "tanzil" ? "quran" : "hadith"} size={20} />
+          {refLabel(m, lang)}
+        </span>
+        <span className="tier">{ui(lang, `tier_${m.collection_tier}`)}</span>
       </div>
       {m.source_text.length > 0 &&
         (showDiff ? (
           <DiffView quote={q.quoted_text} source={m.source_text} sourceRange={m.source_text_range} diff={m.diff} lang={lang} />
         ) : (
-          <p className="diff-text arabic" dir="rtl" lang="ar" data-testid="source-text">
+          <p className="diff-text source-text" dir="rtl" lang="ar" data-testid="source-text">
             {m.source_text}
           </p>
         ))}
@@ -85,6 +89,7 @@ function MatchView({ m, q, lang }: { m: Match; q: QuoteResult; lang: Lang }) {
       <div className="links" aria-label={ui(lang, "links")}>
         {m.links.map((l) => (
           <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer">
+            <Icon name="source-link" size={16} />
             {l.name}
           </a>
         ))}
@@ -96,44 +101,49 @@ function MatchView({ m, q, lang }: { m: Match; q: QuoteResult; lang: Lang }) {
 export function QuoteCard({ q, lang }: { q: QuoteResult; lang: Lang }) {
   const notices = q.notice_keys.filter((k) => k !== "grade_line" && has(lang, "notice", k));
   return (
-    <section className="card quote-card" data-status={q.status} aria-labelledby={`${q.id}-h`}>
-      <div className="quote-head">
+    <section className="card quote" data-status={q.status} aria-labelledby={`${q.id}-h`}>
+      <div className="quote__head">
         <StatusBadge status={q.status} lang={lang} />
         <span className="kind">
-          {q.kind}
+          <Icon name={q.kind === "quran" ? "quran" : "hadith"} size={16} />
+          {ui(lang, `kind_${q.kind}`)}
           {q.review_reason ? ` · ${ui(lang, "review_reason")}: ${ui(lang, `reason_${q.review_reason}`)}` : ""}
         </span>
       </div>
-      <h3 id={`${q.id}-h`} className="sr-only">
-        {msg(lang, "labels", q.status)}
-      </h3>
-      <p className="quoted arabic" dir="auto" data-testid="quoted-text">
-        «{q.quoted_text}»
-      </p>
-      <p className="message" dir="auto">
-        {msg(lang, "status", q.message_key, statusVars(q, lang))}
-      </p>
-      {notices.length > 0 && (
-        <ul className="notices">
-          {notices.map((k) => (
-            <li key={k} dir="auto">
-              {msg(lang, "notice", k, noticeVars(k, q, lang))}
-            </li>
-          ))}
-        </ul>
-      )}
-      {q.matches.map((m, i) => (
-        <MatchView key={`${m.corpus}-${JSON.stringify(m.ref)}-${i}`} m={m} q={q} lang={lang} />
-      ))}
-      {q.external_search_links.length > 0 && (
-        <div className="links">
-          {q.external_search_links.map((l) => (
-            <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer">
-              {l.name}
-            </a>
-          ))}
-        </div>
-      )}
+      <div className="quote__body">
+        <h3 id={`${q.id}-h`} className="sr-only">
+          {msg(lang, "labels", q.status)}
+        </h3>
+        <p className="quoted" dir="auto" data-testid="quoted-text">
+          «{q.quoted_text}»
+        </p>
+        <p className="message" dir="auto">
+          {msg(lang, "status", q.message_key, statusVars(q, lang))}
+        </p>
+        {notices.length > 0 && (
+          <ul className="notices">
+            {notices.map((k) => (
+              <li key={k} dir="auto">
+                <Icon name="info" size={16} />
+                <span>{msg(lang, "notice", k, noticeVars(k, q, lang))}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+        {q.matches.map((m, i) => (
+          <MatchView key={`${m.corpus}-${JSON.stringify(m.ref)}-${i}`} m={m} q={q} lang={lang} />
+        ))}
+        {q.external_search_links.length > 0 && (
+          <div className="links">
+            {q.external_search_links.map((l) => (
+              <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer">
+                <Icon name="search-external" size={16} />
+                {l.name}
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
     </section>
   );
 }
