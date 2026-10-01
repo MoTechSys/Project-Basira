@@ -55,3 +55,4 @@ corpus/index/
 .ruff_cache/
 *.egg-info/
 .scratch/
+corpus/fixture/

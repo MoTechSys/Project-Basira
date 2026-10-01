@@ -1,6 +1,6 @@
 # STATE.md — Living status board (read this every session; update at session end)
 
-**Last updated:** 2026-10-01 (session 3) · **Branch:** `main` · **Last commit:** see `git log -1`
+**Last updated:** 2026-10-01 (session 4 — WP-01..04 shipped) · **Branch:** `main` · **Last commit:** see `git log -1`
 **Repo:** PRIVATE rehearsal. On **Oct 4** a fresh repo is created and work migrated «as if new» (D-002).
 
 ## 0. How to resume (new agent / new account / new machine) — ONE command
@@ -49,17 +49,23 @@ original sandbox; `docs/internal/` is its complete substitute. Never publish `do
 | **State machine** | `backend/app/state.py` | ✅ | 9 invariants I1–I9, 14 tests incl. property test; thresholds boundary ±0.002 |
 | **Post-validator** | `backend/app/verify.py` | ✅ | V1–V5, 7 tests (tampered text, wrong ref, grade on wrong record, forbidden label) |
 | Bootstrap / smoke | `scripts/bootstrap.sh`, `scripts/smoke.py`, `Makefile` | ✅ | fresh-clone rehearsal passed; found+fixed missing `numpy` dep |
+| **Providers (WP-01)** | `backend/app/providers/{base,mock,openai_compat,__init__}.py` | ✅ | `relocate()` re-locates every proposal verbatim, model offsets ignored (ADR-005); factory falls back to mock without key; 8 tests incl. lying/slow/broken providers |
+| **Pipeline (WP-02)** | `backend/app/pipeline.py`, `backend/app/links.py` | ✅ | extract→exact→(fuzzy)→decide→render→verify; deterministic tie order (Quran › showable OHD › Sahihain › idx); HadeethEnc `link` mode = empty body + grade/takhrij/link (V1 extended); all referral URL schemes HTTP-verified live; 20 e2e tests |
+| **API (WP-03)** | `backend/app/main.py` | ✅ | `/health` 503 gate, `POST /v1/check`, `POST /v1/check/image` (mock OCR, degrades honestly), `GET /v1/sources`, `GET /v1/messages/{lang}`, error envelope, CORS, rate limit 30/min + `X-Eval-Key`; live run: 6236/62169/3582 loaded, 33 ms per 2-quote request, RSS 1043 MB |
+| **Fixture + API tests (WP-04)** | `corpus/build_fixture.py`, `backend/tests/{conftest,test_api,test_pipeline,test_providers}.py` | ✅ | fixture = 271 ayat + 111 OHD + 32 HadeethEnc (git-ignored, auto-built from full index, tests skip without corpus); **80/80 tests**, mypy strict 24 files, SMOKE OK |
 | Competition study | `docs/COMPETITION.md`, `docs/internal/competition/` | ✅ | 4 official files archived + analysed; E-014 |
 | Config / schemas | `backend/app/config.py`, `schemas.py` | ✅ | defaults: LLM_PROVIDER=mock, HADEETHENC_MODE=link, OHD_MODE=display, RETRIEVAL_VECTORS=off |
 
-Quality gates at last commit: `ruff` ✅ · `mypy --strict` ✅ · `pytest` 38/38 ✅.
+Quality gates at last commit: `ruff` ✅ · `mypy --strict` ✅ (24 files) · `pytest` **80/80** ✅ · `make smoke` ✅.
+
+**NEXT (session 5): §2 item 7 (eval 150 cases + 500 FA — WP-05), then 8 (frontend — WP-06, palette `#12183F #6150EA #2EF2C2 #F2F4FF`), 9 (delivery docs — WP-07). Then cross-family review of WP-01..04 via `scripts/agents/orchestrator.py` (reviewer=gpt-6-astra `high`, tester=gpt-6.1-sol). Run the server: `cd backend && .venv/bin/uvicorn app.main:app --port 8000` (ready after ~25 s; `/health` is 503 until then). Pending owner: D-012 (C1).**
 
 ## 2. In progress / next (exact order — do not reorder without a DECISIONS entry)
 1. ~~state.py~~ ✅ done. 2. ~~verify.py~~ ✅ done.
-3. **`backend/app/providers/`** — `base.py` (`LLMClient.extract`, `VisionClient.ocr`), `mock.py` (wraps `rules.extract_spans`), factory by env. Real adapters only on competition day (D-004).
-4. **`backend/app/pipeline.py`** — extract (rules ∪ provider) → validate spans → per quote: exact → (if none) retrieve+window → state → verify; timings.
-5. **`backend/app/main.py`** — FastAPI: lifespan loads store+retriever; `/health` 503 until loaded (E-011) with counts/rss/build_sha; `POST /v1/check`; `GET /v1/sources` from manifest; error envelope `{error:{code,message_ar,message_en}}`; CORS from settings; rate limit 30/min + `X-Eval-Key` bypass (T5).
-6. **Tests**: `test_state.py` (adversarial typo → `needs_review`, Quran never partial, threshold boundary ±0.002 at 0.75/0.70/0.60), property test `found ⇒ strict tokens equal`, `test_verify.py` (forbidden word injected → rejected), `test_api.py` (httpx AsyncClient, uses a **small fixture index** built from 3 surahs + 50 hadith so CI has no 229 MB dependency — write `tests/conftest.py` that builds it from `corpus/data` if present, else skips).
+3. ~~providers~~ ✅ (WP-01) — was: **`backend/app/providers/`** — `base.py` (`LLMClient.extract`, `VisionClient.ocr`), `mock.py` (wraps `rules.extract_spans`), factory by env. Real adapters only on competition day (D-004).
+4. ~~pipeline~~ ✅ (WP-02) — was: **`backend/app/pipeline.py`** — extract (rules ∪ provider) → validate spans → per quote: exact → (if none) retrieve+window → state → verify; timings.
+5. ~~main.py~~ ✅ (WP-03) — was: **`backend/app/main.py`** — FastAPI: lifespan loads store+retriever; `/health` 503 until loaded (E-011) with counts/rss/build_sha; `POST /v1/check`; `GET /v1/sources` from manifest; error envelope `{error:{code,message_ar,message_en}}`; CORS from settings; rate limit 30/min + `X-Eval-Key` bypass (T5).
+6. ~~Tests~~ ✅ (WP-04) — was: **Tests**: `test_state.py` (adversarial typo → `needs_review`, Quran never partial, threshold boundary ±0.002 at 0.75/0.70/0.60), property test `found ⇒ strict tokens equal`, `test_verify.py` (forbidden word injected → rejected), `test_api.py` (httpx AsyncClient, uses a **small fixture index** built from 3 surahs + 50 hadith so CI has no 229 MB dependency — write `tests/conftest.py` that builds it from `corpus/data` if present, else skips).
 7. `eval/cases.yaml` (150 cases, categories A–L per BUILD_SPEC §6.1), `eval/PLAN.md`, `eval/false_alarm.py` (500 verbatim segments, seed 20261004), `eval/metrics.py`, `eval/run_eval.py`.
 8. Frontend scaffold `frontend/` (Vite+React+TS, RTL, imports `messages/*.json`): `Check.tsx`, `QuoteCard`, `DiffView`, `StatusBadge`, `SourcesFooter`.
 9. Delivery docs: `SOURCES.md` (generate from manifest — script `corpus/gen_sources_md.py`), `SAFETY.md` (rewritten), `AI_USAGE.md` (D-006 wording), `CHANGELOG.md`, `LICENSE` (Apache-2.0 placeholder, Q1), `THIRD_PARTY_NOTICES.md`, `.env.example`, `Makefile`, `docs/API.md`, `docs/ARCHITECTURE.md`, `backend/README.md`.
@@ -72,6 +78,10 @@ Quality gates at last commit: `ruff` ✅ · `mypy --strict` ✅ · `pytest` 38/3
     (lazy `import openpyxl` — intentional, keep stdlib-only import path for fetch; add a targeted `# noqa: PLC0415` with reason).
 
 ## 3. Known facts discovered (not in the package)
+- **2026-10-01 (s4):** Referral URL schemes verified by HTTP: `quranpedia.net/surah/1/{s}/{a}` → 301 → ayah page 200; `quranpedia.net/surah/{s}/{a}` is **404** (don't use); `dorar.net/hadith/search?q=` 200 (403 with curl default UA — browser UA fine); `shamela.ws/search?q=` 200; `hadeethenc.com/ar/browse/hadith/{id}` 200; OHD GitHub blob at pinned commit 200.
+- **2026-10-01 (s4):** FastAPI `Form/File` needs `python-multipart` → added to deps. Rules introducer left a leading «ﷺ» in spans → fixed in `rules.py`.
+- **2026-10-01 (s4):** HadeethEnc 66511 and OHD Bukhari 1 tie at 0.875 for «إنما الأعمال بالنية…»; deterministic `_order` (E-015) prefers showable OHD + Sahihain so the user sees the highlighted diff.
+- **2026-10-01 (s4):** `pkill -f uvicorn` from the Bash tool kills the tool's own shell — run uvicorn in a background shell and kill by PID.
 - **2026-10-01:** tanzil.net TLS certificate expired (Let's Encrypt, notAfter 2026-09-30 11:47 UTC). Files served are byte-identical
   to the pinned sha256 (both rasms re-downloaded and re-hashed). Mitigated in `fetch.py` (E-013). Re-check with `--strict-tls` later.
 - **2026-10-01:** `/mnt/aidrive` is **not a mount** in this sandbox (empty root dir). AI Drive is **out of scope by owner decision (D-011)** — GitHub only.

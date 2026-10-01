@@ -6,7 +6,8 @@ Five checks; any failure downgrades the affected quote to ``needs_review`` with
 
   V1  every ``matches[].source_text`` is byte-equal to the corpus record's display field
       for the same (corpus, ref) — no religious text may reach the user unless it is the
-      verbatim corpus field;
+      verbatim corpus field; in ``HADEETHENC_MODE=link`` a HadeethEnc match must carry an
+      EMPTY body (text is linked, never embedded — owner Q2);
   V2  every ``ref`` exists in the store;
   V3  ``grade`` (if present) equals the HadeethEnc record's own ``grade``/``takhrij``/``link``
       and the match corpus is ``hadeethenc``;
@@ -40,11 +41,15 @@ def _lookup(store: Store, m: Match) -> Record | None:
         return None
 
 
-def _match_ok(store: Store, m: Match) -> bool:
+def _match_ok(store: Store, m: Match, *, hadeethenc_link: bool) -> bool:
     rec = _lookup(store, m)
     if rec is None:  # V2
         return False
-    if m.source_text != rec.display:  # V1 (byte-exact; display is the verbatim corpus field)
+    if rec.corpus == "hadeethenc" and hadeethenc_link:
+        # link mode (Q2): the full text is NOT embedded; only an empty body is acceptable
+        if m.source_text != "":
+            return False
+    elif m.source_text != rec.display:  # V1 (byte-exact; display is the verbatim corpus field)
         return False
     if m.grade is not None:  # V3
         if rec.corpus != "hadeethenc":
@@ -82,12 +87,14 @@ def _reject(q: QuoteResult) -> None:
     q.score = 0.0
 
 
-def validate_response(resp: CheckResponse, store: Store, messages_dir: Path) -> CheckResponse:
+def validate_response(
+    resp: CheckResponse, store: Store, messages_dir: Path, *, hadeethenc_link: bool = False
+) -> CheckResponse:
     rejections = 0
     for q in resp.quotes:
         bad = False
         for m in q.matches:
-            if not _match_ok(store, m):
+            if not _match_ok(store, m, hadeethenc_link=hadeethenc_link):
                 bad = True
                 break
         if not bad:

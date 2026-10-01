@@ -176,7 +176,7 @@ def extract_spans(text: str, *, min_tokens_marked: int = 2, min_tokens_intro: in
 
     # 2) introducers
     for intro in _INTRODUCERS:
-        for m in re.finditer(re.escape(intro) + r"\s*[:،,]?\s*", text):
+        for m in re.finditer(re.escape(intro) + r"(?:\s*ﷺ)?\s*[:،,]?\s*", text):
             start = m.end()
             # if a bracket opens right here, the bracket rule already caught it
             if start < len(text) and text[start] in {o for o, _ in _BRACKET_PAIRS}:
