@@ -37,7 +37,7 @@ def tiny_store() -> Store:
     ]
     z = np.zeros(6, dtype=np.int32)
     return Store(
-        records=recs, vocab={}, svocab={}, G=z, GS=z, span_start=z, span_end=z, g_rec=z, g_doc=z,
+        records=recs, vocab={}, svocab={}, G=z, GS=z, GS2=z, G2=z, span_start=z, span_end=z, g_rec=z, g_doc=z,
         post_offsets=np.zeros(1, dtype=np.int32), post_positions=np.zeros(0, dtype=np.int32),
         rdocs_quran=[], rdocs_hadith=[], meta={},
     )  # fmt: skip

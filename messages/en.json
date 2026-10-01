@@ -33,7 +33,8 @@
     "no_grade": "We do not show a grade for this hadith; we show its location in the sources only.",
     "hadeethenc_link_only": "This hadith is listed in the Prophetic Hadiths Encyclopedia; you can read it there.",
     "many_positions": "Found at {total} places; the first {shown} are shown.",
-    "ocr_mock": "Demo mode: the image text was NOT actually read; a fixed sample text was used because no vision provider is configured."
+    "ocr_mock": "Demo mode: the image text was NOT actually read; a fixed sample text was used because no vision provider is configured.",
+    "quran_fragment": "The quoted text is part of the ayah, not the whole ayah; the full ayah text is shown next to yours."
   },
   "labels": {
     "found": "Found",

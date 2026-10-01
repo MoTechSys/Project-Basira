@@ -116,3 +116,62 @@ def fuzzy_search(
     out = list(best_by_rec.values())
     out.sort(key=lambda h: (-h.score, h.rec.g_len, h.rec.idx))
     return out
+
+
+def fuzzy_search_surah_stream(
+    store: Store,
+    seeds: list[WindowHit],
+    q_loose: list[str],
+    *,
+    max_seeds: int = 5,
+    budget: int = 400_000,
+) -> list[WindowHit]:
+    """Multi-ayah quotes (E-025). Ayah-level docs cannot score a quote that runs over several ayat
+    («… الْمَشْحُونِ * ثُمَّ أَغْرَقْنَا …»): each ayah alone covers only part of it. Around each seed
+    ayah (best per-ayah hits) we open a window in the *surah stream* — the same stream ``find_exact``
+    uses for cross-ayah exact hits — of ±(len(quote)) tokens, and slide windows there. The hit is
+    attributed to the ayah where the window starts; ``gpos``/``win_len`` let the renderer compute the
+    covered ayah range exactly as for exact cross-ayah hits. Never crosses a surah boundary.
+    """
+    n = len(q_loose)
+    if n < 2 or not seeds:
+        return []
+    q_ids = [store.token_id(t) if store.token_id(t) >= 0 else -1_000_000 - i for i, t in enumerate(q_loose)]
+    hits: list[WindowHit] = []
+    seen_docs: set[tuple[int, int]] = set()
+    used = 0
+    for seed in seeds[:max_seeds]:
+        rec = seed.rec
+        if rec.corpus != "tanzil":
+            continue
+        doc_id = int(store.g_doc[seed.gpos])
+        lo = max(0, seed.gpos - n)
+        hi = min(len(store.G), seed.gpos + seed.win_len + n)
+        # clamp to the surah stream document
+        while lo < seed.gpos and int(store.g_doc[lo]) != doc_id:
+            lo += 1
+        while hi > seed.gpos and int(store.g_doc[hi - 1]) != doc_id:
+            hi -= 1
+        key = (lo, hi)
+        if key in seen_docs or hi - lo <= 0:
+            continue
+        seen_docs.add(key)
+        region = RetrievalDoc(rec.idx, lo, hi - lo)
+        res = best_window(store, region, q_ids, budget - used)
+        used += hi - lo
+        if res is None:
+            continue
+        score, gpos, w = res
+        start_rec = store.record_of_pos(gpos)
+        # basmala tokens of ayah 1 are display-only: a window may not start inside them
+        if gpos - start_rec.g_start < start_rec.offset and gpos < start_rec.g2_start:
+            continue
+        if start_rec.g2_start >= 0 and gpos >= start_rec.g2_start:
+            hits.append(WindowHit(start_rec, -1, -1, round(score, 4), gpos, w))
+        else:
+            ts = gpos - start_rec.g_start
+            hits.append(WindowHit(start_rec, ts, ts + w, round(score, 4), gpos, w))
+        if used >= budget:
+            break
+    hits.sort(key=lambda h: (-h.score, h.win_len, h.rec.idx))
+    return hits

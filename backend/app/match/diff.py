@@ -42,7 +42,18 @@ def word_diff(
     quote_spans: list[tuple[int, int]],
     source_tokens: list[str],
     source_spans: list[tuple[int, int]] | None,
+    source_alt_tokens: list[str] | None = None,
 ) -> list[DiffOp]:
+    """``source_alt_tokens`` (E-024): the same source words in the other Quran rasm. A quote word
+    equal to either spelling is treated as equal, so «كما» against Uthmani «كمآ» is not highlighted."""
+    if source_alt_tokens is not None and len(source_alt_tokens) == len(source_tokens):
+        # project the source onto whichever spelling the quote used, position by position, so the
+        # matcher sees equality without us ever altering the displayed text
+        qset = set(quote_tokens)
+        source_tokens = [
+            alt if (s not in qset and alt in qset) else s
+            for s, alt in zip(source_tokens, source_alt_tokens, strict=True)
+        ]
     sm = SequenceMatcher(a=quote_tokens, b=source_tokens, autojunk=False)
     ops: list[DiffOp] = []
     for tag_, i1, i2, j1, j2 in sm.get_opcodes():

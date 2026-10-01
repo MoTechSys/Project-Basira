@@ -29,7 +29,7 @@ from typing import Any
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "backend"))
 
-from app.normalize import tokenize  # noqa: E402
+from app.normalize import strict_tokens, tokenize  # noqa: E402
 from app.store import Record, Store  # noqa: E402
 
 _ORTHO = {
@@ -81,14 +81,22 @@ def window_tokens(store: Store, src: dict[str, Any]) -> list[str]:
     return out
 
 
-def _apply_ortho(tokens: list[str], kind: str) -> list[str]:
+def _apply_ortho(tokens: list[str], kind: str, avoid: list[str] | None = None) -> list[str]:
+    """``avoid`` (E-024): strict forms of the same words in the OTHER Quran rasm. A fold that lands
+    on the Uthmani spelling («فاذكروني» → «فاذكرونى» == Mushaf «فَٱذْكُرُونِىٓ») is byte-faithful
+    Quran, not a mutation, so such a token is skipped and the next candidate is folded instead."""
     src_chars, dst = _ORTHO[kind]
     out: list[str] = []
     changed = False
-    for t in tokens:
+    for i, t in enumerate(tokens):
         if changed:
             out.append(t)
             continue
+        if avoid is not None and i < len(avoid):
+            cand = _fold_one(t, kind, src_chars, dst)
+            if cand != t and strict_tokens(cand) == [avoid[i]]:
+                out.append(t)
+                continue
         if kind == "ha2ta":
             if t.endswith("\u0647") and len(t) > 2:
                 out.append(t[:-1] + dst)
@@ -114,7 +122,27 @@ def _apply_ortho(tokens: list[str], kind: str) -> list[str]:
     return out
 
 
-def mutate(store: Store, tokens: list[str], mutation: str | None) -> tuple[list[str], str]:  # noqa: PLR0911
+def ortho_foldable(tokens: list[str], kind: str, avoid: list[str] | None) -> bool:
+    """True iff ``_apply_ortho`` would change at least one token into a form that is NOT the
+    twin-rasm spelling (shared by gen_cases.py so generation and materialisation never disagree)."""
+    try:
+        _apply_ortho(tokens, kind, avoid)
+    except ValueError:
+        return False
+    return True
+
+
+def _fold_one(t: str, kind: str, src_chars: str, dst: str) -> str:
+    if kind in ("ha2ta", "ya2alef_maqsura"):
+        return t[:-1] + dst if t.endswith(src_chars) and len(t) > 2 else t
+    for ch in src_chars:
+        t = t.replace(ch, dst)
+    return t
+
+
+def mutate(  # noqa: PLR0911
+    store: Store, tokens: list[str], mutation: str | None, avoid: list[str] | None = None
+) -> tuple[list[str], str]:
     """Return (tokens, applied_description)."""
     if not mutation or mutation == "none":
         return tokens, "none"
@@ -125,7 +153,7 @@ def mutate(store: Store, tokens: list[str], mutation: str | None) -> tuple[list[
             toks, _ = mutate(store, toks, part)
         return toks, mutation
     if kind == "ortho":
-        return _apply_ortho(toks, rest), mutation
+        return _apply_ortho(toks, rest, avoid), mutation
     if kind == "drop":
         k = int(rest)
         del toks[k]
@@ -166,7 +194,12 @@ def materialize(store: Store, case: dict[str, Any]) -> Materialized:
         nxt = case["source"].get("join_next")
         if nxt:
             toks = toks + window_tokens(store, nxt)
-        toks, applied = mutate(store, toks, case.get("mutation"))
+        avoid = None
+        rec = _lookup(store, case["source"])
+        if rec.corpus == "tanzil" and rec.g_len == rec.g2_len and not case["source"].get("join_next"):
+            a, b = case["source"].get("tokens", [0, rec.g_len])
+            avoid = store.strict_tokens_of(rec)[max(a, rec.offset) : b]  # Uthmani forms of the window
+        toks, applied = mutate(store, toks, case.get("mutation"), avoid)
         quote = " ".join(toks)
         notes.append(f"mutation={applied}; n_tokens={len(toks)}")
     else:

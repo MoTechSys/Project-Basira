@@ -87,6 +87,8 @@ class Store:
     svocab: dict[str, int]  # strict token → id
     G: I32  # loose ids per global position
     GS: I32  # strict ids per global position
+    GS2: I32  # strict id of the SAME word in the other Quran rasm (E-024); == GS outside Quran
+    G2: I32  # loose id of the same word in the other Quran rasm (E-024); == G outside Quran
     span_start: I32  # char offsets into the record display text (−1 for variant-2 tokens)
     span_end: I32
     g_rec: I32
@@ -123,6 +125,31 @@ class Store:
     def strict_tokens_of(self, rec: Record) -> list[str]:
         inv = self._inv_svocab
         return [inv[int(t)] for t in self.GS[rec.g_start : rec.g_start + rec.g_len]]
+
+    def strict_alt_tokens_of(self, rec: Record) -> list[str]:
+        """Strict tokens of the record's twin rasm, word-aligned (E-024). Equals ``strict_tokens_of``
+        for hadith and for the 363 ayat whose rasms are not word-aligned."""
+        inv = self._inv_svocab
+        return [inv[int(t)] for t in self.GS2[rec.g_start : rec.g_start + rec.g_len]]
+
+    def strict_tokens_range(self, gpos: int, n: int) -> list[str]:
+        """Strict tokens of an arbitrary global window (may span several ayat of one surah)."""
+        inv = self._inv_svocab
+        return [inv[int(t)] for t in self.GS[gpos : gpos + n]]
+
+    def strict_alt_tokens_range(self, gpos: int, n: int) -> list[str]:
+        inv = self._inv_svocab
+        return [inv[int(t)] for t in self.GS2[gpos : gpos + n]]
+
+    def spans_range(self, rec: Record, gpos: int, n: int) -> list[tuple[int, int]]:
+        """Char spans into ``rec.display`` for the window; positions outside ``rec`` → (-1, -1)."""
+        out: list[tuple[int, int]] = []
+        for g in range(gpos, gpos + n):
+            if rec.g_start <= g < rec.g_start + rec.g_len:
+                out.append((int(self.span_start[g]), int(self.span_end[g])))
+            else:
+                out.append((-1, -1))
+        return out
 
     def spans_of(self, rec: Record) -> list[tuple[int, int]]:
         s = self.span_start[rec.g_start : rec.g_start + rec.g_len]
@@ -184,6 +211,8 @@ def load_store(index_dir: Path) -> Store:
     svocab: dict[str, int] = {}
     G = array("i")
     GS = array("i")
+    GS2 = array("i")
+    G2 = array("i")
     ss = array("i")
     se = array("i")
     g_rec = array("i")
@@ -203,6 +232,8 @@ def load_store(index_dir: Path) -> Store:
             sid = svocab.setdefault(st, len(svocab))
             G.append(tid)
             GS.append(sid)
+            GS2.append(sid)
+            G2.append(tid)
             if spans is not None:
                 ss.append(spans[2 * i])
                 se.append(spans[2 * i + 1])
@@ -241,6 +272,15 @@ def load_store(index_dir: Path) -> Store:
             starts1.append(push_tokens(loose2, strict2, None, d["_idx"], doc_id, int(d["o"])))
         for d, (g_start, g_len), (g2_start, g2_len) in zip(pending_surah, starts0, starts1, strict=True):
             offset = int(d["o"])
+            if g_len == g2_len:
+                # E-024: word-aligned rasms → each position also knows its twin's strict form, so a quote
+                # mixing Uthmani and simple spellings («وأوحى … كما») still passes the strict gate.
+                # Ayat whose word counts differ («يأيها» vs «يا أيها», 363 of 6236) keep GS2 == GS.
+                for k in range(g_len):
+                    GS2[g_start + k] = GS[g2_start + k]
+                    GS2[g2_start + k] = GS[g_start + k]
+                    G2[g_start + k] = G[g2_start + k]
+                    G2[g2_start + k] = G[g_start + k]
             rec = Record(
                 d["_idx"],
                 "tanzil",
@@ -321,6 +361,8 @@ def load_store(index_dir: Path) -> Store:
         svocab=svocab,
         G=np.frombuffer(G, dtype=np.int32).copy(),
         GS=np.frombuffer(GS, dtype=np.int32).copy(),
+        GS2=np.frombuffer(GS2, dtype=np.int32).copy(),
+        G2=np.frombuffer(G2, dtype=np.int32).copy(),
         span_start=np.frombuffer(ss, dtype=np.int32).copy(),
         span_end=np.frombuffer(se, dtype=np.int32).copy(),
         g_rec=np.frombuffer(g_rec, dtype=np.int32).copy(),

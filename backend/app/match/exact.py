@@ -63,10 +63,14 @@ def find_exact(store: Store, loose: list[str], strict: list[str]) -> list[ExactH
         return []
 
     sids = np.asarray([store.strict_id(t) for t in strict], dtype=np.int64)
+    all_known = bool((sids >= 0).all())
     hits: list[ExactHit] = []
     for g in cand.tolist():
-        window_strict = store.GS[g : g + n]
-        strict_ok = bool(np.array_equal(window_strict, sids)) if (sids >= 0).all() else False
+        # E-024: each token passes the strict gate if it equals the record's spelling in EITHER
+        # Quran rasm at that position (GS2 == GS outside the Quran, so hadith is unaffected).
+        strict_ok = (
+            all_known and bool(((store.GS[g : g + n] == sids) | (store.GS2[g : g + n] == sids)).all())
+        )
         rec = store.record_of_pos(g)
         if rec.corpus == "tanzil" and rec.g2_start <= g < rec.g2_start + rec.g2_len:
             if g - rec.g2_start < rec.offset:
@@ -121,3 +125,31 @@ def dedupe_hits(hits: list[ExactHit]) -> list[ExactHit]:
             out.append(ExactHit(h.rec, -1, -1, any_strict, h.gpos, 1))
     out.sort(key=lambda h: (not h.strict_ok, h.rec.idx, h.tok_start))
     return out
+
+
+def mixed_rasm_hit(store: Store, loose: list[str], strict: list[str], gpos: int) -> ExactHit | None:
+    """E-024 (loose tier). A quote that mixes Uthmani and simple spellings *of different words*
+    («آمنا» simple next to «إسحق» Uthmani) matches neither stream token-for-token, so ``find_exact``
+    cannot see it and the fuzzy stage reports a near-miss. Given a candidate window start (from the
+    fuzzy stage, same length as the quote), accept the window iff EVERY position equals the quote's
+    loose token in one of the two rasms; the strict gate is then applied the same way. Quran only
+    (``G2 == G`` elsewhere, so hadith windows can only pass if they were exact already)."""
+    n = len(loose)
+    if n == 0 or gpos < 0 or gpos + n > len(store.G) or int(store.g_doc[gpos]) != int(store.g_doc[gpos + n - 1]):
+        return None
+    rec = store.record_of_pos(gpos)
+    ids = np.asarray([store.token_id(t) for t in loose], dtype=np.int64)
+    g = store.G[gpos : gpos + n]
+    g2 = store.G2[gpos : gpos + n]
+    pure = bool((g == ids).all()) or bool((g2 == ids).all())  # find_exact already handles these
+    if rec.corpus != "tanzil" or (ids < 0).any() or pure or not bool(((g == ids) | (g2 == ids)).all()):
+        return None
+    sids = np.asarray([store.strict_id(t) for t in strict], dtype=np.int64)
+    strict_ok = bool((sids >= 0).all()) and bool(
+        ((store.GS[gpos : gpos + n] == sids) | (store.GS2[gpos : gpos + n] == sids)).all()
+    )
+    variant2 = rec.g2_start <= gpos < rec.g2_start + rec.g2_len
+    ts = gpos - (rec.g2_start if variant2 else rec.g_start)
+    if ts < rec.offset:
+        return None  # window starts inside the display-only basmala
+    return ExactHit(rec, -1, -1, strict_ok, gpos, 1) if variant2 else ExactHit(rec, ts, ts + n, strict_ok, gpos, 0)

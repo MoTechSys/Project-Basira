@@ -36,8 +36,8 @@ from app.extract.rules import (
 )
 from app.links import hadeethenc_url, hadith_search_links, ohd_url, quran_search_links, quran_url
 from app.match.diff import DiffOp, diff_kinds, word_diff
-from app.match.exact import ExactHit, dedupe_hits, find_exact, records_covering
-from app.match.window import WindowHit, fuzzy_search
+from app.match.exact import ExactHit, dedupe_hits, find_exact, mixed_rasm_hit, records_covering
+from app.match.window import WindowHit, fuzzy_search, fuzzy_search_surah_stream
 from app.messages import Messages, load_messages
 from app.normalize import tokenize
 from app.providers import LLMClient, ProviderError, relocate
@@ -238,6 +238,19 @@ class Pipeline:
                 self._order(evidence)
                 return evidence, carriers, 0.0
         tr0 = time.perf_counter()
+        self._fuzzy_evidence(loose, strict, evidence, carriers)
+        self._order(evidence)
+        return evidence, carriers, time.perf_counter() - tr0
+
+    def _fuzzy_evidence(
+        self,
+        loose: list[str],
+        strict: list[str],
+        evidence: list[Evidence],
+        carriers: dict[int, ExactHit | WindowHit],
+    ) -> None:
+        """Retrieval → windowed similarity, per corpus channel. Quran windows are re-scored in the surah
+        stream for multi-ayah quotes (E-025) and re-checked for mixed-rasm exactness (E-024)."""
         for channel, docs in (
             (self.retriever.quran, self.store.rdocs_quran),
             (self.retriever.hadith, self.store.rdocs_hadith),
@@ -245,18 +258,22 @@ class Pipeline:
             ranked = channel.search(self.store, loose, top_k=RETRIEVE_TOP_K)
             if not ranked:
                 continue
-            for w in fuzzy_search(self.store, docs, ranked, loose, max_docs=FUZZY_MAX_DOCS):
+            windows = fuzzy_search(self.store, docs, ranked, loose, max_docs=FUZZY_MAX_DOCS)
+            if docs is self.store.rdocs_quran and windows:
+                windows = _merge_windows(windows, fuzzy_search_surah_stream(self.store, windows, loose))
+            for w in windows:
                 if self.settings.ohd_mode == "off" and w.rec.corpus == "ohd":
                     continue
-                if w.score >= 1.0:
-                    # a loose-identical window that `find_exact` did not return cannot happen on the same
-                    # token ids; guard anyway: treat as loose-exact with a strict check through the diff
-                    evidence.append(Evidence(w.rec.corpus, w.rec.idx, 0.999, False, book=w.rec.book))
-                else:
-                    evidence.append(Evidence(w.rec.corpus, w.rec.idx, w.score, False, book=w.rec.book))
+                mixed = mixed_rasm_hit(self.store, loose, strict, w.gpos) if w.win_len == len(loose) else None
+                if mixed is not None:
+                    evidence.append(Evidence("tanzil", mixed.rec.idx, 1.0, mixed.strict_ok, is_exact=True))
+                    carriers[mixed.rec.idx] = mixed
+                    continue
+                # a loose-identical window that `find_exact` did not return cannot happen on the same
+                # token ids; guard anyway: never report it as exact
+                score = 0.999 if w.score >= 1.0 else w.score
+                evidence.append(Evidence(w.rec.corpus, w.rec.idx, score, False, book=w.rec.book))
                 carriers.setdefault(w.rec.idx, w)
-        self._order(evidence)
-        return evidence, carriers, time.perf_counter() - tr0
 
     def _order(self, evidence: list[Evidence]) -> None:
         """Deterministic order on equal scores (the state machine keeps evidence order for ties):
@@ -314,6 +331,8 @@ class Pipeline:
                 if m is not None:
                     matches.append(m)
             notices.extend(self._hadith_notices(matches, d))
+            if d.status == "found" and d.corpus_scope == "quran" and self._is_fragment(q, carriers, d):
+                notices.append("quran_fragment")  # E-026: faithful text, but not the whole ayah
         msg_key = "found_multi" if d.status == "found" and len(d.winners) > 1 else d.message_key
         status = d.status
         review_reason = d.review_reason
@@ -359,6 +378,24 @@ class Pipeline:
             external_search_links=ext,
         )
 
+    def _is_fragment(self, q: _Quote, carriers: dict[int, ExactHit | WindowHit], d: Decision) -> bool:
+        """True when the exact Quran hit does not start at an ayah head or end at an ayah tail."""
+        for ev in d.winners:
+            c = carriers.get(ev.rec_idx)
+            if not isinstance(c, ExactHit):
+                continue
+            n = len(q.tokens)
+            first = self.store.record_of_pos(c.gpos)
+            last = self.store.record_of_pos(c.gpos + n - 1)
+            f_start = first.g2_start if c.variant == 1 else first.g_start
+            l_start = last.g2_start if c.variant == 1 else last.g_start
+            l_len = last.g2_len if c.variant == 1 else last.g_len
+            at_head = c.gpos == f_start + first.offset
+            at_tail = c.gpos + n == l_start + l_len
+            if at_head and at_tail:
+                return False  # at least one position is a whole ayah / whole run of ayat
+        return bool(d.winners)
+
     def _hadith_notices(self, matches: list[Match], d: Decision) -> list[str]:
         """Fixed, descriptive notices about the *source* (never about the hadith's standing)."""
         out: list[str] = []
@@ -389,28 +426,47 @@ class Pipeline:
             tok_start, tok_end = carrier.tok_start, carrier.tok_end
         src_spans = self.store.spans_of(rec)
         src_strict = self.store.strict_tokens_of(rec)
+        src_alt = self.store.strict_alt_tokens_of(rec) if rec.corpus == "tanzil" else None
         q_strict = [t.strict for t in q.tokens]
         q_spans = [(t.start, t.end) for t in q.tokens]
 
-        # the window to diff against: matched tokens when known, else the whole record (minus basmala)
-        if tok_start >= 0:
+        # Quran (E-024/E-025): the carrier may sit in the simple-rasm stream (variant 1, no char
+        # spans) and/or run past this ayah into the next. Compute the window on the global stream
+        # and project it onto the DISPLAY stream of the same surah (both rasms are pushed ayah by
+        # ayah, so the display twin of a position is found via the record's g_start/g2_start), so
+        # highlights land on the verbatim Uthmani text whenever the two rasms are word-aligned.
+        win_n = len(q.tokens) if isinstance(carrier, ExactHit) else (carrier.win_len if carrier else 0)
+        if rec.corpus == "tanzil" and carrier is not None and win_n > 0:
+            gpos = self._display_gpos(rec, carrier.gpos)
+            if gpos >= 0:
+                win_strict = self.store.strict_tokens_range(gpos, win_n)
+                win_alt: list[str] | None = self.store.strict_alt_tokens_range(gpos, win_n)
+                win_spans = self.store.spans_range(rec, gpos, win_n)
+            else:  # misaligned rasms: compare in the carrier's own stream, no char mapping
+                win_strict = self.store.strict_tokens_range(carrier.gpos, win_n)
+                win_alt = self.store.strict_alt_tokens_range(carrier.gpos, win_n)
+                win_spans = [(-1, -1)] * win_n
+        elif tok_start >= 0:
             win_strict = src_strict[tok_start:tok_end]
             win_spans = src_spans[tok_start:tok_end]
+            win_alt = src_alt[tok_start:tok_end] if src_alt else None
         else:
             win_strict = src_strict[rec.offset :]
             win_spans = src_spans[rec.offset :]
+            win_alt = src_alt[rec.offset :] if src_alt else None
         ops: list[DiffOp] = []
         kinds: list[str] = []
         if d.status != "found" or not ev.strict_ok:
-            ops = word_diff(q_strict, q_spans, win_strict, win_spans)
+            ops = word_diff(q_strict, q_spans, win_strict, win_spans, win_alt)
             kinds = diff_kinds(ops)
         rng = None
-        if win_spans and win_spans[0][0] >= 0:
-            rng = [win_spans[0][0], win_spans[-1][1]]
+        mapped = [sp for sp in win_spans if sp[0] >= 0]
+        if mapped:
+            rng = [mapped[0][0], mapped[-1][1]]
 
         continues_to = None
-        if rec.corpus == "tanzil" and isinstance(carrier, ExactHit):
-            covered = records_covering(self.store, carrier.gpos, len(q.tokens))
+        if rec.corpus == "tanzil" and carrier is not None and win_n > 0:
+            covered = records_covering(self.store, carrier.gpos, win_n)
             if len(covered) > 1:
                 continues_to = covered[-1].ref
 
@@ -444,6 +500,15 @@ class Pipeline:
             grade=grade,
             continues_to=continues_to,
         )
+
+    def _display_gpos(self, rec: Record, gpos: int) -> int:
+        """Map a global position inside ``rec`` (either rasm) to the display-stream position of the
+        same word, or -1 when the record's rasms are not word-aligned."""
+        if rec.g_len != rec.g2_len:
+            return -1
+        if rec.g2_start <= gpos < rec.g2_start + rec.g2_len:
+            return rec.g_start + (gpos - rec.g2_start)
+        return gpos
 
     def _labels(self, rec: Record, continues_to: dict[str, Any] | None) -> tuple[str, str]:
         if rec.corpus == "tanzil":
@@ -484,6 +549,18 @@ class Pipeline:
                 ]
             return []
         return [Link(name="hadeethenc.com", url=hadeethenc_url(rec.link, rec.henc_id))]
+
+
+def _merge_windows(per_ayah: list[WindowHit], stream: list[WindowHit]) -> list[WindowHit]:
+    """One hit per record, best score wins (stream hits replace a weaker per-ayah hit on the same ayah)."""
+    best: dict[int, WindowHit] = {}
+    for h in [*per_ayah, *stream]:
+        cur = best.get(h.rec.idx)
+        if cur is None or h.score > cur.score:
+            best[h.rec.idx] = h
+    out = list(best.values())
+    out.sort(key=lambda h: (-h.score, h.win_len, h.rec.idx))
+    return out
 
 
 def _ms(t0: float) -> int:

@@ -66,6 +66,38 @@ async def test_quran_near_miss_shows_diff_never_partial(pipeline: Pipeline) -> N
     assert q.matches[0].diff_kinds
 
 
+async def test_mixed_rasm_quote_is_found_and_not_highlighted(pipeline: Pipeline) -> None:
+    """E-024: 2:4 in the Uthmani rasm reads «بِمَآ … وَمَآ … وَبِٱلْءَاخِرَةِ»; a quote mixing the simple
+    spelling of some words («بما», «وبالآخرة») with the Uthmani «ومآ» is byte-faithful to the Mushaf
+    in every word and must pass the strict gate — but a real letter change must still fail it."""
+    r = await run(pipeline, "قال تعالى: ﴿والذين يؤمنون بما أنزل إليك ومآ أنزل من قبلك وبالآخرة هم يوقنون﴾")
+    q = r.quotes[0]
+    assert q.status == "found" and (q.matches[0].ref["surah"], q.matches[0].ref["ayah"]) == (2, 4)
+    assert q.matches[0].diff == []
+    # same ayah, one letter changed («إليك» → «عليك»): never found; the diff highlights only that word
+    r = await run(pipeline, "قال تعالى: ﴿والذين يؤمنون بما أنزل عليك ومآ أنزل من قبلك وبالآخرة هم يوقنون﴾")
+    q = r.quotes[0]
+    assert q.status == "needs_review" and q.review_reason in ("near_miss", "orthographic_difference")
+    changed = [o for o in q.matches[0].diff if o.op != "equal"]
+    assert len(changed) == 1 and changed[0].op == "replace"
+    assert q.quoted_text[changed[0].quote_chars[0] : changed[0].quote_chars[1]] == "عليك"
+
+
+async def test_decomposed_madda_is_byte_faithful(pipeline: Pipeline) -> None:
+    """E-023: Tanzil writes «آ» as ا+U+0653; a quote with the precomposed U+0622 is identical text."""
+    r = await run(pipeline, "قال تعالى: ﴿قالوا سبحانك لا علم لنا إلا ما علمتنآ إنك أنت العليم الحكيم﴾")
+    assert r.quotes[0].status == "found"
+
+
+async def test_fragment_of_ayah_is_found_but_labelled_fragment(pipeline: Pipeline) -> None:
+    """E-026: faithful text that is only part of an ayah is `found` (it IS Mushaf text) with the
+    `quran_fragment` notice; a whole ayah carries no such notice."""
+    r = await run(pipeline, "قال تعالى: ﴿إن الله مع الصابرين﴾")
+    assert r.quotes[0].status == "found" and "quran_fragment" in r.quotes[0].notice_keys
+    r = await run(pipeline, "قال تعالى: ﴿الحمد لله رب العالمين﴾")
+    assert r.quotes[0].status == "found" and "quran_fragment" not in r.quotes[0].notice_keys
+
+
 async def test_quran_not_found_shows_no_candidates(pipeline: Pipeline) -> None:
     r = await run(pipeline, "قال تعالى: الدين المعاملة والصدق منجاة")
     q = r.quotes[0]

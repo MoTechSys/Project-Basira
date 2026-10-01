@@ -59,6 +59,21 @@ _ARABIC_LETTER_MAX = 0x064A
 _SEP = " "
 _DROP = ""
 
+# Canonical composition of a base letter + combining hamza/madda into the precomposed letter
+# (Unicode NFC pairs). Tanzil Uthmani writes «آ» as ا + U+0653; most other texts (and Tanzil
+# simple) use U+0622. Without this fold the strict tier would call a byte-faithful «كَمَآ» an
+# orthographic difference (E-023). Only true canonical pairs are listed — ى/و/ي + madda (Uthmani
+# elongation marks) are NOT letters and keep being dropped.
+_COMPOSE: dict[tuple[str, str], str] = {
+    ("\u0627", "\u0653"): "\u0622",  # ا + madda  → آ
+    ("\u0627", "\u0654"): "\u0623",  # ا + hamza above → أ
+    ("\u0627", "\u0655"): "\u0625",  # ا + hamza below → إ
+    ("\u0648", "\u0654"): "\u0624",  # و + hamza above → ؤ
+    ("\u064a", "\u0654"): "\u0626",  # ي + hamza above → ئ
+    ("\u0649", "\u0654"): "\u0626",  # ى + hamza above → ئ (NFC maps to U+0626)
+}
+_COMPOSE_MARKS = frozenset(m for _, m in _COMPOSE)
+
 
 def _is_removed(ch: str) -> bool:
     cp = ord(ch)
@@ -130,7 +145,23 @@ def tokenize(text: str) -> list[Token]:
             cur_strict = []
             tok_start = -1
 
-    for i, ch in enumerate(text):
+    n = len(text)
+    i = -1
+    while i + 1 < n:
+        i += 1
+        ch = text[i]
+        # canonical composition: look ahead one char for a combining hamza/madda (E-023)
+        if i + 1 < n and text[i + 1] in _COMPOSE_MARKS:
+            composed = _COMPOSE.get((ch, text[i + 1]))
+            if composed is not None:
+                lo, st = _map_char(composed)
+                if tok_start < 0:
+                    tok_start = i
+                cur_loose.append(lo)
+                cur_strict.append(st)
+                i += 1
+                last_letter_end = i + 1
+                continue
         lo, st = _map_char(ch)
         if lo == _DROP:
             continue  # diacritic etc. — stays inside the current token span

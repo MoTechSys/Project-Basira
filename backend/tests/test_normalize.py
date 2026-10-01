@@ -99,3 +99,19 @@ def test_idempotent(s: str) -> None:
     assert loose_join(once) == once
     once_s = strict_join(s)
     assert strict_join(once_s) == once_s
+
+
+def test_combining_madda_and_hamza_compose_in_strict_tier() -> None:
+    # E-023: Tanzil Uthmani writes «آ» as ا + U+0653; other texts use the precomposed U+0622.
+    # A byte-faithful quote must not be flagged as an orthographic difference.
+    assert strict_join("كَمَا\u0653") == strict_join("كَمَآ") == "كمآ"
+    assert strict_join("ا\u0654حمد") == strict_join("أحمد")
+    assert strict_join("ا\u0655ن") == strict_join("إن")
+    assert strict_join("يسا\u0654ل") == strict_join("يسأل")
+    # the mark is consumed by the token: spans stay contiguous, loose tier unchanged
+    toks = tokenize("كَمَا\u0653 قال")
+    assert [t.loose for t in toks] == ["كما", "قال"]
+    assert toks[0].end == 6
+    # Uthmani elongation marks over و/ى/ي are NOT letters: still dropped in both tiers
+    assert strict_join("تَبُوٓءُ") == "تبوء"
+    assert strict_join("يَٰٓأَيُّهَا") == "يأيها"

@@ -543,7 +543,7 @@
     tokens:
     - 0
     - 6
-  mutation: ortho:ya2alef_maqsura
+  mutation: ortho:hamza_drop
 - id: B-029
   category: B
   wrapper: 'تذكير اليوم: قال الله تعالى {q}. لا تنسوا الأذكار.'

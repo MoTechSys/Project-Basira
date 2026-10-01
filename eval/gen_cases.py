@@ -35,7 +35,7 @@ sys.path.insert(0, str(REPO / "backend"))
 sys.path.insert(0, str(REPO))
 
 from app.store import Record, Store, load_store  # noqa: E402
-from eval.materialize import _surface_tokens  # noqa: E402
+from eval.materialize import _surface_tokens, ortho_foldable  # noqa: E402
 
 SEED = 20261004
 FIXTURE = REPO / "corpus" / "fixture"
@@ -217,14 +217,11 @@ def main() -> int:  # noqa: PLR0912  (one generator per category, kept linear fo
         n = min(7, len(toks))
         a = r.offset
         window = toks[:n]
+        # E-024: a fold that lands on the Uthmani spelling is faithful Quran, not a mutation —
+        # use the materialiser's own check so the two can never disagree
+        avoid = store.strict_tokens_of(r)[a : a + n] if r.g_len == r.g2_len else None
         for k in kinds:
-            ok = (
-                (k == "ya2alef_maqsura" and any(t.endswith("ي") and len(t) > 2 for t in window))
-                or (k == "ta2ha" and any("ة" in t for t in window))
-                or (k == "hamza_drop" and any(ch in t for t in window for ch in "أإآ"))
-                or (k == "ha2ta" and any(t.endswith("ه") and len(t) > 2 for t in window))
-            )
-            if ok:
+            if ortho_foldable(window, k, avoid):
                 add(
                     "B",
                     rng.choice(W_QURAN),
