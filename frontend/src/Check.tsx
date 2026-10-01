@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { BasiraError, check, checkImage, health, type CheckResponse, type Lang } from "./api";
+import { BasiraError, checkImage, health, type CheckResponse, type Lang } from "./api";
 import { Icon, LogoMark, type BasiraIconName } from "./brand";
+import { ProgressiveStatus } from "./components/ProgressiveStatus";
 import { ResultsView } from "./components/ResultsView";
 import { SourcesFooter } from "./components/SourcesFooter";
 import { MAX_CHARS, msg, ui } from "./i18n";
+import { useProgressiveCheck } from "./useProgressiveCheck";
 
 type HealthState = "ok" | "loading" | "down";
 type Theme = "light" | "dark";
@@ -53,7 +55,9 @@ function useTheme(): [Theme, () => void] {
 }
 
 export function buildReport(r: CheckResponse, lang: Lang): string {
-  const lines = [`${ui(lang, "app_name")} — ${new Date().toISOString()}`, `request_id: ${r.request_id}`, ""];
+  const lines = [`${ui(lang, "app_name")} — ${new Date().toISOString()}`, `request_id: ${r.request_id}`];
+  if (r.determinism_hash) lines.push(`${ui(lang, "report_hash")}: ${r.determinism_hash}`);
+  lines.push("");
   for (const q of r.quotes) {
     lines.push(`[${msg(lang, "labels", q.status)}] «${q.quoted_text}»`);
     for (const m of q.matches) lines.push(`  → ${lang === "ar" ? m.ref_label_ar : m.ref_label_en} — ${m.source_url}`);
@@ -86,70 +90,146 @@ const PILLARS: { key: string; icon: BasiraIconName }[] = [
 
 export default function Check({ lang, onLang }: { lang: Lang; onLang: (l: Lang) => void }) {
   const [text, setText] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [result, setResult] = useState<CheckResponse | null>(null);
+  const [imageBusy, setImageBusy] = useState(false);
   const [checkedText, setCheckedText] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const [copied, setCopied] = useState<"report" | "share" | null>(null);
+  const [printDate, setPrintDate] = useState("");
+  const [sharedIn, setSharedIn] = useState(false);
   const [healthState, corpus] = useHealth();
   const [theme, toggleTheme] = useTheme();
   const abort = useRef<AbortController | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const announced = useRef<"" | "rules" | "full">("");
+  const [announce, setAnnounce] = useState("");
 
-  const run = useCallback(
-    async (fn: (signal: AbortSignal) => Promise<CheckResponse>) => {
-      abort.current?.abort();
-      const ac = new AbortController();
-      abort.current = ac;
-      setBusy(true);
-      setError(null);
-      try {
-        const r = await fn(ac.signal);
-        setResult(r);
-        setTimeout(() => resultsRef.current?.focus(), 0);
-      } catch (e) {
-        if (e instanceof DOMException && e.name === "AbortError") return;
-        if (e instanceof BasiraError) {
-          const b = e.body?.error;
-          setError(b ? (lang === "ar" ? b.message_ar : b.message_en) : msg(lang, "errors", "internal"));
-        } else {
-          setError(ui(lang, "error_network"));
-        }
-      } finally {
-        setBusy(false);
+  const errorText = useCallback(
+    (e: unknown) => {
+      if (e instanceof BasiraError) {
+        const b = e.body?.error;
+        return b ? (lang === "ar" ? b.message_ar : b.message_en) : msg(lang, "errors", "internal");
       }
+      return ui(lang, "error_network");
     },
     [lang],
   );
+  const { state, run, reset, retry, setSingle } = useProgressiveCheck(lang, errorText);
+  const result = state.result;
+  const busy = imageBusy || state.phase === "rules" || state.phase === "full";
+  const error = imageError ?? state.error;
+
+  // E-046: a share link carries the TEXT in the URL fragment (never sent to the server). Intake only:
+  // the user reviews and presses Check themselves — nothing runs because of a foreign URL.
+  useEffect(() => {
+    const h = window.location.hash;
+    if (!h.startsWith("#t")) return;
+    void import("./share").then(async ({ decodeShare }) => {
+      const p = await decodeShare(h, MAX_CHARS);
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+      if (!p) return;
+      setText(p.text);
+      setSharedIn(true);
+      textareaRef.current?.focus();
+    });
+  }, []);
+
+  // exactly two polite announcements per check: preliminary, final
+  useEffect(() => {
+    if (!result) {
+      announced.current = "";
+      return;
+    }
+    const n = result.quotes.length;
+    if (state.isFinal && announced.current !== "full") {
+      announced.current = "full";
+      setAnnounce(ui(lang, "announce_final", { n }));
+    } else if (!state.isFinal && announced.current === "") {
+      announced.current = "rules";
+      setAnnounce(ui(lang, "announce_preliminary", { n }));
+    }
+  }, [result, state.isFinal, lang]);
+
+  // move focus to the results once per check (on whichever response paints first)
+  const runNo = useRef(0);
+  const focusedRun = useRef(0);
+  useEffect(() => {
+    if (!result || focusedRun.current === runNo.current) return;
+    focusedRun.current = runNo.current;
+    setTimeout(() => resultsRef.current?.focus(), 0);
+  }, [result]);
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!text.trim() || busy) return;
+    abort.current?.abort();
+    setImageError(null);
+    setSharedIn(false);
+    runNo.current += 1;
     setCheckedText(text);
-    void run((signal) => check(text, lang, signal));
+    void run(text);
   };
   const onFile = (f: File | undefined) => {
     if (!f) return;
+    reset();
+    abort.current?.abort();
+    const ac = new AbortController();
+    abort.current = ac;
+    setImageBusy(true);
+    setImageError(null);
     setCheckedText("");
-    void run((signal) => checkImage(f, lang, signal));
+    runNo.current += 1;
+    void checkImage(f, lang, ac.signal)
+      .then((r) => {
+        setCheckedText(r.ocr_text ?? "");
+        setSingle(r);
+      })
+      .catch((e: unknown) => {
+        if (e instanceof DOMException && e.name === "AbortError") return;
+        setImageError(errorText(e));
+      })
+      .finally(() => setImageBusy(false));
+  };
+  const flash = (what: "report" | "share") => {
+    setCopied(what);
+    setTimeout(() => setCopied(null), 1500);
   };
   const onCopy = async () => {
-    if (!result) return;
+    if (!result || !state.isFinal) return;
     await navigator.clipboard.writeText(buildReport(result, lang));
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    flash("report");
   };
-  const useExample = (t: string) => {
+  const onShare = async () => {
+    if (!state.isFinal || !checkedText) return;
+    const { encodeShare } = await import("./share");
+    const url = `${window.location.origin}${window.location.pathname}${await encodeShare({ text: checkedText, lang })}`;
+    await navigator.clipboard.writeText(url);
+    flash("share");
+  };
+  const onPrint = () => {
+    setPrintDate(new Date().toISOString().slice(0, 10));
+    // let React commit the header before the print dialog snapshots the page
+    setTimeout(() => window.print(), 0);
+  };
+  const clearAll = () => {
+    abort.current?.abort();
+    reset();
+    setText("");
+    setCheckedText("");
+    setImageError(null);
+    setSharedIn(false);
+  };
+  const pickExample = (t: string) => {
     setText(t);
-    setResult(null);
-    setError(null);
+    reset();
+    setImageError(null);
     textareaRef.current?.focus();
   };
 
   const n = result?.quotes.length ?? 0;
   const nf = new Intl.NumberFormat(lang === "ar" ? "ar-SA" : "en");
   const ready = healthState === "ok";
+  const isFinal = state.isFinal;
 
   return (
     <div className="app">
@@ -232,16 +312,7 @@ export default function Check({ lang, onLang }: { lang: Lang; onLang: (l: Lang) 
                 {ui(lang, "upload_image")}
                 <input type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => onFile(e.target.files?.[0])} disabled={busy || !ready} />
               </label>
-              <button
-                type="button"
-                className="btn btn--ghost"
-                onClick={() => {
-                  setText("");
-                  setResult(null);
-                  setError(null);
-                }}
-                disabled={busy || (!text && !result)}
-              >
+              <button type="button" className="btn btn--ghost" onClick={clearAll} disabled={imageBusy || (!text && !result)}>
                 <Icon name="clear" size={18} />
                 {ui(lang, "clear")}
               </button>
@@ -261,7 +332,7 @@ export default function Check({ lang, onLang }: { lang: Lang; onLang: (l: Lang) 
             <ul className="examples__list">
               {EXAMPLES.map((ex) => (
                 <li key={ex.key}>
-                  <button type="button" className="example" onClick={() => useExample(ex.text)}>
+                  <button type="button" className="example" onClick={() => pickExample(ex.text)}>
                     <Icon name={ex.icon} size={20} />
                     <span className="example__text">
                       <small>{ui(lang, ex.key)}</small>
@@ -276,6 +347,13 @@ export default function Check({ lang, onLang }: { lang: Lang; onLang: (l: Lang) 
           </section>
         )}
 
+        {sharedIn && !result && (
+          <div className="banner banner--info" role="status" dir="auto">
+            <Icon name="info" size={18} />
+            <span>{ui(lang, "shared_banner")}</span>
+          </div>
+        )}
+
         {error && (
           <div className="banner banner--error" role="alert" dir="auto">
             <Icon name="warning" size={18} />
@@ -283,7 +361,12 @@ export default function Check({ lang, onLang }: { lang: Lang; onLang: (l: Lang) 
           </div>
         )}
 
-        <div id="results" ref={resultsRef} tabIndex={-1} className="results" aria-live="polite">
+        <ProgressiveStatus phase={state.phase} lang={lang} totalMs={result?.timings_ms.total} hash={result?.determinism_hash} onRetry={retry} />
+        <div className="sr-only" aria-live="polite" aria-atomic="true">
+          {announce}
+        </div>
+
+        <div id="results" ref={resultsRef} tabIndex={-1} className="results">
           {result && (
             <>
               <div className="summary">
@@ -293,10 +376,20 @@ export default function Check({ lang, onLang }: { lang: Lang; onLang: (l: Lang) 
                   <span>{ui(lang, "processing_time", { ms: nf.format(result.timings_ms.total) })}</span>
                 </span>
                 {n > 0 && (
-                  <button type="button" className="btn btn--ghost btn--sm" onClick={() => void onCopy()}>
-                    <Icon name={copied ? "state-found" : "copy"} size={16} />
-                    {copied ? ui(lang, "copied") : ui(lang, "copy_report")}
-                  </button>
+                  <span className="summary__actions" title={isFinal ? undefined : ui(lang, "actions_wait_final")}>
+                    <button type="button" className="btn btn--ghost btn--sm" onClick={() => void onCopy()} disabled={!isFinal}>
+                      <Icon name={copied === "report" ? "state-found" : "copy"} size={16} />
+                      {copied === "report" ? ui(lang, "copied") : ui(lang, "copy_report")}
+                    </button>
+                    <button type="button" className="btn btn--ghost btn--sm" onClick={() => void onShare()} disabled={!isFinal || !checkedText} title={ui(lang, "share_hint")}>
+                      <Icon name={copied === "share" ? "state-found" : "source-link"} size={16} />
+                      {copied === "share" ? ui(lang, "share_copied") : ui(lang, "share_link")}
+                    </button>
+                    <button type="button" className="btn btn--ghost btn--sm" onClick={onPrint} disabled={!isFinal}>
+                      <Icon name="byte-exact" size={16} />
+                      {ui(lang, "save_pdf")}
+                    </button>
+                  </span>
                 )}
               </div>
               {(result.flags.refusal || result.flags.chain_message || result.flags.pii_suspected || result.extraction_degraded) && (
@@ -318,17 +411,45 @@ export default function Check({ lang, onLang }: { lang: Lang; onLang: (l: Lang) 
                   </p>
                 </section>
               )}
-              {n === 0 && (
+              {n === 0 && isFinal && (
+                // never say "no quotation" while the full stage may still add some
                 <div className="banner banner--info" dir="auto">
                   <Icon name="info" size={18} />
                   <span>{msg(lang, "notice", "no_quotes")}</span>
                 </div>
               )}
-              {n > 0 && <ResultsView text={result.ocr_text ?? checkedText} result={result} lang={lang} />}
+              {n > 0 && <ResultsView text={result.ocr_text ?? checkedText} result={result} lang={lang} changed={state.changed} ruleSpans={state.ruleSpans} />}
             </>
           )}
         </div>
       </main>
+
+      {result && isFinal && (
+        <div className="print-only print-header" aria-hidden="true">
+          <h1>{ui(lang, "report_title")}</h1>
+          <dl>
+            <dt>{ui(lang, "report_date")}</dt>
+            <dd>{printDate}</dd>
+            <dt>{ui(lang, "report_request")}</dt>
+            <dd>{result.request_id}</dd>
+            <dt>{ui(lang, "report_corpus")}</dt>
+            <dd>
+              {Object.entries(result.corpus)
+                .map(([k, v]) => `${k} ${v}`)
+                .join(" · ")}
+            </dd>
+            {result.determinism_hash && (
+              <>
+                <dt>{ui(lang, "report_hash")}</dt>
+                <dd>{result.determinism_hash}</dd>
+              </>
+            )}
+          </dl>
+        </div>
+      )}
+      <p className="print-only print-footer" aria-hidden="true">
+        {msg(lang, "fixed", "footer")}
+      </p>
 
       <SourcesFooter lang={lang} corpus={corpus} />
     </div>

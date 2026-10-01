@@ -1,7 +1,7 @@
 import type { Lang, Match, QuoteResult } from "../api";
 import { Icon } from "../brand";
 import { has, msg, ui } from "../i18n";
-import { DiffView } from "./DiffView";
+import { DiffView, SourceText } from "./DiffView";
 import { StatusBadge } from "./StatusBadge";
 
 const BOOK_NAMES: Record<string, { ar: string; en: string }> = {
@@ -80,11 +80,9 @@ function MatchView({ m, q, lang }: { m: Match; q: QuoteResult; lang: Lang }) {
       </div>
       {m.source_text.length > 0 &&
         (showDiff ? (
-          <DiffView quote={q.quoted_text} source={m.source_text} sourceRange={m.source_text_range} diff={m.diff} lang={lang} />
+          <DiffView quote={q.quoted_text} source={m.source_text} sourceRange={m.source_text_range} diff={m.diff} lang={lang} whole={m.corpus === "tanzil"} />
         ) : (
-          <p className="diff-text source-text" dir="rtl" lang="ar" data-testid="source-text">
-            {m.source_text}
-          </p>
+          <SourceText source={m.source_text} sourceRange={m.source_text_range} marks={[]} inner={[]} lang={lang} whole={m.corpus === "tanzil"} />
         ))}
       {m.grade && (
         <p className="grade" dir="auto">
@@ -103,12 +101,35 @@ function MatchView({ m, q, lang }: { m: Match; q: QuoteResult; lang: Lang }) {
   );
 }
 
-export function QuoteCard({ q, lang }: { q: QuoteResult; lang: Lang }) {
+export function QuoteCard({
+  q,
+  lang,
+  n,
+  updated = false,
+  addedByLlm = false,
+}: {
+  q: QuoteResult;
+  lang: Lang;
+  /** 1-based number shared with the highlight in the user's text (E-045) */
+  n?: number;
+  /** E-044: status changed between preliminary and final / span only found by the model pass */
+  updated?: boolean;
+  addedByLlm?: boolean;
+}) {
   const notices = q.notice_keys.filter((k) => k !== "grade_line" && has(lang, "notice", k));
   return (
-    <section className="card quote" data-status={q.status} aria-labelledby={`${q.id}-h`}>
+    <section id={q.id} tabIndex={-1} className="card quote" data-status={q.status} aria-labelledby={`${q.id}-h`}>
       <div className="quote__head">
-        <StatusBadge status={q.status} lang={lang} />
+        <span className="quote__lead">
+          {n !== undefined && (
+            <span className="quote__n" aria-hidden="true">
+              {n}
+            </span>
+          )}
+          <StatusBadge status={q.status} lang={lang} />
+          {updated && <span className="tag tag--updated">{ui(lang, "updated_tag")}</span>}
+          {addedByLlm && <span className="tag tag--llm">{ui(lang, "added_by_llm")}</span>}
+        </span>
         <span className="kind">
           <Icon name={q.kind === "quran" ? "quran" : "hadith"} size={16} />
           {ui(lang, `kind_${q.kind}`)}
@@ -135,9 +156,19 @@ export function QuoteCard({ q, lang }: { q: QuoteResult; lang: Lang }) {
             ))}
           </ul>
         )}
-        {q.matches.map((m, i) => (
-          <MatchView key={`${m.corpus}-${JSON.stringify(m.ref)}-${i}`} m={m} q={q} lang={lang} />
-        ))}
+        {q.matches[0] && <MatchView m={q.matches[0]} q={q} lang={lang} />}
+        {q.matches.length > 1 && (
+          // other positions of the same text: collapsed by default (one decision per card, not N screens)
+          <details className="more">
+            <summary>
+              <Icon name="diff-words" size={16} />
+              {ui(lang, "more_positions", { n: q.matches.length - 1, total: q.total_positions })}
+            </summary>
+            {q.matches.slice(1).map((m, i) => (
+              <MatchView key={`${m.corpus}-${JSON.stringify(m.ref)}-${i}`} m={m} q={q} lang={lang} />
+            ))}
+          </details>
+        )}
         {q.external_search_links.length > 0 && (
           <div className="links">
             {q.external_search_links.map((l) => (

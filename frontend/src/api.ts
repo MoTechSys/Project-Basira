@@ -10,6 +10,9 @@ export interface DiffOp {
   source_range: [number, number];
   quote_chars: [number, number];
   source_chars: [number, number];
+  /** letter-level sub-ranges inside a replaced word (absolute char offsets), «حرفًا بحرف» (E-039) */
+  quote_letters?: [number, number][];
+  source_letters?: [number, number][];
 }
 export interface Grade {
   text: string;
@@ -54,7 +57,6 @@ export interface QuoteResult {
   notice_keys: string[];
   repeated_spans?: { start: number; end: number }[];
   segments?: { type: "Ayah" | "matn" | "isnad" | "claimed_source"; start: number; end: number }[];
-  determinism_hash?: string;
   matches: Match[];
   total_positions: number;
   external_search_links: Link[];
@@ -70,8 +72,15 @@ export interface CheckResponse {
   quotes: QuoteResult[];
   validator_rejections: number;
   timings_ms: { extract: number; retrieve: number; match: number; total: number };
+  /** E-044: "rules" = deterministic extraction only (instant first phase); "full" = + model proposals */
+  extraction_stage?: Stage;
+  /** E-032: sha256(index sha + normalized input + every verdict); same text on the same corpus ⇒ same hash */
+  determinism_hash?: string;
   ocr_text?: string | null;
 }
+/** Extraction stage (E-044). The two-phase check sends both in parallel; the final "full" response
+ *  replaces the preliminary "rules" one wholesale (never merged card-by-card — determinism). */
+export type Stage = "rules" | "full";
 export interface ApiError {
   error: { code: string; message_ar: string; message_en: string };
 }
@@ -118,11 +127,11 @@ async function parse<T>(r: Response): Promise<T> {
   throw new BasiraError(r.status, body);
 }
 
-export async function check(text: string, ui_lang: Lang, signal?: AbortSignal): Promise<CheckResponse> {
+export async function check(text: string, ui_lang: Lang, signal?: AbortSignal, stage: Stage = "full"): Promise<CheckResponse> {
   const r = await fetch(`${API_BASE}/v1/check`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text, ui_lang, source_modality: "text", options: { max_candidates: 3 } }),
+    body: JSON.stringify({ text, ui_lang, source_modality: "text", options: { max_candidates: 3, stage } }),
     ...(signal ? { signal } : {}),
   });
   return parse<CheckResponse>(r);
