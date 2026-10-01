@@ -21,6 +21,10 @@ Religious-safety invariants enforced here (each has a test in tests/test_state.p
       the Arabic text at that ref is offered with ``arabic_text_at_ref`` (display, no judgment).
   I8  ``claimed_source_mismatch`` never changes the status; it only adds a notice.
   I9  Message keys used here must exist in messages/*.json (checked by a test).
+  I10 ``not_found`` wording follows the quote's claimed kind (quran / hadith / unknown→both), never the
+      corpus of the strongest sub-threshold evidence.
+  I11 A diacritic the user wrote that CONTRADICTS the Mushaf's diacritic on the same letter is a
+      difference (never ``found``); a missing diacritic is not (IslamicEval guideline C2).
 """
 
 from __future__ import annotations
@@ -62,7 +66,7 @@ class Decision:
     status: Status
     score: float
     message_key: str
-    corpus_scope: Literal["quran", "hadith", "none"]
+    corpus_scope: Literal["quran", "hadith", "both", "none"]
     winners: list[Evidence] = field(default_factory=list)  # records to render (≤ max shown decided by caller)
     review_reason: str | None = None
     notice_keys: list[str] = field(default_factory=list)
@@ -84,7 +88,7 @@ def _best(ev: list[Evidence]) -> Evidence | None:
     return max(ev, key=lambda e: (e.score, e.strict_ok, e.is_exact), default=None)
 
 
-def decide(facts: QuoteFacts, evidence: list[Evidence], th: Thresholds) -> Decision:  # noqa: PLR0911
+def decide(facts: QuoteFacts, evidence: list[Evidence], th: Thresholds) -> Decision:  # noqa: PLR0911, PLR0912 — one branch per invariant, kept flat on purpose for auditability
     """Assign a status. See module docstring for the invariants."""
     # I7 — non-Arabic quotes are out of P0 scope
     if facts.language != "ar":
@@ -149,15 +153,26 @@ def decide(facts: QuoteFacts, evidence: list[Evidence], th: Thresholds) -> Decis
 
     # Decide which corpus the fuzzy evidence points to. Quran is considered first when it
     # scores at least as high; a Quran near-miss is more consequential than a hadith one.
-    if bq is not None and (bh is None or bq.score >= bh.score):
-        return _decide_quran_fuzzy(bq, quran_ev, facts, th, short)
-    if bh is not None:
-        return _apply_claim_checks(_decide_hadith_fuzzy(bh, hadith_ev, facts, th, short), facts)
+    first, second = ("q", "h") if bq is not None and (bh is None or bq.score >= bh.score) else ("h", "q")
+    for side in (first, second):
+        if side == "q" and bq is not None:
+            d = _decide_quran_fuzzy(bq, quran_ev, facts, th, short)
+        elif side == "h" and bh is not None:
+            d = _apply_claim_checks(_decide_hadith_fuzzy(bh, hadith_ev, facts, th, short), facts)
+        else:
+            continue
+        if d.status != "not_found":
+            return d
 
-    # nothing at all
-    scope: Literal["quran", "hadith"] = "quran" if facts.kind == "quran" else "hadith"
-    key = "not_found_quran" if scope == "quran" else "not_found"
-    return Decision("not_found", 0.0, key, scope, show_candidates=False)
+    # I10 — nothing passed any threshold: the not-found message follows what the TEXT CLAIMS to be,
+    # never which corpus happened to score highest on weak evidence (a hadith must not be told
+    # «not found among the ayat of the Mushaf»).
+    best_score = max((e.score for e in evidence), default=0.0)
+    if facts.kind == "quran" or (facts.kind == "unknown" and facts.claimed_quran_ref is not None):
+        return Decision("not_found", best_score, "not_found_quran", "quran", show_candidates=False)
+    if facts.kind == "unknown" and not facts.claimed_books:
+        return Decision("not_found", best_score, "not_found_any", "both", show_candidates=False)
+    return Decision("not_found", best_score, "not_found", "hadith", show_candidates=False)
 
 
 def _decide_quran_fuzzy(

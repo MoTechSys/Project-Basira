@@ -105,6 +105,7 @@ def basira_status(pipe: Pipeline, text: str, kind: str) -> tuple[str, str | None
         return "not_found", "too_short", "none", "", []
     evidence, carriers, _ = pipe._gather_evidence(q)
     d = decide(pipe._facts(q, "text"), evidence, pipe.th)
+    d = pipe._diacritic_gate(q, d, carriers)  # I11 — same stage the product runs
     notices = list(d.notice_keys)
     if d.status == "found" and d.corpus_scope == "quran" and pipe._is_fragment(q, carriers, d):
         notices.append("quran_fragment")

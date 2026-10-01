@@ -16,6 +16,7 @@ ReviewReason = Literal[
     "validator_reject",
     "non_arabic",
     "image_unconfirmed",
+    "diacritic_difference",
 ]
 CorpusName = Literal["tanzil", "ohd", "hadeethenc"]
 
@@ -42,6 +43,9 @@ class DiffOpModel(BaseModel):
     source_range: list[int]
     quote_chars: list[int]
     source_chars: list[int]
+    # letter-level sub-ranges inside this op (char-by-char highlighting; diacritic conflicts)
+    quote_letters: list[list[int]] = Field(default_factory=list)
+    source_letters: list[list[int]] = Field(default_factory=list)
 
 
 class Grade(BaseModel):

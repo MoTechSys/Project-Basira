@@ -292,7 +292,11 @@ def _intro_positions(
     for intro in [*_INTRO_LOOSE, *saws]:
         n = len(intro)
         for i in range(len(loose) - n + 1):
-            if tuple(loose[i : i + n]) != intro:
+            window = tuple(loose[i : i + n])
+            if window != intro and not (
+                # conjunction prefix on the introducer's first word: «وقال …», «فقال …», «ولقوله …»
+                len(window[0]) > 2 and window[0][0] in "وف" and (window[0][1:], *window[1:]) == intro
+            ):
                 continue
             if n == 1 and intro[0] in _GENERIC_VERBS:
                 nxt = toks[i + 1].start if i + 1 < len(toks) else len(text)

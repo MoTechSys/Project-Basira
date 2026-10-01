@@ -35,8 +35,9 @@ from app.extract.rules import (
     merge_overlaps,
 )
 from app.links import hadeethenc_url, hadith_search_links, ohd_url, quran_search_links, quran_url
-from app.match.diff import DiffOp, diff_kinds, word_diff
+from app.match.diff import DiffOp, diff_kinds, letter_diff, word_diff
 from app.match.exact import ExactHit, dedupe_hits, find_exact, mixed_rasm_hit, records_covering
+from app.match.harakat import user_vocalised, word_conflicts
 from app.match.window import WindowHit, fuzzy_search, fuzzy_search_surah_stream
 from app.messages import Messages, load_messages
 from app.normalize import tokenize
@@ -177,6 +178,7 @@ class Pipeline:
             t_retr += t_retr_i
             facts = self._facts(q, req.source_modality)
             d = decide(facts, evidence, self.th)
+            d = self._diacritic_gate(q, d, carriers)
             qr = self._render(i, q, d, carriers, req, extra_notices or [])
             t_match += (time.perf_counter() - tr0) - t_retr_i
             quotes.append(qr)
@@ -351,6 +353,8 @@ class Pipeline:
             labels = self.msgs_ar._d["labels"] if req.ui_lang == "ar" else self.msgs_en._d["labels"]
             if d.corpus_scope == "quran":
                 ext = quran_search_links(q.text, labels)
+            elif d.corpus_scope == "both":
+                ext = quran_search_links(q.text, labels) + hadith_search_links(q.text, labels)
             else:
                 ext = hadith_search_links(q.text, labels)
         claimed = None
@@ -377,6 +381,106 @@ class Pipeline:
             total_positions=total,
             external_search_links=ext,
         )
+
+    def _diacritic_gate(self, q: _Quote, d: Decision, carriers: dict[int, ExactHit | WindowHit]) -> Decision:
+        """I11 — a `found` whose user-written diacritics contradict EVERY matching source position is
+        downgraded to `needs_review/diacritic_difference`. Missing diacritics never count."""
+        if d.status != "found" or d.corpus_scope != "quran" or not user_vocalised(q.text):
+            return d
+        keep: list[Evidence] = []
+        conflicted: list[Evidence] = []
+        for ev in d.winners:
+            if self._letter_conflicts(q, ev, carriers.get(ev.rec_idx)):
+                conflicted.append(ev)
+            else:
+                keep.append(ev)
+        if keep:
+            d.winners = keep  # at least one position agrees with the user's vocalisation
+            return d
+        reason = "diacritic_difference"
+        key = "needs_review_quran" if d.corpus_scope == "quran" else "needs_review"
+        nd = Decision(
+            "needs_review",
+            1.0,
+            key,
+            d.corpus_scope,
+            winners=conflicted,
+            review_reason=reason,
+            notice_keys=[*d.notice_keys, "diacritic_difference"],
+        )
+        nd.extra["diacritic"] = True
+        return nd
+
+    def _source_words(
+        self, q: _Quote, ev: Evidence, carrier: ExactHit | WindowHit | None
+    ) -> tuple[Record, list[tuple[int, int]]] | None:
+        """Char spans (in rec.display) of the source words aligned 1:1 with the quote tokens."""
+        rec = self.store.records[ev.rec_idx]
+        n = len(q.tokens)
+        if not isinstance(carrier, ExactHit):
+            return None
+        if rec.corpus == "tanzil":
+            gpos = self._display_gpos(rec, carrier.gpos)
+            if gpos >= 0:
+                spans = self.store.spans_range(rec, gpos, n)
+            else:
+                # rasms not word-aligned in this ayah: locate the same strict word run in the display text
+                got = self._locate_in_display(rec, [t.loose for t in q.tokens])
+                if got is None:
+                    return None
+                spans = got
+        else:
+            if carrier.tok_start < 0:
+                return None
+            spans = self.store.spans_of(rec)[carrier.tok_start : carrier.tok_start + n]
+        if len(spans) != n:
+            return None
+        return rec, spans
+
+    def _locate_in_display(self, rec: Record, q_loose: list[str]) -> list[tuple[int, int]] | None:
+        """Char spans of the display words aligned to the quote when the ayah's two rasms are not
+        word-aligned (363 ayat). Words are paired by letter skeleton with the long-vowel alif removed
+        («الصابرين» ~ «الصبرين»); returns None unless the run aligns 1:1 everywhere."""
+
+        def sk(w: str) -> str:
+            return w.replace("ا", "").replace("و", "").replace("ي", "")
+
+        disp = [sk(t) for t in self.store.loose_tokens_of(rec)]
+        want = [sk(t) for t in q_loose]
+        spans = self.store.spans_of(rec)
+        n = len(want)
+        hits = [i for i in range(len(disp) - n + 1) if disp[i : i + n] == want]
+        return spans[hits[0] : hits[0] + n] if len(hits) == 1 else None
+
+    def _letter_conflicts(
+        self, q: _Quote, ev: Evidence, carrier: ExactHit | WindowHit | None
+    ) -> list[tuple[int, tuple[int, int], tuple[int, int]]]:
+        """(token index, quote char range, source char range) for every conflicting letter."""
+        got = self._source_words(q, ev, carrier)
+        if got is None:
+            return []
+        rec, spans = got
+        out: list[tuple[int, tuple[int, int], tuple[int, int]]] = []
+        for k, (tok, (a, b)) in enumerate(zip(q.tokens, spans, strict=True)):
+            if a < 0:
+                continue
+            # extend each word to include its trailing marks
+            ue = tok.end
+            while ue < len(q.text) and not q.text[ue].isspace() and not ("\u0621" <= q.text[ue] <= "\u064a"):
+                ue += 1
+            se = b
+            disp = rec.display
+            while se < len(disp) and not disp[se].isspace() and not ("\u0621" <= disp[se] <= "\u064a"):
+                se += 1
+            for c in word_conflicts(q.text[tok.start : ue], disp[a:se]):
+                out.append(
+                    (
+                        k,
+                        (tok.start + c.quote_chars[0], tok.start + c.quote_chars[1]),
+                        (a + c.source_chars[0], a + c.source_chars[1]),
+                    )
+                )
+        return out
 
     def _is_fragment(self, q: _Quote, carriers: dict[int, ExactHit | WindowHit], d: Decision) -> bool:
         """True when the exact Quran hit does not start at an ayah head or end at an ayah tail."""
@@ -427,8 +531,6 @@ class Pipeline:
         src_spans = self.store.spans_of(rec)
         src_strict = self.store.strict_tokens_of(rec)
         src_alt = self.store.strict_alt_tokens_of(rec) if rec.corpus == "tanzil" else None
-        q_strict = [t.strict for t in q.tokens]
-        q_spans = [(t.start, t.end) for t in q.tokens]
 
         # Quran (E-024/E-025): the carrier may sit in the simple-rasm stream (variant 1, no char
         # spans) and/or run past this ayah into the next. Compute the window on the global stream
@@ -454,11 +556,7 @@ class Pipeline:
             win_strict = src_strict[rec.offset :]
             win_spans = src_spans[rec.offset :]
             win_alt = src_alt[rec.offset :] if src_alt else None
-        ops: list[DiffOp] = []
-        kinds: list[str] = []
-        if d.status != "found" or not ev.strict_ok:
-            ops = word_diff(q_strict, q_spans, win_strict, win_spans, win_alt)
-            kinds = diff_kinds(ops)
+        ops, kinds, letters = self._diff_ops(q, d, ev, rec, carrier, win_strict, win_spans, win_alt)
         rng = None
         mapped = [sp for sp in win_spans if sp[0] >= 0]
         if mapped:
@@ -494,12 +592,75 @@ class Pipeline:
             source_text_range=rng,
             source_url=links[0].url if links else "",
             links=links,
-            diff=[DiffOpModel(**o) for o in ops],
+            diff=[
+                DiffOpModel(
+                    **o, quote_letters=letters.get(k, ([], []))[0], source_letters=letters.get(k, ([], []))[1]
+                )
+                for k, o in enumerate(ops)
+            ],
             diff_kinds=kinds,
             score=round(ev.score, 4),
             grade=grade,
             continues_to=continues_to,
         )
+
+    def _diff_ops(
+        self,
+        q: _Quote,
+        d: Decision,
+        ev: Evidence,
+        rec: Record,
+        carrier: ExactHit | WindowHit | None,
+        win_strict: list[str],
+        win_spans: list[tuple[int, int]],
+        win_alt: list[str] | None,
+    ) -> tuple[list[DiffOp], list[str], dict[int, tuple[list[list[int]], list[list[int]]]]]:
+        """Word diff + letter-level (char-by-char) sub-ranges; diacritic conflicts get their own ops."""
+        q_strict = [t.strict for t in q.tokens]
+        q_spans = [(t.start, t.end) for t in q.tokens]
+        ops: list[DiffOp] = []
+        kinds: list[str] = []
+        letters: dict[int, tuple[list[list[int]], list[list[int]]]] = {}
+        if d.review_reason == "diacritic_difference":
+            conf = self._letter_conflicts(q, ev, carrier)
+            by_tok: dict[int, tuple[list[list[int]], list[list[int]]]] = {}
+            for k, qc, sc in conf:
+                by_tok.setdefault(k, ([], []))
+                by_tok[k][0].append(list(qc))
+                by_tok[k][1].append(list(sc))
+            for k, tok in enumerate(q.tokens):
+                sp = win_spans[k] if k < len(win_spans) else (-1, -1)
+                ops.append(
+                    DiffOp(
+                        op="replace" if k in by_tok else "equal",
+                        quote_range=[k, k + 1],
+                        source_range=[k, k + 1],
+                        quote_chars=[tok.start, tok.end],
+                        source_chars=[sp[0], sp[1]],
+                    )
+                )
+                if k in by_tok:
+                    letters[len(ops) - 1] = by_tok[k]
+            kinds = ["diacritic_conflict"]
+        elif d.status != "found" or not ev.strict_ok:
+            ops = word_diff(q_strict, q_spans, win_strict, win_spans, win_alt)
+            kinds = diff_kinds(ops)
+            # char-by-char: inside every 1:1 replaced word, the differing letters
+            for idx, o in enumerate(ops):
+                if o["op"] != "replace":
+                    continue
+                qa, qb = o["quote_range"]
+                sa, sb = o["source_range"]
+                if qb - qa != 1 or sb - sa != 1:
+                    continue
+                qs, qe = q_spans[qa]
+                ss, se = win_spans[sa] if sa < len(win_spans) else (-1, -1)
+                if ss < 0:
+                    continue
+                ql, sl = letter_diff(q.text[qs:qe], rec.display[ss:se])
+                if ql or sl:
+                    letters[idx] = ([[qs + x, qs + y] for x, y in ql], [[ss + x, ss + y] for x, y in sl])
+        return ops, kinds, letters
 
     def _display_gpos(self, rec: Record, gpos: int) -> int:
         """Map a global position inside ``rec`` (either rasm) to the display-stream position of the

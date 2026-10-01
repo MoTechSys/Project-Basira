@@ -85,3 +85,50 @@ def diff_kinds(ops: list[DiffOp]) -> list[str]:
         elif o["op"] == "delete":
             kinds.append("word_added_in_quote")
     return sorted(set(kinds))
+
+
+def _graphemes(word: str) -> list[tuple[int, int, str]]:
+    """(start, end, strict letter) per base letter; attached marks stay inside the grapheme."""
+    from app.normalize import tokenize  # noqa: PLC0415 — tiny, avoids an import cycle at module load
+
+    out: list[tuple[int, int, str]] = []
+    i, n = 0, len(word)
+    while i < n:
+        j = i + 1
+        while (
+            (j < n and 0x064B <= ord(word[j]) <= 0x065F)
+            or (j < n and 0x06D6 <= ord(word[j]) <= 0x06ED)
+            or (j < n and word[j] in "\u0670\u0640")
+        ):
+            j += 1
+        toks = tokenize(word[i:j])
+        letter = toks[0].strict if toks else ""
+        if letter:
+            out.append((i, j, letter))
+        i = j
+    return out
+
+
+def letter_diff(quote_word: str, source_word: str) -> tuple[list[tuple[int, int]], list[tuple[int, int]]]:
+    """Char-by-char difference inside two differing words (the «حرفًا بحرف» highlight).
+
+    Compared on strict letters (so hamza seats, ة/ه and ى/ي ARE differences, tashkeel is not); returns
+    char ranges inside each word for the letters that differ. Ranges cover whole graphemes (a letter
+    with its marks), so a highlight never splits a letter from its diacritics."""
+    qg, sg = _graphemes(quote_word), _graphemes(source_word)
+    if not qg or not sg:
+        return [], []
+    sm = SequenceMatcher(a=[g[2] for g in qg], b=[g[2] for g in sg], autojunk=False)
+    ql: list[tuple[int, int]] = []
+    sl: list[tuple[int, int]] = []
+    for tag, i1, i2, j1, j2 in sm.get_opcodes():
+        if tag == "equal":
+            continue
+        if i2 > i1:
+            ql.append((qg[i1][0], qg[i2 - 1][1]))
+        if j2 > j1:
+            sl.append((sg[j1][0], sg[j2 - 1][1]))
+    # a word that shares (almost) nothing is a word substitution, not a letter typo: no letter marks
+    if sm.ratio() < 0.5:
+        return [], []
+    return ql, sl

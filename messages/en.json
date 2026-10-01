@@ -11,7 +11,8 @@
     "needs_review_short": "Needs review. The quote is very short ({n} words), too little for automatic verification.",
     "needs_review_non_arabic": "Needs review. Our sources are Arabic only, so translated texts are not verified automatically.",
     "needs_review_failure": "Needs review. One stage of the automatic check failed for this quote, so no result is shown.",
-    "needs_review_image": "Needs review. The text was extracted automatically from an image; please confirm the extracted text first."
+    "needs_review_image": "Needs review. The text was extracted automatically from an image; please confirm the extracted text first.",
+    "not_found_any": "We did not find this text in the Mushaf or in the hadith collections we hold. This is not a judgment on it; consult an approved Mushaf or specialised hadith references."
   },
   "notice": {
     "hadith_variant": "Hadiths are transmitted with close wordings across different books; the highlighted difference may be a wording in another transmission our sources do not cover.",
@@ -34,7 +35,8 @@
     "hadeethenc_link_only": "This hadith is listed in the Prophetic Hadiths Encyclopedia; you can read it there.",
     "many_positions": "Found at {total} places; the first {shown} are shown.",
     "ocr_mock": "Demo mode: the image text was NOT actually read; a fixed sample text was used because no vision provider is configured.",
-    "quran_fragment": "The quoted text is part of the ayah, not the whole ayah; the full ayah text is shown next to yours."
+    "quran_fragment": "The quoted text is part of the ayah, not the whole ayah; the full ayah text is shown next to yours.",
+    "diacritic_difference": "The vowel mark on one or more letters in your text differs from the source; the highlighted letters show where. Missing diacritics are not counted as a difference."
   },
   "labels": {
     "found": "Found",
@@ -53,7 +55,8 @@
     "search_shamela": "Search Shamela",
     "search_quranpedia": "Search Quranpedia",
     "open_source": "Source",
-    "report_issue": "Report an error"
+    "report_issue": "Report an error",
+    "diff_diacritic_conflict": "diacritic difference"
   },
   "fixed": {
     "footer": "Basira is an automated aid for checking how verses and hadiths are quoted. It does not evaluate hadiths or issue religious rulings, and does not replace review by qualified scholars.",
