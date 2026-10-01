@@ -23,6 +23,11 @@ CorpusName = Literal["tanzil", "ohd", "hadeethenc"]
 
 class CheckOptions(BaseModel):
     max_candidates: int = Field(default=3, ge=1, le=5)
+    # E-044 two-phase check. "rules": deterministic extraction only (explicit markers, model tags,
+    # corpus anchors) — never calls the language model, answers in milliseconds. "full" (default):
+    # the same plus the model's span proposals. Matching/decision code is identical in both stages,
+    # so a quote found by both gets the same status; "full" can only ADD quotes (tested).
+    stage: Literal["rules", "full"] = "full"
 
 
 class CheckRequest(BaseModel):
@@ -136,10 +141,13 @@ class CheckResponse(BaseModel):
     quotes: list[QuoteResult]
     validator_rejections: int = 0
     timings_ms: Timings
-    ocr_text: str | None = None
+    # E-044: which extraction stage produced these spans (two-phase UI; the final "full" response
+    # replaces the preliminary "rules" one wholesale on the client).
+    extraction_stage: Literal["rules", "full"] = "full"
+    ocr_text: str | None = None  # image path only: the text as read, so the user can verify it (ADR-003)
     # E-032: sha256(index records sha + normalized input + every quote verdict). Same input on the same
     # corpus build ⇒ same hash — a judge can re-run and compare. Excludes request_id/timings.
-    determinism_hash: str = ""  # image path only: the text as read, so the user can verify it (ADR-003)
+    determinism_hash: str = ""
 
 
 class ErrorBody(BaseModel):

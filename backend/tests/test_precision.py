@@ -122,3 +122,75 @@ async def test_orthographic_typo_gets_letter_level_highlight(pipeline: Pipeline)
     assert q.status == "needs_review"
     letters = [lt for m in q.matches for op in m.diff for lt in op.quote_letters]
     assert letters, "char-by-char highlight expected inside «علي»"
+
+
+# ---------------------------------------------------------------- two-phase check (E-044, options.stage)
+
+
+class _CountingLLM:
+    """Wraps the pipeline's provider and counts calls (the rules stage must make none)."""
+
+    def __init__(self, inner: object) -> None:
+        self.inner = inner
+        self.name = getattr(inner, "name", "mock")
+        self.calls = 0
+
+    async def extract(self, text: str) -> object:
+        self.calls += 1
+        return await self.inner.extract(text)  # type: ignore[attr-defined]
+
+
+async def test_rules_stage_skips_model_and_keeps_decisions(pipeline: Pipeline) -> None:
+    """`options.stage="rules"` never calls the provider; any quote both stages find has the same status;
+    the response is deterministic (same hash twice) and fast (no provider wait)."""
+    from app.schemas import CheckOptions  # noqa: PLC0415
+
+    text = "قال تعالى: ﴿إن الله علي كل شيء قدير﴾ وقال ﷺ «إنما الأعمال بالنيات» رواه البخاري"
+    orig = pipeline.llm
+    spy = _CountingLLM(orig)
+    pipeline.llm = spy  # type: ignore[assignment]
+    try:
+        r1 = await pipeline.check(CheckRequest(text=text, options=CheckOptions(stage="rules")))
+        r2 = await pipeline.check(CheckRequest(text=text, options=CheckOptions(stage="rules")))
+        assert spy.calls == 0
+        full = await pipeline.check(CheckRequest(text=text))
+        assert spy.calls == 1
+    finally:
+        pipeline.llm = orig
+    assert r1.extraction_stage == "rules" and r1.extraction_provider == "rules"
+    assert full.extraction_stage == "full"
+    assert r1.extraction_degraded is False  # skipping the model on purpose is not a degradation
+    assert r1.determinism_hash == r2.determinism_hash
+    assert r1.timings_ms.extract < 200
+    assert len(r1.quotes) >= 2  # both marked quotes are found by the rules alone
+    by_span = {(q.span.start, q.span.end): q.status for q in full.quotes}
+    for q in r1.quotes:
+        assert by_span.get((q.span.start, q.span.end), q.status) == q.status
+
+
+async def test_full_stage_is_default_and_superset_of_rules(pipeline: Pipeline) -> None:
+    """The model may only ADD spans; rule spans never disappear in the full stage."""
+    from app.schemas import CheckOptions  # noqa: PLC0415
+
+    text = "قال تعالى: ﴿قُلْ هُوَ اللَّهُ أَحَدٌ﴾ ثم كلام عادي بلا علامات"
+    full = await pipeline.check(CheckRequest(text=text))
+    rules = await pipeline.check(CheckRequest(text=text, options=CheckOptions(stage="rules")))
+    assert full.extraction_stage == "full"
+    rule_spans = {(q.span.start, q.span.end) for q in rules.quotes}
+    full_spans = {(q.span.start, q.span.end) for q in full.quotes}
+    assert rule_spans and rule_spans <= full_spans
+
+
+async def test_rules_stage_still_finds_unmarked_quotes_via_corpus_anchors(pipeline: Pipeline) -> None:
+    """The deterministic stage includes the corpus-anchored detector (E-039): an unmarked, verbatim
+    ayah is found without the model — this is what makes the first phase useful, not just fast."""
+    from app.schemas import CheckOptions  # noqa: PLC0415
+
+    r = await pipeline.check(
+        CheckRequest(
+            text="توفي اليوم جارنا رحمه الله، إنا لله وإنا إليه راجعون، نسأل الله له الرحمة",
+            options=CheckOptions(stage="rules"),
+        )
+    )
+    assert r.extraction_provider == "rules"
+    assert any(q.kind == "quran" and q.status == "found" for q in r.quotes)

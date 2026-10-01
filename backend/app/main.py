@@ -126,6 +126,10 @@ def _error(status: int, code: str, messages_dir: Path, **vars: Any) -> JSONRespo
 def create_app(cfg: Settings | None = None) -> FastAPI:
     cfg = cfg or default_settings
     limiter = RateLimiter(cfg.rate_limit_per_min)
+    # E-044: the rules stage never calls the model (the cost the limit protects), so it gets its own
+    # wider bucket; one two-phase check therefore spends exactly one unit of the main limit. It is
+    # still bounded (not exempt): the deterministic pass costs CPU on the shared index.
+    rules_limiter = RateLimiter(cfg.rate_limit_per_min * 4)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -228,11 +232,12 @@ def create_app(cfg: Settings | None = None) -> FastAPI:
         ip = fwd.split(",")[0].strip() if fwd else (request.client.host if request.client else "?")
         return ip
 
-    def _guard(request: Request) -> Pipeline:
+    def _guard(request: Request, *, rules_only: bool = False) -> Pipeline:
         if not getattr(request.app.state, "ready", False) or request.app.state.pipeline is None:
             raise ApiError(503, "degraded")
         eval_key = request.headers.get("x-eval-key", "")
-        if not (cfg.eval_key and eval_key == cfg.eval_key) and not limiter.allow(_client_key(request)):
+        bucket = rules_limiter if rules_only else limiter
+        if not (cfg.eval_key and eval_key == cfg.eval_key) and not bucket.allow(_client_key(request)):
             raise ApiError(429, "rate_limited")
         pipeline: Pipeline = request.app.state.pipeline
         return pipeline
@@ -280,7 +285,7 @@ def create_app(cfg: Settings | None = None) -> FastAPI:
         },
     )
     async def check(req: CheckRequest, request: Request) -> CheckResponse:
-        pipeline = _guard(request)
+        pipeline = _guard(request, rules_only=req.options.stage == "rules")
         if len(req.text) > cfg.max_text_chars:
             raise ApiError(413, "text_too_long", max=cfg.max_text_chars)
         if not req.text.strip():
