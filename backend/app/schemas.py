@@ -78,6 +78,14 @@ class Match(BaseModel):
     continues_to: dict[str, Any] | None = None  # Quran: last ayah ref when the quote spans several
 
 
+class SegmentModel(BaseModel):
+    """One typed part of a citation (IslamicEval 2026 schema): char offsets into the request text."""
+
+    type: Literal["Ayah", "matn", "isnad", "claimed_source"]
+    start: int
+    end: int
+
+
 class ClaimedSource(BaseModel):
     raw: str
     parsed: dict[str, Any]
@@ -100,6 +108,7 @@ class QuoteResult(BaseModel):
     matches: list[Match] = Field(default_factory=list)
     total_positions: int = 0
     external_search_links: list[Link] = Field(default_factory=list)
+    segments: list[SegmentModel] = Field(default_factory=list)
 
 
 class Flags(BaseModel):

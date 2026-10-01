@@ -24,6 +24,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from app.config import Settings
+from app.extract.anchor import detect
 from app.extract.rules import (
     RuleSpan,
     detect_chain_message,
@@ -34,6 +35,7 @@ from app.extract.rules import (
     language_of,
     merge_overlaps,
 )
+from app.extract.segments import segment, tagged_spans, tighten
 from app.links import hadeethenc_url, hadith_search_links, ohd_url, quran_search_links, quran_url
 from app.match.diff import DiffOp, diff_kinds, letter_diff, word_diff
 from app.match.exact import ExactHit, dedupe_hits, find_exact, mixed_rasm_hit, records_covering
@@ -53,6 +55,7 @@ from app.schemas import (
     Link,
     Match,
     QuoteResult,
+    SegmentModel,
     Span,
     Timings,
 )
@@ -140,6 +143,7 @@ class Pipeline:
         # --- 1. extraction (rules always; provider may add spans; never blocks the answer)
         t0 = time.perf_counter()
         spans = extract_spans(text)
+        spans = self._augment_spans(text, spans)
         degraded = False
         provider_name = self.llm.name
         try:
@@ -202,6 +206,33 @@ class Pipeline:
         )
         resp.timings_ms.total = _ms(t_start)
         return resp
+
+    def _augment_spans(self, text: str, spans: list[RuleSpan]) -> list[RuleSpan]:
+        """Explicit model tags (authoritative) + corpus-anchored unmarked quotes, then boundary tightening.
+
+        A tag span replaces any overlapping rule span; an anchor span only fills gaps (it never
+        overrides a marked quote) or extends an overlapping unmarked one to the verbatim run."""
+        tags = tagged_spans(text)
+        out = [sp for sp in spans if not any(t.start < sp.end and sp.start < t.end for t in tags)]
+        out += [RuleSpan(t.start, t.end, t.kind, True) for t in tags]
+        if self.settings.anchor_detect:
+            for an in detect(self.store, text):
+                kind = "quran" if an.corpus == "tanzil" else "hadith_matn"
+                hit = [sp for sp in out if sp.start < an.end and an.start < sp.end]
+                if not hit:
+                    out.append(RuleSpan(an.start, an.end, kind, False))
+                    continue
+                for sp in hit:
+                    if sp.kind == "unknown":
+                        sp.kind = kind
+        for sp in out:
+            sp.start, sp.end = tighten(text, sp.start, sp.end)
+        out = [sp for sp in out if sp.end > sp.start]
+        out = merge_overlaps(out)
+        for sp in out:
+            if sp.claimed_source is None:
+                sp.claimed_source = find_claimed_source(text, sp.start, sp.end)
+        return out
 
     # ------------------------------------------------------------------ stages
 
@@ -363,8 +394,15 @@ class Pipeline:
                 raw=str(q.span.claimed_source.get("raw", "")),
                 parsed=dict(q.span.claimed_source.get("parsed", {})),
             )
+        cit = segment(
+            req.text, q.span.start, q.span.end, "quran" if d.corpus_scope == "quran" else q.span.kind
+        )
+        segs = [SegmentModel(type=cit.text.type, start=cit.text.start, end=cit.text.end)] + [
+            SegmentModel(type=x.type, start=x.start, end=x.end) for x in cit.extra
+        ]
         return QuoteResult(
             id=f"q{i + 1}",
+            segments=segs,
             span=Span(start=q.span.start, end=q.span.end),
             quoted_text=q.text,
             kind=q.span.kind,  # type: ignore[arg-type]
