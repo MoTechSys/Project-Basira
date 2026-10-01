@@ -78,12 +78,12 @@ class MockLLM(LLMClient):
 
 
 def _after_last_marker(sent: str) -> int:
-    """Offset just after the last marker in the first half of the sentence (the matn follows it);
-    0 when the marker sits late (then the whole sentence is proposed verbatim)."""
+    """Offset just after the last marker that still leaves ≥ _MIN_HEURISTIC_TOKENS tokens after it
+    (the matn follows the marker); 0 when no marker qualifies (whole sentence proposed verbatim)."""
     best = 0
     for m in _MARKERS:
         i = sent.rfind(m)
-        if i >= 0 and i + len(m) <= len(sent) // 2 + 1:
+        if i >= 0 and len(loose_tokens(sent[i + len(m) :])) >= _MIN_HEURISTIC_TOKENS:
             best = max(best, i + len(m))
     return best
 

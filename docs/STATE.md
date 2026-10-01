@@ -53,12 +53,14 @@ original sandbox; `docs/internal/` is its complete substitute. Never publish `do
 | **Pipeline (WP-02)** | `backend/app/pipeline.py`, `backend/app/links.py` | ✅ | extract→exact→(fuzzy)→decide→render→verify; deterministic tie order (Quran › showable OHD › Sahihain › idx); HadeethEnc `link` mode = empty body + grade/takhrij/link (V1 extended); all referral URL schemes HTTP-verified live; 20 e2e tests |
 | **API (WP-03)** | `backend/app/main.py` | ✅ | `/health` 503 gate, `POST /v1/check`, `POST /v1/check/image` (mock OCR, degrades honestly), `GET /v1/sources`, `GET /v1/messages/{lang}`, error envelope, CORS, rate limit 30/min + `X-Eval-Key`; live run: 6236/62169/3582 loaded, 33 ms per 2-quote request, RSS 1043 MB |
 | **Fixture + API tests (WP-04)** | `corpus/build_fixture.py`, `backend/tests/{conftest,test_api,test_pipeline,test_providers}.py` | ✅ | fixture = 271 ayat + 111 OHD + 32 HadeethEnc (git-ignored, auto-built from full index, tests skip without corpus); **80/80 tests**, mypy strict 24 files, SMOKE OK |
+| **Eval harness (WP-05)** | `eval/{PLAN,gen_cases,materialize,metrics,run_eval,false_alarm}.py`, `eval/cases.yaml` (150, A–M), `eval/REPORT.md` | ✅ | **Full index, 3 repeats: 150/150 pass · 0 unsafe · recall@found 1.0 (78/78) · precision 1.0 · false-alarm 0/500 · forbidden 0 · variance 0**; cases reference records by ID + mechanical mutations (no religious text in repo); `make eval` (fixture, CI gate) / `make eval-full` |
+| Extractor v2 | `backend/app/extract/rules.py`, `tests/test_rules.py` | ✅ | longest-introducer-first (fixes «قال الله تعالى» swallowing «تعالى»), new introducers («قوله تعالى», «وفي الحديث»…), **trailers** («… صدق الله العظيم», «… رواه X»), optional ﷺ; 14 tests |
 | Competition study | `docs/COMPETITION.md`, `docs/internal/competition/` | ✅ | 4 official files archived + analysed; E-014 |
 | Config / schemas | `backend/app/config.py`, `schemas.py` | ✅ | defaults: LLM_PROVIDER=mock, HADEETHENC_MODE=link, OHD_MODE=display, RETRIEVAL_VECTORS=off |
 
-Quality gates at last commit: `ruff` ✅ · `mypy --strict` ✅ (24 files) · `pytest` **80/80** ✅ · `make smoke` ✅.
+Quality gates at last commit: `ruff` ✅ · `mypy --strict` ✅ (24 files) · `pytest` **94/94** ✅ · `make smoke` ✅ · `make eval` 150/150, 0 unsafe ✅.
 
-**NEXT (session 5): §2 item 7 (eval 150 cases + 500 FA — WP-05), then 8 (frontend — WP-06, palette `#12183F #6150EA #2EF2C2 #F2F4FF`), 9 (delivery docs — WP-07). Then cross-family review of WP-01..04 via `scripts/agents/orchestrator.py` (reviewer=gpt-6-astra `high`, tester=gpt-6.1-sol). Run the server: `cd backend && .venv/bin/uvicorn app.main:app --port 8000` (ready after ~25 s; `/health` is 503 until then). Pending owner: D-012 (C1).**
+**NEXT: §2 item 8 (frontend — WP-06, palette `#12183F #6150EA #2EF2C2 #F2F4FF`), 9 (delivery docs — WP-07). Then cross-family review of WP-01..04 via `scripts/agents/orchestrator.py` (reviewer=gpt-6-astra `high`, tester=gpt-6.1-sol). Run the server: `cd backend && .venv/bin/uvicorn app.main:app --port 8000` (ready after ~25 s; `/health` is 503 until then). Pending owner: D-012 (C1).**
 
 ## 2. In progress / next (exact order — do not reorder without a DECISIONS entry)
 1. ~~state.py~~ ✅ done. 2. ~~verify.py~~ ✅ done.
@@ -66,18 +68,22 @@ Quality gates at last commit: `ruff` ✅ · `mypy --strict` ✅ (24 files) · `p
 4. ~~pipeline~~ ✅ (WP-02) — was: **`backend/app/pipeline.py`** — extract (rules ∪ provider) → validate spans → per quote: exact → (if none) retrieve+window → state → verify; timings.
 5. ~~main.py~~ ✅ (WP-03) — was: **`backend/app/main.py`** — FastAPI: lifespan loads store+retriever; `/health` 503 until loaded (E-011) with counts/rss/build_sha; `POST /v1/check`; `GET /v1/sources` from manifest; error envelope `{error:{code,message_ar,message_en}}`; CORS from settings; rate limit 30/min + `X-Eval-Key` bypass (T5).
 6. ~~Tests~~ ✅ (WP-04) — was: **Tests**: `test_state.py` (adversarial typo → `needs_review`, Quran never partial, threshold boundary ±0.002 at 0.75/0.70/0.60), property test `found ⇒ strict tokens equal`, `test_verify.py` (forbidden word injected → rejected), `test_api.py` (httpx AsyncClient, uses a **small fixture index** built from 3 surahs + 50 hadith so CI has no 229 MB dependency — write `tests/conftest.py` that builds it from `corpus/data` if present, else skips).
-7. `eval/cases.yaml` (150 cases, categories A–L per BUILD_SPEC §6.1), `eval/PLAN.md`, `eval/false_alarm.py` (500 verbatim segments, seed 20261004), `eval/metrics.py`, `eval/run_eval.py`.
+7. ~~eval~~ ✅ (WP-05) — was: `eval/cases.yaml` (150 cases, categories A–L per BUILD_SPEC §6.1), `eval/PLAN.md`, `eval/false_alarm.py` (500 verbatim segments, seed 20261004), `eval/metrics.py`, `eval/run_eval.py`.
 8. Frontend scaffold `frontend/` (Vite+React+TS, RTL, imports `messages/*.json`): `Check.tsx`, `QuoteCard`, `DiffView`, `StatusBadge`, `SourcesFooter`.
 9. Delivery docs: `SOURCES.md` (generate from manifest — script `corpus/gen_sources_md.py`), `SAFETY.md` (rewritten), `AI_USAGE.md` (D-006 wording), `CHANGELOG.md`, `LICENSE` (Apache-2.0 placeholder, Q1), `THIRD_PARTY_NOTICES.md`, `.env.example`, `Makefile`, `docs/API.md`, `docs/ARCHITECTURE.md`, `backend/README.md`.
 10. Memory optimization (P1): retriever peak ~1 GB during build → stream trigram CSR without `gram_rows` list; target <700 MB peak.
 12. Test that `docs/agent/context/RED_LINES.md` code block == `orchestrator.RED_LINES` (drift guard).
-13. `orchestrator.py`: treat HTTP 524 like 429 (retry w/ backoff); default long reviews to `high` not `xhigh` (R-O2).
+13. ~~524 retry~~ ✅ done (RETRY_CODES, reviewer→`high`) — but see §3: the review run still hit 524×4 on 12-file briefs → split briefs ≤4 files (retry w/ backoff); default long reviews to `high` not `xhigh` (R-O2).
 14. Review owner's template from yesterday's agent (SK-09) when provided; merge best parts into TEAM.md.
+16. Re-run cross-family review of WP-01..05 with split briefs (≤4 files each): reviewer (pipeline+verify), reviewer (main+providers), tester (adversarial tests), safety (messages+pipeline notices).
 15. Package agent memory as an installable Genspark skill via official `skill-creator` (SK-13) so a new account bootstraps with one command.
-11. Widen `make lint` to cover `corpus/*.py` and `scripts/*.py` (currently backend-only). `build_index.py` has one `PLC0415`
+11. ~~Widen `make lint`~~ ✅ done (covers corpus/, eval/, scripts/smoke.py) (currently backend-only). `build_index.py` has one `PLC0415`
     (lazy `import openpyxl` — intentional, keep stdlib-only import path for fetch; add a targeted `# noqa: PLC0415` with reason).
 
 ## 3. Known facts discovered (not in the package)
+- **2026-10-01 (s4):** Cross-family review of WP-01..04 (reviewer/tester/safety, 12 attached files ≈ 60 KB brief) → **all three HTTP 524 after 4 retries (504 s each)**. The proxy's origin timeout (~120 s) is hit by long briefs regardless of model/effort. Rule: **≤ 4 files / ≤ 20 KB per brief**; split reviews per module. Re-run pending (STATE §2 item 16).
+- **2026-10-01 (s4):** First false-alarm run on the full index: 132/500 misses — ALL were extraction misses (wrappers «… صدق الله العظيم» and «وفي الحديث: …» had no rule). Fixed with trailers + new introducers → 0/500. Lesson: the FA set tests the *extractor* as much as the matcher; wrappers must stay diverse.
+- **2026-10-01 (s4):** Introducer bug: «قال الله تعالى …» matched both «قال الله تعالى» and «قال الله», the latter swallowing «تعالى» into the quote → 6 verbatim ayat came back `needs_review`. Fixed (longest-first, overlap skip). This was invisible to the 8 smoke cases — the 150-case eval caught it.
 - **2026-10-01 (s4):** Referral URL schemes verified by HTTP: `quranpedia.net/surah/1/{s}/{a}` → 301 → ayah page 200; `quranpedia.net/surah/{s}/{a}` is **404** (don't use); `dorar.net/hadith/search?q=` 200 (403 with curl default UA — browser UA fine); `shamela.ws/search?q=` 200; `hadeethenc.com/ar/browse/hadith/{id}` 200; OHD GitHub blob at pinned commit 200.
 - **2026-10-01 (s4):** FastAPI `Form/File` needs `python-multipart` → added to deps. Rules introducer left a leading «ﷺ» in spans → fixed in `rules.py`.
 - **2026-10-01 (s4):** HadeethEnc 66511 and OHD Bukhari 1 tie at 0.875 for «إنما الأعمال بالنية…»; deterministic `_order` (E-015) prefers showable OHD + Sahihain so the user sees the highlighted diff.

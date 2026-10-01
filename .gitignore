@@ -56,3 +56,4 @@ corpus/index/
 *.egg-info/
 .scratch/
 corpus/fixture/
+eval/results/

@@ -3,7 +3,9 @@
 Captures:
   * text between ﴿ ﴾, « », " ", “ ”, ( ) when it contains ≥ min tokens of Arabic;
   * text after an introducer («قال تعالى», «قال الله», «قال رسول الله», «قال النبي»,
-    «عن النبي … قال», «ﷺ») up to the end of the sentence;
+    «عن النبي … قال», «ﷺ», «وفي الحديث», «قوله تعالى») up to the end of the sentence;
+  * text BEFORE a trailer («… صدق الله العظيم», «… رواه البخاري») back to the previous sentence
+    boundary, when nothing else already covers it;
   * a claimed source expression near the quote («رواه البخاري», «سورة البقرة: 255»,
     «Quran 9:11», «[البقرة: 255]») parsed by dictionary, never by a model.
 
@@ -51,7 +53,27 @@ _INTRODUCERS = (
     "أن النبي صلى الله عليه وسلم قال",
     "قال عليه الصلاة والسلام",
     "قال عليه السلام",
+    "وفي الحديث الشريف",
+    "في الحديث الشريف",
+    "وفي الحديث",
+    "في الحديث",
+    "جاء في الحديث",
+    "ورد في الحديث",
+    "وفي الصحيحين",
+    "في الصحيحين",
+    "قوله تعالى",
+    "قوله سبحانه",
+    "قوله عز وجل",
+    "لقوله تعالى",
+    "قوله صلى الله عليه وسلم",
+    "قوله ﷺ",
+    "لقوله ﷺ",
+    "لقوله صلى الله عليه وسلم",
 )
+# Trailers: the quote PRECEDES these («… صدق الله العظيم», «… رواه البخاري»); span runs back to the
+# previous sentence boundary (or text start).
+_TRAILERS = ("صدق الله العظيم", "صدق الله", "رواه", "أخرجه", "متفق عليه")
+_SENTENCE_START = re.compile(r"[.!?؟\n؛:]")
 _SENTENCE_END = re.compile(r"[.!?؟\n؛]|(?=\s+(?:رواه|أخرجه|متفق|صدق الله|سورة|\[|\(|«|﴿))")
 
 # --- claimed source dictionaries -------------------------------------------------------------
@@ -155,8 +177,16 @@ def _kind_from_introducer(intro: str) -> str:
 
 def extract_spans(text: str, *, min_tokens_marked: int = 2, min_tokens_intro: int = 3) -> list[RuleSpan]:
     spans: list[RuleSpan] = []
+    _bracketed(text, spans, min_tokens_marked)
+    _introduced(text, spans, min_tokens_intro)
+    _trailed(text, spans, min_tokens_intro)
+    spans = merge_overlaps(spans)
+    for sp in spans:
+        sp.claimed_source = find_claimed_source(text, sp.start, sp.end)
+    return spans
 
-    # 1) bracketed
+
+def _bracketed(text: str, spans: list[RuleSpan], min_tokens: int) -> None:
     for open_, close in _BRACKET_PAIRS:
         i = 0
         while True:
@@ -169,31 +199,51 @@ def extract_spans(text: str, *, min_tokens_marked: int = 2, min_tokens_intro: in
             inner = text[a + 1 : b]
             is_ref_only = _QURAN_REF.fullmatch(inner.strip()) is not None
             latin_words = len(re.findall(r"[A-Za-z]{2,}", inner))
-            if not is_ref_only and (_arabic_token_count(inner) >= min_tokens_marked or latin_words >= 3):
+            if not is_ref_only and (_arabic_token_count(inner) >= min_tokens or latin_words >= 3):
                 kind = "quran" if open_ == "﴿" else "unknown"
                 spans.append(RuleSpan(a + 1, b, kind, True))
             i = b + 1
 
-    # 2) introducers
-    for intro in _INTRODUCERS:
+
+def _introduced(text: str, spans: list[RuleSpan], min_tokens: int) -> None:
+    """Longest introducer first; a shorter one overlapping an already matched longer one is skipped
+    («قال الله تعالى» must not also fire as «قال الله» and swallow «تعالى»)."""
+    taken: list[tuple[int, int]] = []
+    for intro in sorted(_INTRODUCERS, key=len, reverse=True):
         for m in re.finditer(re.escape(intro) + r"(?:\s*ﷺ)?\s*[:،,]?\s*", text):
+            if any(a < m.end() and m.start() < b for a, b in taken):
+                continue
+            taken.append((m.start(), m.end()))
             start = m.end()
             # if a bracket opens right here, the bracket rule already caught it
             if start < len(text) and text[start] in {o for o, _ in _BRACKET_PAIRS}:
                 continue
             end_m = _SENTENCE_END.search(text, start)
             end = end_m.start() if end_m else len(text)
-            seg = text[start:end]
-            if _arabic_token_count(seg) >= min_tokens_intro:
-                # trim trailing whitespace
+            if _arabic_token_count(text[start:end]) >= min_tokens:
                 while end > start and text[end - 1].isspace():
                     end -= 1
                 spans.append(RuleSpan(start, end, _kind_from_introducer(intro), False))
 
-    spans = merge_overlaps(spans)
-    for sp in spans:
-        sp.claimed_source = find_claimed_source(text, sp.start, sp.end)
-    return spans
+
+def _trailed(text: str, spans: list[RuleSpan], min_tokens: int) -> None:
+    """Quote BEFORE a trailer («… صدق الله العظيم», «… رواه البخاري») back to the previous sentence
+    boundary — only where no span already covers that text."""
+    for tr in _TRAILERS:
+        for m in re.finditer(r"(?<![\u0621-\u064A])" + re.escape(tr), text):
+            end = m.start()
+            while end > 0 and (text[end - 1].isspace() or text[end - 1] in "،,-–—"):
+                end -= 1
+            if end == 0:
+                continue
+            starts = [x.end() for x in _SENTENCE_START.finditer(text, 0, end)]
+            start = starts[-1] if starts else 0
+            while start < end and text[start].isspace():
+                start += 1
+            if any(sp.start < end and start < sp.end for sp in spans):
+                continue
+            if _arabic_token_count(text[start:end]) >= min_tokens:
+                spans.append(RuleSpan(start, end, "quran" if tr.startswith("صدق") else "hadith_matn", False))
 
 
 def merge_overlaps(spans: list[RuleSpan]) -> list[RuleSpan]:

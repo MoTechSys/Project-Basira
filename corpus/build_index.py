@@ -181,7 +181,7 @@ def build_ohd(src: dict[str, Any], meta: dict[str, Any]) -> list[dict[str, Any]]
 
 
 def build_hadeethenc(src: dict[str, Any]) -> list[dict[str, Any]]:
-    import openpyxl
+    import openpyxl  # noqa: PLC0415  (lazy: keep fetch/stdlib paths importable without openpyxl)
 
     wb = openpyxl.load_workbook(DATA / src["filename"], read_only=True)
     ws = wb.worksheets[0]

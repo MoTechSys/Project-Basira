@@ -41,6 +41,7 @@ OUT_DIR = ROOT / ".scratch" / "agents"
 PLATFORM_CONCURRENCY_CAP = 20  # "Too many concurrent requests. Maximum 20 allowed per user."
 SAFE_CONCURRENCY = 18
 MAX_RETRIES_429 = 4
+RETRY_CODES = frozenset({429, 524, 502, 503})  # 524 = Cloudflare origin timeout on long xhigh calls (R-O2)
 
 ANTHROPIC_URL = os.environ.get("ANTHROPIC_BASE_URL", "").rstrip("/") + "/v1/messages"
 OPENAI_URL = os.environ.get("OPENAI_BASE_URL", "").rstrip("/") + "/chat/completions"
@@ -82,7 +83,7 @@ ROSTER: dict[str, RoleSpec] = {
         "You are the second author working on an independent track (eval, frontend). Same output contract: diff, rationale, assumptions.",
     ),
     "reviewer": RoleSpec(
-        "gpt-6-astra", "openai", {"reasoning_effort": "xhigh"},
+        "gpt-6-astra", "openai", {"reasoning_effort": "high"},  # xhigh hit HTTP 524 twice on long briefs (E-012/R-O2)
         "You are an adversarial code reviewer from a different model family. Return a findings table: severity | file:line | issue | concrete fix. If the table is empty, list exactly what you checked. Do not propose relaxing the constraints above.",
     ),
     "tester": RoleSpec(
@@ -173,7 +174,7 @@ async def run_role(role: str, brief: str, files: list[str] | None = None, *, cli
             while True:
                 attempts += 1
                 code, d = await _post(client, spec, system, user)
-                if code == 429 and attempts < MAX_RETRIES_429:
+                if code in RETRY_CODES and attempts < MAX_RETRIES_429:
                     await asyncio.sleep(0.5 * 2 ** (attempts - 1))
                     continue
                 break
