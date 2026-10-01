@@ -71,3 +71,21 @@ Frontend footer already links to `/docs` (Vite proxies `/docs` and `/openapi.jso
 |---|---|---|
 | Q5 | Ship the MCP server in the competition submission (3.1) or only document the design? | Ship, behind `BASIRA_MCP=1`, if 3.1 tests are green before WP-08 |
 | Q6 | Public `/developers` page (3.2) in the first deploy? | Yes — static, no new backend surface |
+
+## 5. Implementation notes for the next agent (verified 2026-10-01, do not re-discover)
+
+**MCP SDK**: `pip install "mcp>=2.2,<3"` installs **mcp 2.2.0**. `from mcp.server.fastmcp import FastMCP` **no longer exists** (v1 API); the SDK raises a `ModuleNotFoundError` pointing to the migration guide. Use:
+
+```python
+from mcp.server.mcpserver import MCPServer
+mcp = MCPServer(name="basira", version=__version__, instructions=<grounding rules from messages/*.json>)
+@mcp.tool(name="check_text", structured_output=True) async def check_text(text: str, ui_lang: str = "ar") -> dict: ...
+@mcp.resource("basira://sources") ...
+asgi = mcp.streamable_http_app(streamable_http_path="/mcp", stateless_http=True, json_response=True, host="0.0.0.0")
+app.mount("/", asgi)   # or app.mount("/mcp", …) depending on path handling — test both, SDK path semantics changed in v2
+```
+Signature facts: `MCPServer.__init__(name, title, description, instructions, website_url, icons, version, …, lifespan, middleware)`; `tool(name, title, description, annotations, icons, meta, structured_output)`; `resource(uri, *, name, title, description, mime_type, …)`; `streamable_http_app(*, streamable_http_path="/mcp", json_response=False, stateless_http=False, max_request_body_size=4 MiB, session_idle_timeout=1800, max_sessions=10000, transport_security, host="127.0.0.1")` → Starlette app. `stateless_http=True` fits our no-persistence rule. Reuse `app.state.pipeline` — never a second pipeline instance (memory ×2 would break the Lite budget, E-038).
+
+**Tests to write before shipping**: tool JSON == `/v1/check` JSON for the 8 smoke cases; forbidden-lexicon sweep over tool descriptions and `instructions`; `grounding_rules` text sourced from `messages/*.json`; tool errors carry the same `{code, message_ar, message_en}` envelope.
+
+**Latency (open)**: long texts (≥ 1 500 chars) still cost 8–11 s on gpt-5.4 `none`; gpt-5.2 `none` did the same job in 3.5–4.7 s with more spans. Options, in order: (a) run rules first and return immediately when the LLM adds nothing new within 2 s (progressive response), (b) chunk long texts at paragraph breaks and call the provider concurrently, (c) A/B gpt-5.2 vs gpt-5.4 on IslamicEval 1A before switching the default. Do not raise `PROVIDER_TIMEOUT_S` blindly — the 8 s cap is what keeps p95 bounded.

@@ -33,3 +33,19 @@ What the spec asserts beyond axe: `<html dir="rtl" lang="ar">`; health gate («�
 ### Screenshots (git-ignored, regenerated on each run)
 
 `frontend/e2e/screenshot-ar.png` (spec), `screenshot-dark-desktop.png`, `screenshot-light-mobile.png`, `screenshot-dark-mobile.png`.
+
+## 2026-10-01 — Lighthouse on the production bundle + pixel audit
+
+**Setup**: `npm run build` → `vite preview` on :4173 (same proxy as dev; added to `vite.config.ts`), Lighthouse 13.5 with Playwright's Chromium (`CHROME_PATH=…/ms-playwright/chromium-1243/chrome-linux64/chrome`), backend real providers.
+
+| Run | Perf | A11y | Best-practices | SEO | FCP | LCP | TBT | CLS |
+|---|---|---|---|---|---|---|---|---|
+| mobile, before fixes | 98 | 100 | 100 | 91 | 1.5 s | 2.1 s | 80 ms | 0.002 |
+| **mobile, after** | **99** | **100** | **100** | **100** | 1.5 s | 2.1 s | 50 ms | 0.002 |
+| **desktop, after** | **100** | **100** | **100** | **100** | 0.4 s | 0.5 s | 10 ms | 0 |
+
+Fixed (E-037): `label-content-name-mismatch` on the brand link; invalid `robots.txt` (SPA fallback). Remaining informational items, deliberately not "fixed": `unused-javascript` 37 KiB (React 19 runtime — the whole bundle is 85 kB gz; code-splitting a one-screen app would add requests), `render-blocking` 4.7 kB CSS (inlining it would defeat caching).
+
+**Pixel audit** (2× screenshots, 320–1440 px, light/dark, home/result): one defect — topbar overflow at 360 px (E-036), fixed and re-swept: `scrollWidth == clientWidth` at all 7 widths. Result card verified: Mushaf pane in Amiri Quran, user typo «علي» marked, source words «على» marked, byte-exact pane, referral links visible.
+
+**Speed** (E-035): `/v1/check` wall 8.0 s → **1.96 s** on the smoke text; 16 concurrent short checks p50 2.1 s / p95 2.3 s; 8 concurrent 1 500-char texts p95 8.3 s (LLM-bound; `match` ≤ 6 ms). Long texts remain the open latency item — see INTEGRATIONS §5.
