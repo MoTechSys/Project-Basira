@@ -1,0 +1,79 @@
+
+added 115 packages, and audited 116 packages in 8s
+
+23 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+npm notice
+npm notice New major version of npm available! 10.9.8 -> 12.2.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+npm notice To update run: npm install -g npm@12.2.0
+npm notice
+
+> frontend@0.0.0 build
+> tsc -b && vite build
+
+[36mvite v8.3.2 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 28 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   3.14 kB │ gzip:  1.30 kB
+dist/assets/index-Ba2cNVIA.css   19.00 kB │ gzip:  4.48 kB
+dist/assets/index-CxBMdopA.js   272.02 kB │ gzip: 85.71 kB
+
+[32m✓ built in 533ms[39m
+npm notice
+npm notice New major version of npm available! 10.9.8 -> 12.2.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+npm notice To update run: npm install -g npm@12.2.0
+npm notice
+
+> frontend@0.0.0 test
+> vitest run
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv5.0.3 [39m[90m/home/user/webapp/prototype_audit_source/frontend[39m
+
+ [32m✓[39m src/Check.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[33m 1739[2mms[22m[39m
+   [32m✓[39m Check page [2m(3)[22m
+     [33m[2m✓[22m[39m submits text and renders results, flags and fixed footer[33m 909[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m8 passed[39m[22m[90m (8)[39m
+[2m   Start at [22m 17:55:11
+[2m   Duration [22m 3.72s[2m (tests 50%, environment 27%, transform 12%, import 5%, setup 5%, worker 1%)[22m
+
+
+> frontend@0.0.0 lint
+> oxlint
+
+
+  ! react(only-export-components): Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+    ,-[src/brand/Icon.tsx:46:14]
+ 45 | 
+ 46 | export const BASIRA_ICON_NAMES: readonly BasiraIconName[] = [
+    :              ^^^^^^^^^^^^^^^^^
+ 47 |   'api', 'arrow-start', 'byte-exact', 'check-run', 'chevron-down', 'clear', 'close', 'copy', 'deterministic', 'diff-words', 'github', 'grade-quoted', 'hadith', 'health', 'hijri-date', 'info', 'keyboard', 'language', 'limits', 'menu', 'no-generation', 'no-judgment', 'ocr-scan', 'paste-text', 'privacy-nostore', 'quran', 'refer-scholar', 'report-export', 'search-external', 'share-link', 'shield-verify', 'source-link', 'spinner', 'state-found', 'state-notfound', 'state-partial', 'state-review', 'theme', 'upload-image', 'warning'
+    `----
+
+  ! react(only-export-components): Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+    ,-[src/Check.tsx:55:17]
+ 54 | 
+ 55 | export function buildReport(r: CheckResponse, lang: Lang): string {
+    :                 ^^^^^^^^^^^
+ 56 |   const lines = [`${ui(lang, "app_name")} — ${new Date().toISOString()}`, `request_id: ${r.request_id}`, ""];
+    `----
+
+  x react-hooks(rules-of-hooks): React Hook "useExample" cannot be called inside a callback. React Hooks must be called in a React function component or a custom React Hook function.
+     ,-[src/Check.tsx:261:76]
+ 260 |                 <li key={ex.key}>
+ 261 |                   <button type="button" className="example" onClick={() => useExample(ex.text)}>
+     :                                                                            ^^^^^^^^^|^^^^^^^^^
+     :                                                                                     `-- This Hook call is inside a nested callback.
+ 262 |                     <Icon name={ex.icon} size={20} />
+     `----
+
+Found 2 warnings and 1 error.
+Finished in 93ms on 17 files with 116 rules using 4 threads.

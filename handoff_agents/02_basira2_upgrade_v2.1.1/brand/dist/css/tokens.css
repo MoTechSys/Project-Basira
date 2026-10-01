@@ -1,0 +1,162 @@
+/* ============================================================
+   Basira — Brand Tokens v1.0  (بصيرة)
+   Source of truth: official IslamicAIch 2026 design system
+   (#12183F navy · #6150EA violet · #2EF2C2 teal · #F2F4FF off-white)
+   Light + dark via [data-theme] or prefers-color-scheme.
+   ============================================================ */
+:root {
+  /* --- Brand palette (never change) --- */
+  --bs-navy: #12183F;
+  --bs-violet: #6150EA;
+  --bs-teal: #2EF2C2;
+  --bs-offwhite: #F2F4FF;
+
+  /* tints / shades */
+  --bs-navy-900: #0B0F2A;
+  --bs-navy-700: #1C2459;
+  --bs-navy-500: #2C3780;
+  --bs-violet-700: #4A3BC9;
+  --bs-violet-300: #9A8FF3;
+  --bs-violet-100: #E6E3FC;
+  --bs-teal-700: #16B892;
+  --bs-teal-100: #D8FCF2;
+
+  /* --- Semantic (4-state machine) --- */
+  --bs-state-found: #16B892;          /* found — exact match */
+  --bs-state-found-bg: #D8FCF2;
+  --bs-state-partial: #D98E04;        /* partial_match */
+  --bs-state-partial-bg: #FFF1D6;
+  --bs-state-review: #6150EA;         /* needs_review */
+  --bs-state-review-bg: #E6E3FC;
+  --bs-state-notfound: #C62C45;       /* not_found */
+  --bs-state-notfound-bg: #FDE3E8;
+
+  /* --- Surfaces / text (light) --- */
+  --bs-bg: #FFFFFF;
+  --bs-bg-subtle: var(--bs-offwhite);
+  --bs-surface: #FFFFFF;
+  --bs-surface-raised: #F7F8FF;
+  --bs-border: #D9DCF0;
+  --bs-text: var(--bs-navy);
+  --bs-text-muted: #4B5280;
+  --bs-text-inverse: var(--bs-offwhite);
+  --bs-link: var(--bs-violet);
+  --bs-focus: var(--bs-violet);
+  --bs-accent: var(--bs-teal);
+
+  /* --- Typography --- */
+  --bs-font-ui: "Readex Pro", "Segoe UI", Tahoma, system-ui, sans-serif;
+  --bs-font-mushaf: "KFGQPC Uthmanic Script HAFS", "Amiri Quran", "Scheherazade New", serif;
+  --bs-font-mono: ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace;
+  --bs-fs-caption: 0.875rem;  /* 14px  (template 18pt caption) */
+  --bs-fs-body: 1rem;         /* 16px  (template 24pt body)    */
+  --bs-fs-lg: 1.125rem;
+  --bs-fs-h3: 1.375rem;
+  --bs-fs-h2: 1.75rem;
+  --bs-fs-h1: clamp(2rem, 1.3rem + 2.5vw, 2.75rem); /* template 45pt bold */
+  --bs-lh-tight: 1.25;
+  --bs-lh-body: 1.7;          /* Arabic needs generous leading */
+  --bs-lh-mushaf: 2.1;
+
+  /* --- Radii (template: 10/16/24) --- */
+  --bs-radius-sm: 10px;
+  --bs-radius-md: 16px;
+  --bs-radius-lg: 24px;
+  --bs-radius-pill: 999px;
+
+  /* --- Spacing (4pt grid) --- */
+  --bs-sp-1: 4px;  --bs-sp-2: 8px;  --bs-sp-3: 12px; --bs-sp-4: 16px;
+  --bs-sp-5: 20px; --bs-sp-6: 24px; --bs-sp-8: 32px; --bs-sp-10: 40px;
+  --bs-sp-12: 48px; --bs-sp-16: 64px;
+
+  /* --- Elevation --- */
+  --bs-shadow-sm: 0 1px 2px rgb(18 24 63 / .06), 0 1px 3px rgb(18 24 63 / .08);
+  --bs-shadow-md: 0 6px 16px -4px rgb(18 24 63 / .14);
+  --bs-shadow-lg: 0 20px 40px -12px rgb(18 24 63 / .22);
+  --bs-shadow-focus: 0 0 0 3px rgb(97 80 234 / .45);
+
+  /* --- Motion --- */
+  --bs-ease: cubic-bezier(.2,.8,.2,1);
+  --bs-dur-fast: 120ms;
+  --bs-dur: 200ms;
+
+  /* --- Gradient (logo tile / hero) --- */
+  --bs-gradient-brand: linear-gradient(135deg, #6150EA 0%, #12183F 100%);
+  --bs-gradient-accent: linear-gradient(135deg, #2EF2C2 0%, #6150EA 100%);
+
+  /* --- Layout --- */
+  --bs-container: 72rem;
+  --bs-container-narrow: 48rem;
+  --bs-touch-min: 44px; /* WCAG 2.2 AA 2.5.8 target size (24px min, 44 recommended) */
+
+  color-scheme: light;
+}
+
+/* ---------- Dark theme ---------- */
+[data-theme="dark"] {
+  --bs-bg: #0B0F2A;
+  --bs-bg-subtle: var(--bs-navy);
+  --bs-surface: #141B48;
+  --bs-surface-raised: #1C2459;
+  --bs-border: #2C3780;
+  --bs-text: var(--bs-offwhite);
+  --bs-text-muted: #AEB4D9;
+  --bs-text-inverse: var(--bs-navy);
+  --bs-link: #9A8FF3;
+  --bs-focus: var(--bs-teal);
+  --bs-state-found-bg: rgb(22 184 146 / .16);
+  --bs-state-partial-bg: rgb(217 142 4 / .18);
+  --bs-state-review-bg: rgb(97 80 234 / .22);
+  --bs-state-notfound-bg: rgb(198 44 69 / .2);
+  --bs-shadow-focus: 0 0 0 3px rgb(46 242 194 / .5);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bs-bg: #0B0F2A; --bs-bg-subtle: #12183F; --bs-surface: #141B48;
+    --bs-surface-raised: #1C2459; --bs-border: #2C3780;
+    --bs-text: #F2F4FF; --bs-text-muted: #AEB4D9; --bs-text-inverse: #12183F;
+    --bs-link: #9A8FF3; --bs-focus: #2EF2C2;
+    --bs-state-found-bg: rgb(22 184 146 / .16); --bs-state-partial-bg: rgb(217 142 4 / .18);
+    --bs-state-review-bg: rgb(97 80 234 / .22); --bs-state-notfound-bg: rgb(198 44 69 / .2);
+    --bs-shadow-focus: 0 0 0 3px rgb(46 242 194 / .5);
+    color-scheme: dark;
+  }
+}
+
+/* ---------- Base ---------- */
+html { font-family: var(--bs-font-ui); font-size: 100%; -webkit-text-size-adjust: 100%; }
+body { background: var(--bs-bg); color: var(--bs-text); line-height: var(--bs-lh-body); margin: 0; }
+:focus-visible { outline: none; box-shadow: var(--bs-shadow-focus); border-radius: var(--bs-radius-sm); }
+
+/* Quranic / Hadith text — NEVER letter-spacing, NEVER fake-bold, NEVER text-transform */
+.bs-mushaf {
+  font-family: var(--bs-font-mushaf);
+  font-size: 1.5rem; line-height: var(--bs-lh-mushaf);
+  letter-spacing: 0 !important; font-synthesis: none; font-kerning: normal;
+  direction: rtl; unicode-bidi: isolate; text-align: start;
+  font-feature-settings: "calt" 1, "liga" 1, "mark" 1, "mkmk" 1;
+}
+
+/* ---------- Icons ---------- */
+.bs-icon { display: inline-block; width: 1.5em; height: 1.5em; vertical-align: -0.35em; flex: none; }
+.bs-icon--sm { width: 1.25em; height: 1.25em; }
+[dir="rtl"] .bs-icon--rtl-flip { transform: scaleX(-1); }
+@keyframes bs-spin { to { transform: rotate(360deg); } }
+.bs-icon--spin { animation: bs-spin 0.9s linear infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .bs-icon--spin { animation-duration: 1.8s; }
+  *, *::before, *::after { transition-duration: 0.01ms !important; }
+}
+
+/* ---------- State badges ---------- */
+.bs-badge { display: inline-flex; align-items: center; gap: var(--bs-sp-2); padding: 4px 12px;
+  border-radius: var(--bs-radius-pill); font-weight: 600; font-size: var(--bs-fs-caption); line-height: 1.4; }
+.bs-badge[data-state="found"]     { color: #0B5E4A; background: var(--bs-state-found-bg); }
+.bs-badge[data-state="partial_match"] { color: #6B4500; background: var(--bs-state-partial-bg); }
+.bs-badge[data-state="needs_review"]  { color: #3B2FA3; background: var(--bs-state-review-bg); }
+.bs-badge[data-state="not_found"]     { color: #8A1C2E; background: var(--bs-state-notfound-bg); }
+[data-theme="dark"] .bs-badge[data-state="found"] { color: #7FF5D6; }
+[data-theme="dark"] .bs-badge[data-state="partial_match"] { color: #FFD28A; }
+[data-theme="dark"] .bs-badge[data-state="needs_review"] { color: #C4BCFA; }
+[data-theme="dark"] .bs-badge[data-state="not_found"] { color: #FFB3C0; }

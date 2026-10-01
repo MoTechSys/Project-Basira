@@ -1,0 +1,30 @@
+/* Readex Pro (OFL 1.1) — variable font, Arabic + Latin, self-hosted.
+   Put the woff2 at /fonts/ReadexPro[wght].woff2 (≈ 95 KB) and preload it:
+   <link rel="preload" href="/fonts/ReadexPro[wght].woff2" as="font" type="font/woff2" crossorigin>
+   font-display: swap keeps LCP fast; size-adjust prevents layout shift on fallback. */
+@font-face {
+  font-family: "Readex Pro";
+  src: url("/fonts/ReadexPro[wght].woff2") format("woff2-variations"),
+       url("/fonts/ReadexPro[wght].woff2") format("woff2");
+  font-weight: 160 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF, U+2000-206F, U+20A0-20CF;
+}
+/* Metric-compatible fallback to reduce CLS before the webfont arrives */
+@font-face {
+  font-family: "Readex Pro Fallback";
+  src: local("Tahoma"), local("Segoe UI"), local("Arial");
+  size-adjust: 108%;
+  ascent-override: 102%;
+  descent-override: 36%;
+  line-gap-override: 0%;
+}
+/* Mushaf text — KFGQPC Uthmanic Script HAFS (King Fahd Complex; free for non-commercial/da'wah use).
+   Load lazily only on result pages that render Quran text. ≈ 300 KB woff2 → subset or lazy-load. */
+@font-face {
+  font-family: "KFGQPC Uthmanic Script HAFS";
+  src: url("/fonts/UthmanicHafs.woff2") format("woff2");
+  font-weight: 400; font-style: normal; font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF, U+FD3E-FD3F;
+}

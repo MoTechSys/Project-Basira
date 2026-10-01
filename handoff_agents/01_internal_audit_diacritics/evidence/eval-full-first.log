@@ -1,0 +1,4 @@
+backend/.venv/bin/python eval/run_eval.py --index corpus/index --repeats 3 --false-alarm 500 --fail-on-unsafe
+cases: pass 150/150 · unsafe 0 · recall@found 1.0 · precision@found 1.0 · forbidden 0 · variance 0 · 7.0s
+false-alarm: 0/500 = 0.0000
+EXIT=0 WALL_SECONDS=31

@@ -1,0 +1,52 @@
+== 1/5 fetch + verify corpora (sha256, counts)
+  ! TLS certificate rejected for https://tanzil.net/pub/download/index.php?quranType=uthmani&outType=txt-2&agree=true
+    ([SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: certificate has expired (_ssl.c:1032))
+    retrying WITHOUT certificate verification; integrity relies on pinned sha256 bf4f57b968d0… (use --strict-tls to forbid)
+  ! TLS certificate rejected for https://tanzil.net/pub/download/index.php?quranType=simple-clean&outType=txt-2&agree=true
+    ([SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: certificate has expired (_ssl.c:1032))
+    retrying WITHOUT certificate verification; integrity relies on pinned sha256 228df2a71767… (use --strict-tls to forbid)
+[tanzil_uthmani]
+  ↓ tanzil_uthmani: https://tanzil.net/pub/download/index.php?quranType=uthmani&outType=txt-2&agree=true
+  ✓ tanzil_uthmani: 6236 records, sha256 ok
+[tanzil_simple_clean]
+  ↓ tanzil_simple_clean: https://tanzil.net/pub/download/index.php?quranType=simple-clean&outType=txt-2&agree=true
+  ✓ tanzil_simple_clean: 6236 records, sha256 ok
+[ohd]
+  ↓ ohd/sahih_al-bukhari/plain
+  ↓ ohd/sahih_al-bukhari/display
+  ↓ ohd/sahih_muslim/plain
+  ↓ ohd/sahih_muslim/display
+  ↓ ohd/sunan_abu-dawud/plain
+  ↓ ohd/sunan_abu-dawud/display
+  ↓ ohd/sunan_al-tirmidhi/plain
+  ↓ ohd/sunan_al-tirmidhi/display
+  ↓ ohd/sunan_al-nasai/plain
+  ↓ ohd/sunan_al-nasai/display
+  ↓ ohd/sunan_ibn-maja/plain
+  ↓ ohd/sunan_ibn-maja/display
+  ↓ ohd/maliks_muwataa/plain
+  ↓ ohd/maliks_muwataa/display
+  ↓ ohd/musnad_ahmad/plain
+  ↓ ohd/musnad_ahmad/display
+  ↓ ohd/sunan_al-darimi/plain
+  ↓ ohd/sunan_al-darimi/display
+  ✓ ohd: 9 books, 62169 rows
+[hadeethenc_ar]
+  ↓ hadeethenc_ar: https://hadeethenc.com/browse/download/ar
+  ✓ hadeethenc_ar: 3582 records, sha256 ok
+
+all sources present and verified
+== 2/5 python venv + deps
+== 3/5 build index (skipped if up to date)
+== 4/5 quality gates
+All checks passed!
+Success: no issues found in 28 source files
+........................................................................ [ 43%]
+........................................................................ [ 87%]
+....................                                                     [100%]
+== 5/5 message templates lexicon self-check
+templates clean
+
+BOOTSTRAP OK — now read docs/STATE.md §2 for the next task.
+
+EXIT=0 WALL_SECONDS=113

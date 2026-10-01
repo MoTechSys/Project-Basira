@@ -1,0 +1,2 @@
+bash: line 1: /usr/bin/time: No such file or directory
+BOOTSTRAP_EXIT=127

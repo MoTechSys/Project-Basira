@@ -1,0 +1,10 @@
+
+> frontend@0.0.0 e2e
+> playwright test
+
+
+Running 1 test using 1 worker
+
+  ✓  1 [chromium] › e2e/check.spec.ts:6:1 › rtl shell, real check against the backend, axe clean (5.2s)
+
+  1 passed (6.7s)

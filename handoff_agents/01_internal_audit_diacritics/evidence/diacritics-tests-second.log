@@ -1,0 +1,23 @@
+{
+  "targeted_passed": 48,
+  "corpus_checks": {
+    "identity_total": 6236,
+    "identity_passed": 6230,
+    "canonical_nfd_total": 6236,
+    "canonical_nfd_passed": 6230,
+    "last_mark_deletion_total": 6235,
+    "last_mark_deletion_passed": 6229,
+    "last_mark_substitution_total": 6235,
+    "last_mark_substitution_passed": 6235,
+    "last_mark_duplication_total": 6235,
+    "last_mark_duplication_passed": 6235
+  },
+  "corpus_seconds": 54.2072194780003,
+  "same_rasm_pair_latency_ms": {
+    "n": 200,
+    "p50": 2.7306755000608973,
+    "p95": 3.100170999459806,
+    "max": 3.4962909994646907
+  }
+}
+Targeted total 48 unsupported identities 6 failures 18
