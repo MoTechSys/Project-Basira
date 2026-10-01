@@ -1,0 +1,298 @@
+{
+  "validator_tamper": {
+    "status": "found",
+    "rejections": 0,
+    "span_end": 999999,
+    "message_key": "nonexistent_key"
+  },
+  "short_marked_state": "partial_match",
+  "short_unmarked_state": "needs_review",
+  "final_vowel_conflicts": 0,
+  "active_rate_keys": 10002,
+  "xff_rate_same_ip": [
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    429
+  ],
+  "xff_rate_changed_ip": 200,
+  "fake_png": {
+    "status": 200,
+    "body": {
+      "request_id": "6456681c-cefb-4cac-8ac1-2fac694aef21",
+      "disclaimer_key": "footer",
+      "transparency_key": "transparency_notice",
+      "corpus": {
+        "tanzil": "1.1",
+        "ohd_commit": "1515f6cb",
+        "hadeethenc": "1.7.0"
+      },
+      "extraction_degraded": false,
+      "extraction_provider": "mock",
+      "flags": {
+        "chain_message": false,
+        "refusal": false,
+        "pii_suspected": false
+      },
+      "quotes": [
+        {
+          "id": "q1",
+          "span": {
+            "start": 12,
+            "end": 44
+          },
+          "quoted_text": "إِنَّ اللَّهَ مَعَ الصَّابِرِينَ",
+          "kind": "quran",
+          "language": "ar",
+          "source_modality": "image",
+          "claimed_source": null,
+          "claimed_source_mismatch": false,
+          "status": "needs_review",
+          "review_reason": "image_unconfirmed",
+          "score": 1.0,
+          "message_key": "needs_review_image",
+          "notice_keys": [
+            "ocr_mock",
+            "quran_fragment",
+            "image_extracted"
+          ],
+          "matches": [
+            {
+              "corpus": "tanzil",
+              "ref": {
+                "surah": 2,
+                "ayah": 153
+              },
+              "ref_label_ar": "سورة البقرة، الآية 153",
+              "ref_label_en": "Surah Al-Baqarah (2:153)",
+              "collection_tier": "quran",
+              "source_text": "يَٰٓأَيُّهَا ٱلَّذِينَ ءَامَنُوا۟ ٱسْتَعِينُوا۟ بِٱلصَّبْرِ وَٱلصَّلَوٰةِ إِنَّ ٱللَّهَ مَعَ ٱلصَّٰبِرِينَ",
+              "source_text_range": null,
+              "source_url": "https://quranpedia.net/surah/1/2/153",
+              "links": [
+                {
+                  "name": "quranpedia.net",
+                  "url": "https://quranpedia.net/surah/1/2/153"
+                }
+              ],
+              "diff": [],
+              "diff_kinds": [],
+              "score": 1.0,
+              "grade": null,
+              "continues_to": null
+            },
+            {
+              "corpus": "tanzil",
+              "ref": {
+                "surah": 8,
+                "ayah": 46
+              },
+              "ref_label_ar": "سورة الأنفال، الآية 46",
+              "ref_label_en": "Surah Al-Anfal (8:46)",
+              "collection_tier": "quran",
+              "source_text": "وَأَطِيعُوا۟ ٱللَّهَ وَرَسُولَهُۥ وَلَا تَنَٰزَعُوا۟ فَتَفْشَلُوا۟ وَتَذْهَبَ رِيحُكُمْ وَٱصْبِرُوٓا۟ إِنَّ ٱللَّهَ مَعَ ٱلصَّٰبِرِينَ",
+              "source_text_range": [
+                102,
+                133
+              ],
+              "source_url": "https://quranpedia.net/surah/1/8/46",
+              "links": [
+                {
+                  "name": "quranpedia.net",
+                  "url": "https://quranpedia.net/surah/1/8/46"
+                }
+              ],
+              "diff": [],
+              "diff_kinds": [],
+              "score": 1.0,
+              "grade": null,
+              "continues_to": null
+            }
+          ],
+          "total_positions": 2,
+          "external_search_links": [],
+          "segments": [
+            {
+              "type": "Ayah",
+              "start": 12,
+              "end": 44
+            }
+          ],
+          "repeated_spans": []
+        }
+      ],
+      "validator_rejections": 0,
+      "timings_ms": {
+        "extract": 18,
+        "retrieve": 0,
+        "match": 2,
+        "total": 24
+      },
+      "ocr_text": "قال تعالى: ﴿إِنَّ اللَّهَ مَعَ الصَّابِرِينَ﴾",
+      "determinism_hash": "0fcdb553e6e27f22786e88a02b3c04050e7605bfabeba19867ce3de17600c85b"
+    }
+  },
+  "case28_image": {
+    "status": 200,
+    "body": {
+      "request_id": "17ca9933-21cc-4ca3-b2b6-41f126a74b12",
+      "disclaimer_key": "footer",
+      "transparency_key": "transparency_notice",
+      "corpus": {
+        "tanzil": "1.1",
+        "ohd_commit": "1515f6cb",
+        "hadeethenc": "1.7.0"
+      },
+      "extraction_degraded": false,
+      "extraction_provider": "mock",
+      "flags": {
+        "chain_message": false,
+        "refusal": false,
+        "pii_suspected": false
+      },
+      "quotes": [
+        {
+          "id": "q1",
+          "span": {
+            "start": 12,
+            "end": 44
+          },
+          "quoted_text": "إِنَّ اللَّهَ مَعَ الصَّابِرِينَ",
+          "kind": "quran",
+          "language": "ar",
+          "source_modality": "image",
+          "claimed_source": null,
+          "claimed_source_mismatch": false,
+          "status": "needs_review",
+          "review_reason": "image_unconfirmed",
+          "score": 1.0,
+          "message_key": "needs_review_image",
+          "notice_keys": [
+            "ocr_mock",
+            "quran_fragment",
+            "image_extracted"
+          ],
+          "matches": [
+            {
+              "corpus": "tanzil",
+              "ref": {
+                "surah": 2,
+                "ayah": 153
+              },
+              "ref_label_ar": "سورة البقرة، الآية 153",
+              "ref_label_en": "Surah Al-Baqarah (2:153)",
+              "collection_tier": "quran",
+              "source_text": "يَٰٓأَيُّهَا ٱلَّذِينَ ءَامَنُوا۟ ٱسْتَعِينُوا۟ بِٱلصَّبْرِ وَٱلصَّلَوٰةِ إِنَّ ٱللَّهَ مَعَ ٱلصَّٰبِرِينَ",
+              "source_text_range": null,
+              "source_url": "https://quranpedia.net/surah/1/2/153",
+              "links": [
+                {
+                  "name": "quranpedia.net",
+                  "url": "https://quranpedia.net/surah/1/2/153"
+                }
+              ],
+              "diff": [],
+              "diff_kinds": [],
+              "score": 1.0,
+              "grade": null,
+              "continues_to": null
+            },
+            {
+              "corpus": "tanzil",
+              "ref": {
+                "surah": 8,
+                "ayah": 46
+              },
+              "ref_label_ar": "سورة الأنفال، الآية 46",
+              "ref_label_en": "Surah Al-Anfal (8:46)",
+              "collection_tier": "quran",
+              "source_text": "وَأَطِيعُوا۟ ٱللَّهَ وَرَسُولَهُۥ وَلَا تَنَٰزَعُوا۟ فَتَفْشَلُوا۟ وَتَذْهَبَ رِيحُكُمْ وَٱصْبِرُوٓا۟ إِنَّ ٱللَّهَ مَعَ ٱلصَّٰبِرِينَ",
+              "source_text_range": [
+                102,
+                133
+              ],
+              "source_url": "https://quranpedia.net/surah/1/8/46",
+              "links": [
+                {
+                  "name": "quranpedia.net",
+                  "url": "https://quranpedia.net/surah/1/8/46"
+                }
+              ],
+              "diff": [],
+              "diff_kinds": [],
+              "score": 1.0,
+              "grade": null,
+              "continues_to": null
+            }
+          ],
+          "total_positions": 2,
+          "external_search_links": [],
+          "segments": [
+            {
+              "type": "Ayah",
+              "start": 12,
+              "end": 44
+            }
+          ],
+          "repeated_spans": []
+        }
+      ],
+      "validator_rejections": 0,
+      "timings_ms": {
+        "extract": 4,
+        "retrieve": 0,
+        "match": 1,
+        "total": 8
+      },
+      "ocr_text": "قال تعالى: ﴿إِنَّ اللَّهَ مَعَ الصَّابِرِينَ﴾",
+      "determinism_hash": "0fcdb553e6e27f22786e88a02b3c04050e7605bfabeba19867ce3de17600c85b"
+    }
+  },
+  "bad_mime": {
+    "status": 422,
+    "body": {
+      "error": {
+        "code": "invalid_input",
+        "message_ar": "المدخل غير صالح.",
+        "message_en": "Invalid input."
+      }
+    }
+  },
+  "oversized": {
+    "status": 413,
+    "body": {
+      "error": {
+        "code": "image_too_large",
+        "message_ar": "الصورة أكبر من الحد المسموح (6 ميجابايت).",
+        "message_en": "The image exceeds the allowed size (6 MB)."
+      }
+    }
+  }
+}

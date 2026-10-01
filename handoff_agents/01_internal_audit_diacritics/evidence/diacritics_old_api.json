@@ -1,0 +1,199 @@
+{
+  "health": {
+    "status": "ok",
+    "build_sha": "dev",
+    "corpus": {
+      "tanzil": "1.1",
+      "ohd_commit": "1515f6cb",
+      "hadeethenc": "1.7.0"
+    },
+    "corpus_loaded": true,
+    "counts": {
+      "tanzil": 6236,
+      "ohd": 62169,
+      "hadeethenc": 3582
+    },
+    "rss_mb": 281,
+    "providers": {
+      "llm": "mock",
+      "vision": "mock"
+    },
+    "index_sha256": "54d34102371239b8522de428fd65c929729179ff1869612d8638ed66aacbf074",
+    "boot": "snapshot",
+    "boot_seconds": 1.72
+  },
+  "cases": {
+    "USER": {
+      "input": "﴿ ۞ قُلْ يَا عِبَادِيَ الَّذِينَ أَسرَفُوا عَلَىٰ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ  إِنَّ اللهَ يَغْفِرُ الذُّنوبَ جَمِيعًا ۚ إِنَّهُ هُوَ الْغَفُورُ الرَّحِيمُ﴾",
+      "http_status": 200,
+      "response": {
+        "request_id": "d86aa840-b7f3-4c17-89f2-66234e14af7b",
+        "disclaimer_key": "footer",
+        "transparency_key": "transparency_notice",
+        "corpus": {
+          "tanzil": "1.1",
+          "ohd_commit": "1515f6cb",
+          "hadeethenc": "1.7.0"
+        },
+        "extraction_degraded": false,
+        "extraction_provider": "mock",
+        "flags": {
+          "chain_message": false,
+          "refusal": false,
+          "pii_suspected": false
+        },
+        "quotes": [
+          {
+            "id": "q1",
+            "span": {
+              "start": 2,
+              "end": 176
+            },
+            "quoted_text": "۞ قُلْ يَا عِبَادِيَ الَّذِينَ أَسرَفُوا عَلَىٰ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ  إِنَّ اللهَ يَغْفِرُ الذُّنوبَ جَمِيعًا ۚ إِنَّهُ هُوَ الْغَفُورُ الرَّحِيمُ",
+            "kind": "quran",
+            "language": "ar",
+            "source_modality": "text",
+            "claimed_source": null,
+            "claimed_source_mismatch": false,
+            "status": "found",
+            "review_reason": null,
+            "score": 1.0,
+            "message_key": "found",
+            "notice_keys": [],
+            "matches": [
+              {
+                "corpus": "tanzil",
+                "ref": {
+                  "surah": 39,
+                  "ayah": 53
+                },
+                "ref_label_ar": "سورة الزمر، الآية 53",
+                "ref_label_en": "Surah Az-Zumar (39:53)",
+                "collection_tier": "quran",
+                "source_text": "قُلْ يَٰعِبَادِىَ ٱلَّذِينَ أَسْرَفُوا۟ عَلَىٰٓ أَنفُسِهِمْ لَا تَقْنَطُوا۟ مِن رَّحْمَةِ ٱللَّهِ إِنَّ ٱللَّهَ يَغْفِرُ ٱلذُّنُوبَ جَمِيعًا إِنَّهُۥ هُوَ ٱلْغَفُورُ ٱلرَّحِيمُ",
+                "source_text_range": null,
+                "source_url": "https://quranpedia.net/surah/1/39/53",
+                "links": [
+                  {
+                    "name": "quranpedia.net",
+                    "url": "https://quranpedia.net/surah/1/39/53"
+                  }
+                ],
+                "diff": [],
+                "diff_kinds": [],
+                "score": 1.0,
+                "grade": null,
+                "continues_to": null
+              }
+            ],
+            "total_positions": 1,
+            "external_search_links": [],
+            "segments": [
+              {
+                "type": "Ayah",
+                "start": 2,
+                "end": 176
+              }
+            ],
+            "repeated_spans": []
+          }
+        ],
+        "validator_rejections": 0,
+        "timings_ms": {
+          "extract": 7,
+          "retrieve": 0,
+          "match": 1,
+          "total": 10
+        },
+        "ocr_text": null,
+        "determinism_hash": "742bc6c9a4c6cc5a0765e1c8bc43435851aecc080d8cf4f29077f8b27ba31731"
+      }
+    },
+    "GIVEN": {
+      "input": "﴿ ۞ قُلْ يَا عِبَادِيَ الَّذِينَ أَسْرَفُوا عَلَىٰ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ ۚ إِنَّ اللَّهَ يَغْفِرُ الذُّنُوبَ جَمِيعًا ۚ إِنَّهُ هُوَ الْغَفُورُ الرَّحِيمُ﴾",
+      "http_status": 200,
+      "response": {
+        "request_id": "33e320ac-85db-491d-9efe-41d7ecb3454f",
+        "disclaimer_key": "footer",
+        "transparency_key": "transparency_notice",
+        "corpus": {
+          "tanzil": "1.1",
+          "ohd_commit": "1515f6cb",
+          "hadeethenc": "1.7.0"
+        },
+        "extraction_degraded": false,
+        "extraction_provider": "mock",
+        "flags": {
+          "chain_message": false,
+          "refusal": false,
+          "pii_suspected": false
+        },
+        "quotes": [
+          {
+            "id": "q1",
+            "span": {
+              "start": 2,
+              "end": 181
+            },
+            "quoted_text": "۞ قُلْ يَا عِبَادِيَ الَّذِينَ أَسْرَفُوا عَلَىٰ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ ۚ إِنَّ اللَّهَ يَغْفِرُ الذُّنُوبَ جَمِيعًا ۚ إِنَّهُ هُوَ الْغَفُورُ الرَّحِيمُ",
+            "kind": "quran",
+            "language": "ar",
+            "source_modality": "text",
+            "claimed_source": null,
+            "claimed_source_mismatch": false,
+            "status": "found",
+            "review_reason": null,
+            "score": 1.0,
+            "message_key": "found",
+            "notice_keys": [],
+            "matches": [
+              {
+                "corpus": "tanzil",
+                "ref": {
+                  "surah": 39,
+                  "ayah": 53
+                },
+                "ref_label_ar": "سورة الزمر، الآية 53",
+                "ref_label_en": "Surah Az-Zumar (39:53)",
+                "collection_tier": "quran",
+                "source_text": "قُلْ يَٰعِبَادِىَ ٱلَّذِينَ أَسْرَفُوا۟ عَلَىٰٓ أَنفُسِهِمْ لَا تَقْنَطُوا۟ مِن رَّحْمَةِ ٱللَّهِ إِنَّ ٱللَّهَ يَغْفِرُ ٱلذُّنُوبَ جَمِيعًا إِنَّهُۥ هُوَ ٱلْغَفُورُ ٱلرَّحِيمُ",
+                "source_text_range": null,
+                "source_url": "https://quranpedia.net/surah/1/39/53",
+                "links": [
+                  {
+                    "name": "quranpedia.net",
+                    "url": "https://quranpedia.net/surah/1/39/53"
+                  }
+                ],
+                "diff": [],
+                "diff_kinds": [],
+                "score": 1.0,
+                "grade": null,
+                "continues_to": null
+              }
+            ],
+            "total_positions": 1,
+            "external_search_links": [],
+            "segments": [
+              {
+                "type": "Ayah",
+                "start": 2,
+                "end": 181
+              }
+            ],
+            "repeated_spans": []
+          }
+        ],
+        "validator_rejections": 0,
+        "timings_ms": {
+          "extract": 2,
+          "retrieve": 0,
+          "match": 0,
+          "total": 4
+        },
+        "ocr_text": null,
+        "determinism_hash": "2898359d8ed125f20ec98be83ca956047c69fa67c577fbec436b1cd4b95c9609"
+      }
+    }
+  }
+}

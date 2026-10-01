@@ -1,0 +1,3 @@
+tests/test_verify.py::test_disclaimer_keys_are_forced_valid
+
+164 tests collected in 0.47s

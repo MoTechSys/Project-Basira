@@ -1,0 +1,6 @@
+tests/test_rules.py: 28
+tests/test_scholar_lens.py: 29
+tests/test_snapshot.py: 4
+tests/test_state.py: 18
+tests/test_verify.py: 7
+

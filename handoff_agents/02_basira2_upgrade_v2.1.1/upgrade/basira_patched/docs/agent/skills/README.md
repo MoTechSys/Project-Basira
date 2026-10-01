@@ -1,0 +1,21 @@
+# skills/ — مهارات الوكيل (إجراءات مُجرَّبة قابلة لإعادة الاستخدام)
+
+> **جرد مهارات المنصة** (2026-10-01): مفعّلة 2 (`gsk-hosted-deploy`, `gsk-hosted-identity`) · معلنة +2 (`cf-byok-deploy`, `designer-handoff`) · رسمية 1 (**`skill-creator`** ← مهمة للذاكرة المحمولة) · مجتمع 222 (إبداعية، لا هندسية) · مثبّتة/خاصة 0. التفاصيل: `../research/09-genspark-code-environment.md §8`.
+
+> صيغة كل مهارة: **متى** · **الخطوات** · **معيار النجاح** · **الدليل أنها تعمل**. المهارات هنا مكمّلة لـ Genspark skills الأربع (`gsk-hosted-deploy`, `gsk-hosted-identity`, `cf-byok-deploy`, `designer-handoff`) التي تُفعَّل بـ `activate_ai_developer_skill`.
+
+| ID | المهارة | متى | الخطوات | النجاح | الدليل |
+|---|---|---|---|---|---|
+| SK-01 | **اكتشاف الذات في 10 دقائق** | بداية أي جلسة/حساب جديد | `AGENT_PLAYBOOK.md §1–3` | كل جدول القدرات مملوء بأرقام من أوامر | E1–E5 |
+| SK-02 | **استعادة المستودع على آلة جديدة** | sandbox جديد | `bash scripts/bootstrap.sh && make smoke` | `BOOTSTRAP OK` + `SMOKE OK` + sha `3175b625…` | E9 |
+| SK-03 | **تشغيل الفريق على حزمة عمل** | أي WP | brief → `run_many([...])` → مراجعة → بوابات → دمج (`SESSION_PROTOCOL.md`) | 9/9 selftest؛ المخرجات في `.scratch/agents/<run>/role-NN.md` | E10 |
+| SK-04 | **بحث مُسنَد بوكلاء متوازيين** | قرار تقني | 1) `web_search` ×N بالتوازي 2) `crawler` للمصادر الأولية 3) وكلاء `research` بـ brief يُلزم URL+اقتباس 4) **verifier**: استخرج الروابط، `HEAD` كل واحد، ارفض ≠200 5) اكتب الملخص مع `[S-xx]` | 100% روابط 200 أو موسومة UNVERIFIED | بحث المعايير 2026-10-01 |
+| SK-05 | **قياس حد منصة بدل افتراضه** | أي حد غير موثّق | ارفع الحمل تدريجيًا؛ **اقرأ نص الخطأ**؛ اختبر «لكل X أم إجمالي» بتجربتين؛ اشتق قاعدة بهامش؛ تحقق 60/60 | قاعدة مكتوبة + تجربة تؤكدها | E3→E5 |
+| SK-06 | **التحقق من ادعاء «النموذج لا يغلط»** | عند أي ادعاء مطلق | مهام بحقيقة أرضية **محسوبة محليًا**؛ قارن نموذجين؛ ابحث عن اختبارات صارمة منشورة (16/18 vs 0/18) | جدول ✓/✗ + مصادر | E7 |
+| SK-07 | **تحديد هوية نموذج** | شك في النموذج | لا تسأله؛ اقرأ واجهة المنصة أو `response.model` | حقيقة بدليل | E11 + لقطة شاشة المالك |
+| SK-08 | **إصلاح فشل تحميل خارجي بأمان** | شهادة/خادم خارجي معطّل | `openssl s_client -dates`؛ `curl -k` + `sha256sum` مقابل المثبّت؛ fallback **فقط** للملفات المثبّتة + تحذير + `--strict-tls` | sha مطابق + قرار E-xxx موثّق | E8 / E-013 |
+| SK-09 | **مراجعة قالب/برومبت خارجي** | المالك يرسل قالبًا | اقرأ سطرًا سطرًا؛ جدول: قوة/ثغرة/تعارض مع D-xxx أو الخطوط الحمراء؛ ادمج الأفضل في `TEAM.md` موثقًا المصدر | جدول مراجعة + diff على TEAM.md | (معلّق — قالب الأمس) |
+| SK-10 | **نشر مُستضاف عبر Genspark** | عند طلب المالك النشر | فعّل `gsk-hosted-deploy`؛ preflight bindings (D1×1, R2×1 فقط)؛ `gsk hosted deploy` → `pending_approval` → موافقة المالك → `action_wait` → `code=ok`؛ اقرأ `first_error_line` عند الفشل | `deployment_url` يعمل | وثائق المهارة (S-G skill) |
+| SK-12 | ~~AI Drive backup~~ **removed (D-011)** | — | GitHub is the only persistence; `git push` after every WP | — | D-011 |
+| SK-13 | **تغليف الذاكرة كمهارة Genspark** | عند الانتقال لحساب جديد | فعّل `skill-creator` الرسمية (`gsk skills info system-pipeline/skill-creator`)؛ غلّف `AGENT_PLAYBOOK §1–4` + `docs/agent/context/*` كـ `SKILL.md`؛ انشر؛ `gsk skills install` في الحساب الجديد | وكيل جديد «يعرف من هو» بأمر واحد | research/09 §8 (مهمة STATE #15) |
+| SK-11 | **بوابة التسريب قبل النشر العام** | يوم 4 أكتوبر | قائمة عبارات محظورة من `docs/internal/` (لا تُنشر)؛ `grep -rF` على الشجرة العامة؛ orphan branch؛ لا `docs/internal/` ولا `.intake/` | 0 تطابقات | (مهمة قادمة) |

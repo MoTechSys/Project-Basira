@@ -1,0 +1,29 @@
+{
+  "tracked_root_files": [
+    ".dockerignore",
+    ".env.example",
+    ".gitignore",
+    "AGENTS.md",
+    "AI_USAGE.md",
+    "CHANGELOG.md",
+    "CLAUDE.md",
+    "Dockerfile",
+    "LICENSE",
+    "Makefile",
+    "README.md",
+    "SAFETY.md",
+    "SECURITY.md",
+    "SOURCES.md",
+    "THIRD_PARTY_NOTICES.md",
+    "docker-compose.yml"
+  ],
+  "release_artifacts": [
+    "docs/internal/competition/assets/basira_idea_deck.pdf",
+    "docs/internal/competition/assets/official_slides_template.pptx",
+    "docs/internal/competition/assets/participant_guide.pdf",
+    "docs/internal/competition/assets/scientific_reference_package.pdf",
+    "docs/manual-test/images/04_not_an_image.pdf"
+  ],
+  "python_locks": [],
+  "source_commit": "d285bf10e8a23b653b2f739ac7984bfc910afbd3"
+}

@@ -1,0 +1,2 @@
+Lighthouse mobile, prod build, 2026-10-01
+{"performance": 99, "accessibility": 100, "best-practices": 96, "seo": 91}

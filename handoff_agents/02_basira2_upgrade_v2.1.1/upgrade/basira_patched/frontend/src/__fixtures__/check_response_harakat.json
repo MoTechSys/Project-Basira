@@ -1,0 +1,122 @@
+{
+  "request_id": "fixture-harakat",
+  "disclaimer_key": "footer",
+  "transparency_key": "transparency_notice",
+  "corpus": {
+    "tanzil": "1.1",
+    "ohd_commit": "1515f6cb",
+    "hadeethenc": "1.7.0"
+  },
+  "extraction_degraded": false,
+  "extraction_provider": "mock",
+  "extraction_stage": "full",
+  "flags": {
+    "chain_message": false,
+    "refusal": false,
+    "pii_suspected": false
+  },
+  "quotes": [
+    {
+      "id": "q1",
+      "span": {
+        "start": 12,
+        "end": 64
+      },
+      "quoted_text": "إِنَّمَا يَخْشَى اللَّهُ مِنْ عِبَادِهِ الْعُلَمَاءَ",
+      "kind": "quran",
+      "language": "ar",
+      "source_modality": "text",
+      "claimed_source": null,
+      "claimed_source_mismatch": false,
+      "status": "found",
+      "review_reason": null,
+      "score": 1.0,
+      "message_key": "found",
+      "notice_keys": [
+        "partial_ayah_context",
+        "harakat_conflict"
+      ],
+      "matches": [
+        {
+          "corpus": "tanzil",
+          "ref": {
+            "surah": 35,
+            "ayah": 28
+          },
+          "ref_label_ar": "سورة فاطر، الآية 28",
+          "ref_label_en": "Surah Fatir (35:28)",
+          "collection_tier": "quran",
+          "source_text": "وَمِنَ ٱلنَّاسِ وَٱلدَّوَآبِّ وَٱلْأَنْعَٰمِ مُخْتَلِفٌ أَلْوَٰنُهُۥ كَذَٰلِكَ إِنَّمَا يَخْشَى ٱللَّهَ مِنْ عِبَادِهِ ٱلْعُلَمَٰٓؤُا۟ إِنَّ ٱللَّهَ عَزِيزٌ غَفُورٌ",
+          "source_text_range": [
+            0,
+            164
+          ],
+          "source_url": "https://quranpedia.net/surah/1/35/28",
+          "links": [
+            {
+              "name": "quranpedia.net",
+              "url": "https://quranpedia.net/surah/1/35/28"
+            }
+          ],
+          "diff": [],
+          "diff_kinds": [],
+          "score": 1.0,
+          "grade": null,
+          "continues_to": null,
+          "harakat_verdict": "conflict",
+          "harakat_conflicts": [
+            {
+              "quote_chars": [
+                22,
+                24
+              ],
+              "reference_chars": [
+                100,
+                102
+              ],
+              "quote_marks": [
+                "damma"
+              ],
+              "reference_marks": [
+                "fatha"
+              ]
+            },
+            {
+              "quote_chars": [
+                50,
+                52
+              ],
+              "reference_chars": [
+                128,
+                130
+              ],
+              "quote_marks": [
+                "fatha"
+              ],
+              "reference_marks": [
+                "damma"
+              ]
+            }
+          ],
+          "harakat_reference": "وَمِنَ النَّاسِ وَالدَّوَابِّ وَالْأَنْعَامِ مُخْتَلِفٌ أَلْوَانُهُ كَذَٰلِكَ إِنَّمَا يَخْشَى اللَّهَ مِنْ عِبَادِهِ الْعُلَمَاءُ إِنَّ اللَّهَ عَزِيزٌ غَفُورٌ",
+          "harakat_reference_range": [
+            78,
+            130
+          ]
+        }
+      ],
+      "total_positions": 1,
+      "external_search_links": [],
+      "repeated_spans": []
+    }
+  ],
+  "validator_rejections": 0,
+  "timings_ms": {
+    "extract": 20,
+    "retrieve": 0,
+    "match": 4,
+    "total": 27
+  },
+  "ocr_text": null,
+  "determinism_hash": "314a5acaa784be0631abc6319e4e82315368b38f772d6e87e9ae34c4359245bf"
+}

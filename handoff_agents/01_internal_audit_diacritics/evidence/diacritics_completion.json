@@ -1,0 +1,21 @@
+{
+  "targeted": 58,
+  "corpus_checks": 31177,
+  "total_checks": 31235,
+  "tests_exit": 0,
+  "source_tree_unchanged": true,
+  "private_repository": true,
+  "production_integration": false,
+  "source_authentication_in_comparator": false,
+  "new_engine_sha256": "87fee81b4b8323e38673ddb2b1e059fe4babdcef1311f50ec5cab1ce67abcab4",
+  "new_test_sha256": "a2a2d8979d12b9cab1638de2260b314b4f340983d47a198827a19b845c227a46",
+  "references_accessed": "2026-10-01",
+  "sources": [
+    "https://www.unicode.org/reports/tr15/",
+    "https://www.unicode.org/reports/tr29/",
+    "https://www.unicode.org/reports/tr53/",
+    "https://tanzil.net/docs/quran_text_types",
+    "https://tanzil.net/docs/text_license"
+  ],
+  "new_vocalized_imlaei_download": "Blocked by expired TLS certificate; verification not disabled; no new source admitted."
+}

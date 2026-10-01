@@ -1,0 +1,11 @@
+node_modules/
+.env
+.env.*
+*.key
+__pycache__/
+*.pyc
+.DS_Store
+handoff/*.zip
+brand/*.zip
+upgrade/*.zip
+upgrade/pkg/

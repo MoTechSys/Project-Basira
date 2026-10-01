@@ -1,0 +1,16 @@
+63dfda65e6d0f02ea521e65a98e8dd78c50fd240 2026-10-01 19:01:46 +0000 feat(E-038): spliced-quote decomposition (≥2 Quran passages glued) with exact ayah labels; I16; tests; UI list
+18b75cd697fe73095df1b359421ceae88654dc10 2026-10-01 18:58:15 +0000 feat(E-037): per-letter harakat verification against vocalized Mushaf — new Tanzil Simple source, match/harakat.py, Match.harakat_*, HarakatView UI; I14/I15; 23+2 tests; 0 false alarms over 6,236 ayat; evidence screenshots
+ab27a34f0ef1b1393310d5249c968c29bc27d271 2026-10-01 18:15:46 +0000 docs: full-spectrum analysis v2.1, INTEGRATION_v2.1 guide, BASELINE.md + RUNBOOK.md templates (Terms §8/§13)
+336471e2f94dddb98bb930d376956ca5a05fedde 2026-10-01 18:11:43 +0000 feat(frontend v2.1): real UI code — AnnotatedText inline highlights, progressive two-stage check hook, compact mobile QuoteCard with AyahText (never cuts source in DOM), share link via deflate-raw hash (no storage), print.css report; 15 new vitest tests (23 total), tsc strict clean, 85.05 kB gz
+f464715b21a802982cefa53f6de83563c2dbec73 2026-10-01 18:02:01 +0000 fix(upgrade v2.1): CSP nonce for inline scripts, optional brand copy in Dockerfile, I12/I13 renumber, drop redundant scan.py, add options.stage rules|full (progressive)
+7e963489248426047e7a0b03c3057d054695b795 2026-10-01 17:48:58 +0000 docs(10): UX executive spec — inline highlight, progressive response, mobile card, live hero, print-PDF/share/QR, a11y
+4bd61ba9d25ea67898315d010f1583df8ac5caa1 2026-10-01 17:20:09 +0000 docs(09): replace login-gated link with public direct download links (72h) + SHA-256
+43e1dc3edaaf9fe166dcc64c701573a6062b2e79 2026-10-01 16:54:03 +0000 docs: independent-analysis prompt for a fresh agent (GPT-Astra) + inputs pack
+cd6ec63c571312a46629e67fe71bd87dd053b2f5 2026-10-01 15:22:01 +0000 feat(upgrade): Basira upgrade pack v2 — I10/I11 scholar fixes, deterministic Quran scan, mmap snapshot (25s→1.9s, 1GB→250MB), security headers, mandatory deliverables, 133 tests, agent prompt
+c928619d08ceb71b393786e5efed70a99a5cd0e9 2026-10-01 14:35:30 +0000 docs: zero-defect audit — global hackathon judging research, IslamicMMLU, 28 scholar-lens probes (6 gaps), missing mandatory files, 20 judge Q&A
+3646041c831e2a6dc5d2fa67af13ccde6ce9aabd 2026-10-01 14:10:21 +0000 feat(brand): complete Basira brand kit v1.0
+1f95544e76f326cc7c1e06d5c09d83bebb0aa9f5 2026-10-01 13:44:37 +0000 docs: master brief for first place — official template analysis, brand assets, Google/DGA/WCAG standards, 10 innovations, video script, deck plan, Q&A prep
+792e442f557288ed7bd51e0636f28356bd0afc9c 2026-10-01 13:28:58 +0000 docs: developer brief v2 (identity tokens, security, responsive, deliverables) + device/lighthouse evidence
+6d1f073dfd1a7fad26d0cc1643967930dd8f3dcf 2026-10-01 13:18:47 +0000 docs(audit): remove §5 per owner decision
+0788d477d7fa2efb7222c85c3448ac7f67d142ee 2026-10-01 12:55:06 +0000 docs: independent audit of MoTechSys/Project-Basira
+7270e33f917962395404110fbf6f0d164c99f28c 2026-10-01 12:13:51 +0000 docs: hackathon analysis, verbatim idea, claims verification

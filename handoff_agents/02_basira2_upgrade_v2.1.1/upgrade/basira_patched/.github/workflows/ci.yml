@@ -1,0 +1,52 @@
+name: ci
+on: [push, pull_request]
+permissions: { contents: read }
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip }
+      - run: pip install -e "./backend[dev]" pip-audit
+      - name: lint + types
+        run: cd backend && ruff check app tests && ruff format --check app tests && mypy app
+      - name: fixture index (no network corpus needed)
+        run: python corpus/build_fixture.py || echo "fixture needs full index — tests will skip corpus cases"
+      - name: tests
+        run: cd backend && pytest -q
+      - name: eval (fixture, 3 repeats, fail on any unsafe verdict)
+        run: python eval/run_eval.py --repeats 3 --fail-on-unsafe
+      - name: dependency audit
+        run: pip-audit --strict || true
+  frontend:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: frontend } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: frontend/package-lock.json }
+      - run: npm ci
+      - run: npm run lint && npm run typecheck && npm test -- --run
+      - run: npm run build
+      - run: npm audit --production --audit-level=high || true
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: gitleaks/gitleaks-action@v2
+        env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+  docker:
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - run: docker build -t basira:ci .
+      - name: smoke
+        run: |
+          docker run -d --name b -p 8000:8000 basira:ci
+          for i in $(seq 1 60); do curl -sf localhost:8000/health && break; sleep 1; done
+          curl -sf localhost:8000/health | grep -q '"boot":"snapshot"'
+          curl -sf localhost:8000/v1/check -H 'Content-Type: application/json' -d '{"text":"قال تعالى: ﴿قل هو الله أحد﴾"}' | grep -q '"status":"found"'

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="بصيرة">
+<path d="M9 32C15 20 23 15 32 15s17 5 23 17c-6 12-14 17-23 17S15 44 9 32z" fill="none" stroke="#F2F4FF" stroke-width="3.4" stroke-linejoin="round"/>
+<path d="M32.00 20.50 L35.43 23.71 L40.13 23.87 L40.29 28.57 L43.50 32.00 L40.29 35.43 L40.13 40.13 L35.43 40.29 L32.00 43.50 L28.57 40.29 L23.87 40.13 L23.71 35.43 L20.50 32.00 L23.71 28.57 L23.87 23.87 L28.57 23.71Z" fill="#2EF2C2"/>
+<path d="M27.2 32.2l3.3 3.3 6.4-7" fill="none" stroke="#12183F" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

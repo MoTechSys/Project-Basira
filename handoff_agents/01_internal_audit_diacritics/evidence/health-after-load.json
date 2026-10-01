@@ -1,0 +1,26 @@
+{
+  "health": {
+    "status": "ok",
+    "build_sha": "dev",
+    "corpus": {
+      "tanzil": "1.1",
+      "ohd_commit": "1515f6cb",
+      "hadeethenc": "1.7.0"
+    },
+    "corpus_loaded": true,
+    "counts": {
+      "tanzil": 6236,
+      "ohd": 62169,
+      "hadeethenc": 3582
+    },
+    "rss_mb": 1071,
+    "providers": {
+      "llm": "mock",
+      "vision": "mock"
+    },
+    "index_sha256": "54d34102371239b8522de428fd65c929729179ff1869612d8638ed66aacbf074",
+    "boot": "build",
+    "boot_seconds": 23.13
+  },
+  "proc_status": "Name:\tpython\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t3083\nNgid:\t0\nPid:\t3083\nPPid:\t3078\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t64\nGroups:\t \nNStgid:\t3083\nNSpid:\t3083\nNSpgid:\t391\nNSsid:\t391\nVmPeak:\t 1305956 kB\nVmSize:\t 1282720 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t 1097644 kB\nVmRSS:\t  758084 kB\nRssAnon:\t  731264 kB\nRssFile:\t   26820 kB\nRssShmem:\t       0 kB\nVmData:\t  946312 kB\nVmStk:\t     132 kB\nVmExe:\t       4 kB\nVmLib:\t   53188 kB\nVmPTE:\t    1676 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nThreads:\t11\nSigQ:\t0/31837\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001005\nSigCgt:\t0000000100004002\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\tf\nCpus_allowed_list:\t0-3\nMems_allowed:\t00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000001\nMems_allowed_list:\t0\nvoluntary_ctxt_switches:\t3251\nnonvoluntary_ctxt_switches:\t261\n"
+}

@@ -1,0 +1,17 @@
+{
+  "built_at": "2026-10-01T17:54:47Z",
+  "ohd_display_plain_mismatch": 0,
+  "counts": {
+    "tanzil": 6236,
+    "ohd": 62169,
+    "hadeethenc": 3582
+  },
+  "versions": {
+    "tanzil": "1.1",
+    "ohd_commit": "1515f6cb",
+    "hadeethenc": "1.7.0"
+  },
+  "records_sha256": "54d34102371239b8522de428fd65c929729179ff1869612d8638ed66aacbf074",
+  "records_bytes": 228972044,
+  "build_seconds": 55.2
+}

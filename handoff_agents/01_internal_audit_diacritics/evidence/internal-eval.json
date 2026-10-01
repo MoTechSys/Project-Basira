@@ -1,0 +1,2386 @@
+{
+ "meta": {
+  "index": "corpus/index",
+  "records_sha256": "54d34102371239b8522de428fd65c929729179ff1869612d8638ed66aacbf074",
+  "provider": "mock",
+  "repeats": 3,
+  "date": "2026-10-01 17:56 UTC",
+  "variance_cases": 0,
+  "seconds": 7.0
+ },
+ "summary": {
+  "pass": {
+   "k": 150,
+   "n": 150,
+   "rate": 1.0,
+   "ci95": [
+    0.975,
+    1.0
+   ]
+  },
+  "unsafe": {
+   "k": 0,
+   "n": 150,
+   "rate": 0.0,
+   "ci95": [
+    0.0,
+    0.025
+   ]
+  },
+  "recall_found": {
+   "k": 78,
+   "n": 78,
+   "rate": 1.0,
+   "ci95": [
+    0.9531,
+    1.0
+   ]
+  },
+  "precision_found": {
+   "k": 78,
+   "n": 78,
+   "rate": 1.0,
+   "ci95": [
+    0.9531,
+    1.0
+   ]
+  },
+  "forbidden_hits": 0,
+  "latency_ms": {
+   "p50": 4,
+   "p95": 33,
+   "max": 41
+  }
+ },
+ "per_category": {
+  "A": {
+   "pass": {
+    "k": 20,
+    "n": 20,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "unsafe": {
+    "k": 0,
+    "n": 20,
+    "rate": 0.0,
+    "indicative": true
+   },
+   "recall_found": {
+    "k": 20,
+    "n": 20,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "precision_found": {
+    "k": 20,
+    "n": 20,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "forbidden_hits": 0,
+   "latency_ms": {
+    "p50": 3,
+    "p95": 8,
+    "max": 8
+   }
+  },
+  "B": {
+   "pass": {
+    "k": 12,
+    "n": 12,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "unsafe": {
+    "k": 0,
+    "n": 12,
+    "rate": 0.0,
+    "indicative": true
+   },
+   "recall_found": {
+    "k": 0,
+    "n": 0,
+    "rate": null
+   },
+   "precision_found": {
+    "k": 0,
+    "n": 0,
+    "rate": null
+   },
+   "forbidden_hits": 0,
+   "latency_ms": {
+    "p50": 3,
+    "p95": 4,
+    "max": 4
+   }
+  },
+  "C": {
+   "pass": {
+    "k": 16,
+    "n": 16,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "unsafe": {
+    "k": 0,
+    "n": 16,
+    "rate": 0.0,
+    "indicative": true
+   },
+   "recall_found": {
+    "k": 0,
+    "n": 0,
+    "rate": null
+   },
+   "precision_found": {
+    "k": 0,
+    "n": 0,
+    "rate": null
+   },
+   "forbidden_hits": 0,
+   "latency_ms": {
+    "p50": 23,
+    "p95": 28,
+    "max": 28
+   }
+  },
+  "D": {
+   "pass": {
+    "k": 8,
+    "n": 8,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "unsafe": {
+    "k": 0,
+    "n": 8,
+    "rate": 0.0,
+    "indicative": true
+   },
+   "recall_found": {
+    "k": 0,
+    "n": 0,
+    "rate": null
+   },
+   "precision_found": {
+    "k": 0,
+    "n": 0,
+    "rate": null
+   },
+   "forbidden_hits": 0,
+   "latency_ms": {
+    "p50": 20,
+    "p95": 24,
+    "max": 24
+   }
+  },
+  "E": {
+   "pass": {
+    "k": 18,
+    "n": 18,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "unsafe": {
+    "k": 0,
+    "n": 18,
+    "rate": 0.0,
+    "indicative": true
+   },
+   "recall_found": {
+    "k": 18,
+    "n": 18,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "precision_found": {
+    "k": 18,
+    "n": 18,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "forbidden_hits": 0,
+   "latency_ms": {
+    "p50": 4,
+    "p95": 28,
+    "max": 28
+   }
+  },
+  "F": {
+   "pass": {
+    "k": 14,
+    "n": 14,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "unsafe": {
+    "k": 0,
+    "n": 14,
+    "rate": 0.0,
+    "indicative": true
+   },
+   "recall_found": {
+    "k": 0,
+    "n": 0,
+    "rate": null
+   },
+   "precision_found": {
+    "k": 0,
+    "n": 0,
+    "rate": null
+   },
+   "forbidden_hits": 0,
+   "latency_ms": {
+    "p50": 23,
+    "p95": 41,
+    "max": 41
+   }
+  },
+  "G": {
+   "pass": {
+    "k": 10,
+    "n": 10,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "unsafe": {
+    "k": 0,
+    "n": 10,
+    "rate": 0.0,
+    "indicative": true
+   },
+   "recall_found": {
+    "k": 0,
+    "n": 0,
+    "rate": null
+   },
+   "precision_found": {
+    "k": 0,
+    "n": 0,
+    "rate": null
+   },
+   "forbidden_hits": 0,
+   "latency_ms": {
+    "p50": 21,
+    "p95": 40,
+    "max": 40
+   }
+  },
+  "H": {
+   "pass": {
+    "k": 8,
+    "n": 8,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "unsafe": {
+    "k": 0,
+    "n": 8,
+    "rate": 0.0,
+    "indicative": true
+   },
+   "recall_found": {
+    "k": 0,
+    "n": 0,
+    "rate": null
+   },
+   "precision_found": {
+    "k": 0,
+    "n": 0,
+    "rate": null
+   },
+   "forbidden_hits": 0,
+   "latency_ms": {
+    "p50": 17,
+    "p95": 26,
+    "max": 26
+   }
+  },
+  "I": {
+   "pass": {
+    "k": 10,
+    "n": 10,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "unsafe": {
+    "k": 0,
+    "n": 10,
+    "rate": 0.0,
+    "indicative": true
+   },
+   "recall_found": {
+    "k": 10,
+    "n": 10,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "precision_found": {
+    "k": 10,
+    "n": 10,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "forbidden_hits": 0,
+   "latency_ms": {
+    "p50": 3,
+    "p95": 6,
+    "max": 6
+   }
+  },
+  "J": {
+   "pass": {
+    "k": 8,
+    "n": 8,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "unsafe": {
+    "k": 0,
+    "n": 8,
+    "rate": 0.0,
+    "indicative": true
+   },
+   "recall_found": {
+    "k": 8,
+    "n": 8,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "precision_found": {
+    "k": 8,
+    "n": 8,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "forbidden_hits": 0,
+   "latency_ms": {
+    "p50": 5,
+    "p95": 8,
+    "max": 8
+   }
+  },
+  "K": {
+   "pass": {
+    "k": 8,
+    "n": 8,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "unsafe": {
+    "k": 0,
+    "n": 8,
+    "rate": 0.0,
+    "indicative": true
+   },
+   "recall_found": {
+    "k": 4,
+    "n": 4,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "precision_found": {
+    "k": 4,
+    "n": 4,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "forbidden_hits": 0,
+   "latency_ms": {
+    "p50": 2,
+    "p95": 5,
+    "max": 5
+   }
+  },
+  "L": {
+   "pass": {
+    "k": 8,
+    "n": 8,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "unsafe": {
+    "k": 0,
+    "n": 8,
+    "rate": 0.0,
+    "indicative": true
+   },
+   "recall_found": {
+    "k": 8,
+    "n": 8,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "precision_found": {
+    "k": 8,
+    "n": 8,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "forbidden_hits": 0,
+   "latency_ms": {
+    "p50": 4,
+    "p95": 5,
+    "max": 5
+   }
+  },
+  "M": {
+   "pass": {
+    "k": 10,
+    "n": 10,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "unsafe": {
+    "k": 0,
+    "n": 10,
+    "rate": 0.0,
+    "indicative": true
+   },
+   "recall_found": {
+    "k": 10,
+    "n": 10,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "precision_found": {
+    "k": 10,
+    "n": 10,
+    "rate": 1.0,
+    "indicative": true
+   },
+   "forbidden_hits": 0,
+   "latency_ms": {
+    "p50": 3,
+    "p95": 6,
+    "max": 6
+   }
+  }
+ },
+ "false_alarm": {
+  "n": 500,
+  "seed": 20261004,
+  "not_found": 0,
+  "rate": 0.0,
+  "ci95": [
+   0.0,
+   0.007624618530903363
+  ],
+  "misses": []
+ },
+ "cases": [
+  {
+   "id": "A-001",
+   "category": "A",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=5"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "A-002",
+   "category": "A",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=5"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "A-003",
+   "category": "A",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=6"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "A-004",
+   "category": "A",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=9"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "A-005",
+   "category": "A",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=4"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "A-006",
+   "category": "A",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "A-007",
+   "category": "A",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=4"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "A-008",
+   "category": "A",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=6"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "A-009",
+   "category": "A",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=5"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "A-010",
+   "category": "A",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=9"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "A-011",
+   "category": "A",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=4"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "A-012",
+   "category": "A",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=5"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "A-013",
+   "category": "A",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "A-014",
+   "category": "A",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=5"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "A-015",
+   "category": "A",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=9"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "A-016",
+   "category": "A",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=6"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "A-017",
+   "category": "A",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=6"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "A-018",
+   "category": "A",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=6"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "A-019",
+   "category": "A",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=6"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "A-020",
+   "category": "A",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=3"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "B-021",
+   "category": "B",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=ortho:hamza_drop; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "B-022",
+   "category": "B",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=ortho:ta2ha; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "B-023",
+   "category": "B",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=ortho:hamza_drop; n_tokens=6"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "B-024",
+   "category": "B",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=ortho:hamza_drop; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "B-025",
+   "category": "B",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=ortho:hamza_drop; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "B-026",
+   "category": "B",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=ortho:ha2ta; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "B-027",
+   "category": "B",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=ortho:ta2ha; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "B-028",
+   "category": "B",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=ortho:hamza_drop; n_tokens=6"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "B-029",
+   "category": "B",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=ortho:ta2ha; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "B-030",
+   "category": "B",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=ortho:hamza_drop; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "B-031",
+   "category": "B",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=ortho:hamza_drop; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "B-032",
+   "category": "B",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=ortho:ta2ha; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "C-033",
+   "category": "C",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=drop:5; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "C-034",
+   "category": "C",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=dup:2; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "C-035",
+   "category": "C",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=swap:2; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "C-036",
+   "category": "C",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=subst:3:tanzil:2:81:10; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "C-037",
+   "category": "C",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=drop:2; n_tokens=5"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "C-038",
+   "category": "C",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=dup:5; n_tokens=9"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "C-039",
+   "category": "C",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=swap:1; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "C-040",
+   "category": "C",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=subst:4:tanzil:2:58:18; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "C-041",
+   "category": "C",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=drop:1; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "C-042",
+   "category": "C",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=dup:5; n_tokens=9"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "C-043",
+   "category": "C",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=swap:2; n_tokens=6"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "C-044",
+   "category": "C",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=subst:1:tanzil:2:89:25; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "C-045",
+   "category": "C",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=drop:1; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "C-046",
+   "category": "C",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=dup:2; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "C-047",
+   "category": "C",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=swap:3; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "C-048",
+   "category": "C",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=subst:1:tanzil:8:47:10; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "D-049",
+   "category": "D",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "not_found",
+   "expected": "not_found",
+   "notes": [],
+   "n_quotes": 1
+  },
+  {
+   "id": "D-050",
+   "category": "D",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "not_found",
+   "expected": "not_found",
+   "notes": [],
+   "n_quotes": 1
+  },
+  {
+   "id": "D-051",
+   "category": "D",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "not_found",
+   "expected": "not_found",
+   "notes": [],
+   "n_quotes": 1
+  },
+  {
+   "id": "D-052",
+   "category": "D",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "not_found",
+   "expected": "not_found",
+   "notes": [],
+   "n_quotes": 1
+  },
+  {
+   "id": "D-053",
+   "category": "D",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "not_found",
+   "expected": "not_found",
+   "notes": [],
+   "n_quotes": 1
+  },
+  {
+   "id": "D-054",
+   "category": "D",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "not_found",
+   "expected": "not_found",
+   "notes": [],
+   "n_quotes": 1
+  },
+  {
+   "id": "D-055",
+   "category": "D",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "not_found",
+   "expected": "not_found",
+   "notes": [],
+   "n_quotes": 1
+  },
+  {
+   "id": "D-056",
+   "category": "D",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "not_found",
+   "expected": "not_found",
+   "notes": [],
+   "n_quotes": 1
+  },
+  {
+   "id": "E-057",
+   "category": "E",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "E-058",
+   "category": "E",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=9"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "E-059",
+   "category": "E",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=10"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "E-060",
+   "category": "E",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "E-061",
+   "category": "E",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=5"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "E-062",
+   "category": "E",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=6"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "E-063",
+   "category": "E",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=6"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "E-064",
+   "category": "E",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=10"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "E-065",
+   "category": "E",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=9"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "E-066",
+   "category": "E",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=9"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "E-067",
+   "category": "E",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "E-068",
+   "category": "E",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "E-069",
+   "category": "E",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "E-070",
+   "category": "E",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=9"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "E-071",
+   "category": "E",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "E-072",
+   "category": "E",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "E-073",
+   "category": "E",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "E-074",
+   "category": "E",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "F-075",
+   "category": "F",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "partial_match",
+   "expected": "partial_match",
+   "notes": [
+    "mutation=subst:4:ohd:sunan_al-nasai:7:28; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "F-076",
+   "category": "F",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "partial_match",
+   "expected": "partial_match",
+   "notes": [
+    "mutation=subst:1:ohd:sunan_al-nasai:11:30; n_tokens=10"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "F-077",
+   "category": "F",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "partial_match",
+   "expected": "partial_match",
+   "notes": [
+    "mutation=subst:8:ohd:sahih_muslim:8:60; n_tokens=10"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "F-078",
+   "category": "F",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "partial_match",
+   "expected": "partial_match",
+   "notes": [
+    "mutation=subst:5:ohd:musnad_ahmad:10:63; n_tokens=10"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "F-079",
+   "category": "F",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "partial_match",
+   "expected": "partial_match",
+   "notes": [
+    "mutation=subst:8:ohd:sunan_ibn-maja:12:66; n_tokens=10"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "F-080",
+   "category": "F",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "partial_match",
+   "expected": "partial_match",
+   "notes": [
+    "mutation=subst:1:ohd:sunan_al-tirmidhi:5:140; n_tokens=10"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "F-081",
+   "category": "F",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "partial_match",
+   "expected": "partial_match",
+   "notes": [
+    "mutation=subst:3:ohd:sunan_abu-dawud:5:25; n_tokens=10"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "F-082",
+   "category": "F",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "partial_match",
+   "expected": "partial_match",
+   "notes": [
+    "mutation=subst:3:ohd:musnad_ahmad:2:73; n_tokens=10"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "F-083",
+   "category": "F",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "partial_match",
+   "expected": "partial_match",
+   "notes": [
+    "mutation=subst:5:ohd:sunan_al-darimi:9:51; n_tokens=10"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "F-084",
+   "category": "F",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "partial_match",
+   "expected": "partial_match",
+   "notes": [
+    "mutation=subst:6:ohd:sunan_ibn-maja:1:29; n_tokens=10"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "F-085",
+   "category": "F",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "partial_match",
+   "expected": "partial_match",
+   "notes": [
+    "mutation=subst:6:ohd:sunan_al-tirmidhi:1:43; n_tokens=10"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "F-086",
+   "category": "F",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "partial_match",
+   "expected": "partial_match",
+   "notes": [
+    "mutation=subst:7:ohd:sunan_ibn-maja:7:48; n_tokens=10"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "F-087",
+   "category": "F",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "partial_match",
+   "expected": "partial_match",
+   "notes": [
+    "mutation=subst:7:ohd:sunan_ibn-maja:9:50; n_tokens=10"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "F-088",
+   "category": "F",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "partial_match",
+   "expected": "partial_match",
+   "notes": [
+    "mutation=subst:8:ohd:sunan_al-tirmidhi:8:86; n_tokens=10"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "G-089",
+   "category": "G",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "not_found",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=multi:drop:1|swap:2|subst:6:ohd:sunan_abu-dawud:1882:51; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "G-090",
+   "category": "G",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "not_found",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=multi:drop:1|swap:2|subst:6:ohd:sunan_ibn-maja:9:39; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "G-091",
+   "category": "G",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "not_found",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=multi:drop:1|swap:2|subst:6:ohd:sunan_ibn-maja:3:34; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "G-092",
+   "category": "G",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "not_found",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=multi:drop:1|swap:2|subst:6:ohd:musnad_ahmad:6:93; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "G-093",
+   "category": "G",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "not_found",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=multi:drop:1|swap:2|subst:6:ohd:sunan_al-tirmidhi:1:78; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "G-094",
+   "category": "G",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "not_found",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=multi:drop:1|swap:2|subst:6:ohd:musnad_ahmad:1:62; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "G-095",
+   "category": "G",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "not_found",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=multi:drop:1|swap:2|subst:5:ohd:sahih_al-bukhari:9:87; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "G-096",
+   "category": "G",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "not_found",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=multi:drop:1|swap:2|subst:6:ohd:sahih_al-bukhari:8:37; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "G-097",
+   "category": "G",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "not_found",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=multi:drop:1|swap:2|subst:6:ohd:sunan_ibn-maja:3:28; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "G-098",
+   "category": "G",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "not_found",
+   "expected": "needs_review",
+   "notes": [
+    "mutation=multi:drop:1|swap:2|subst:6:ohd:musnad_ahmad:2:74; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "H-099",
+   "category": "H",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "not_found",
+   "expected": "not_found",
+   "notes": [],
+   "n_quotes": 1
+  },
+  {
+   "id": "H-100",
+   "category": "H",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "not_found",
+   "expected": "not_found",
+   "notes": [],
+   "n_quotes": 1
+  },
+  {
+   "id": "H-101",
+   "category": "H",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "not_found",
+   "expected": "not_found",
+   "notes": [],
+   "n_quotes": 1
+  },
+  {
+   "id": "H-102",
+   "category": "H",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "not_found",
+   "expected": "not_found",
+   "notes": [],
+   "n_quotes": 1
+  },
+  {
+   "id": "H-103",
+   "category": "H",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "not_found",
+   "expected": "not_found",
+   "notes": [],
+   "n_quotes": 1
+  },
+  {
+   "id": "H-104",
+   "category": "H",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "not_found",
+   "expected": "not_found",
+   "notes": [],
+   "n_quotes": 1
+  },
+  {
+   "id": "H-105",
+   "category": "H",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [
+    "no span extracted (treated as not_found)"
+   ],
+   "got": null,
+   "expected": "not_found",
+   "notes": [],
+   "n_quotes": 0
+  },
+  {
+   "id": "H-106",
+   "category": "H",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "not_found",
+   "expected": "not_found",
+   "notes": [],
+   "n_quotes": 1
+  },
+  {
+   "id": "I-107",
+   "category": "I",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "I-108",
+   "category": "I",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=8"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "I-109",
+   "category": "I",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=10"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "I-110",
+   "category": "I",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=6"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "I-111",
+   "category": "I",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=10"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "I-112",
+   "category": "I",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "I-113",
+   "category": "I",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=10"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "I-114",
+   "category": "I",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=10"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "I-115",
+   "category": "I",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=10"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "I-116",
+   "category": "I",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "J-117",
+   "category": "J",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "J-118",
+   "category": "J",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=6"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "J-119",
+   "category": "J",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=7"
+   ],
+   "n_quotes": 2
+  },
+  {
+   "id": "J-120",
+   "category": "J",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=6"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "J-121",
+   "category": "J",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "J-122",
+   "category": "J",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=6"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "J-123",
+   "category": "J",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=7"
+   ],
+   "n_quotes": 2
+  },
+  {
+   "id": "J-124",
+   "category": "J",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=6"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "K-125",
+   "category": "K",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [],
+   "n_quotes": 1
+  },
+  {
+   "id": "K-126",
+   "category": "K",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [],
+   "n_quotes": 1
+  },
+  {
+   "id": "K-127",
+   "category": "K",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [],
+   "n_quotes": 1
+  },
+  {
+   "id": "K-128",
+   "category": "K",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "needs_review",
+   "expected": "needs_review",
+   "notes": [],
+   "n_quotes": 1
+  },
+  {
+   "id": "K-129",
+   "category": "K",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=2"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "K-130",
+   "category": "K",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=2"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "K-131",
+   "category": "K",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=3"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "K-132",
+   "category": "K",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=3"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "L-133",
+   "category": "L",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "L-134",
+   "category": "L",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "L-135",
+   "category": "L",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "L-136",
+   "category": "L",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=6"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "L-137",
+   "category": "L",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=6"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "L-138",
+   "category": "L",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "L-139",
+   "category": "L",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "L-140",
+   "category": "L",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "M-141",
+   "category": "M",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=6"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "M-142",
+   "category": "M",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=6"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "M-143",
+   "category": "M",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=6"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "M-144",
+   "category": "M",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=6"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "M-145",
+   "category": "M",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=7"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "M-146",
+   "category": "M",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=6"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "M-147",
+   "category": "M",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=6"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "M-148",
+   "category": "M",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=6"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "M-149",
+   "category": "M",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=6"
+   ],
+   "n_quotes": 1
+  },
+  {
+   "id": "M-150",
+   "category": "M",
+   "passed": true,
+   "unsafe": false,
+   "reasons": [],
+   "got": "found",
+   "expected": "found",
+   "notes": [
+    "mutation=none; n_tokens=7"
+   ],
+   "n_quotes": 1
+  }
+ ]
+}

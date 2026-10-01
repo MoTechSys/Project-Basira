@@ -1,0 +1,372 @@
+"""Basira HTTP API (BUILD_SPEC §4, ADR-001/004).
+
+* lifespan loads the Store + Retriever once; ``/health`` answers 503 ``loading`` until ready (E-011);
+* ``POST /v1/check`` — the only mutating-looking endpoint; stores NOTHING (ADR-004);
+* ``POST /v1/check/image`` — OCR via ``VisionClient`` then the same pipeline with ``source_modality=image``;
+* ``GET /v1/sources`` — straight from ``corpus/manifest.json``;
+* ``GET /v1/messages/{lang}`` — the UI strings (single source of truth, E-009);
+* every error is ``{"error":{"code","message_ar","message_en"}}`` (audit §5);
+* in-memory fixed-window rate limit per client IP (30/min default) with ``X-Eval-Key`` bypass (T5).
+
+No request body or user text is ever logged. Access logs are left to the ASGI server and
+contain only method/path/status.
+"""
+
+from __future__ import annotations
+
+import json
+import logging
+import os
+import resource
+import secrets
+import time
+from collections import deque
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+from pathlib import Path
+from typing import Any
+
+from fastapi import FastAPI, File, Form, Request, UploadFile
+from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse, JSONResponse
+
+from app import __version__
+from app.config import Settings
+from app.config import settings as default_settings
+from app.csp import stamp_nonce
+from app.messages import load_messages, self_check_templates
+from app.pipeline import CorpusMeta, Pipeline
+from app.providers import ProviderError, make_llm, make_vision
+from app.schemas import (
+    CheckRequest,
+    CheckResponse,
+    ErrorBody,
+    ErrorResponse,
+    HealthResponse,
+    SourceInfo,
+)
+from app.snapshot import LAST_BOOT, load_or_build
+
+log = logging.getLogger("basira")
+
+MAX_IMAGE_BYTES = 6 * 1024 * 1024
+ALLOWED_IMAGE_MIME = frozenset({"image/png", "image/jpeg", "image/webp"})
+
+
+class ApiError(Exception):
+    def __init__(self, status: int, code: str, **vars: Any) -> None:
+        super().__init__(code)
+        self.status = status
+        self.code = code
+        self.vars = vars
+
+
+class RateLimiter:
+    """Fixed 60 s window per key, in memory (single process). Enough for a demo; documented limit."""
+
+    def __init__(self, per_min: int) -> None:
+        self.per_min = per_min
+        self._hits: dict[str, deque[float]] = {}
+
+    def allow(self, key: str, now: float | None = None) -> bool:
+        if self.per_min <= 0:
+            return True
+        now = time.monotonic() if now is None else now
+        dq = self._hits.setdefault(key, deque())
+        while dq and now - dq[0] >= 60.0:
+            dq.popleft()
+        if len(dq) >= self.per_min:
+            return False
+        dq.append(now)
+        if len(self._hits) > 10_000:  # bounded memory
+            for k in [k for k, v in self._hits.items() if not v or now - v[-1] >= 60.0]:
+                self._hits.pop(k, None)
+        return True
+
+
+def _rss_mb() -> int:
+    return int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss // 1024)
+
+
+def _error(status: int, code: str, messages_dir: Path, **vars: Any) -> JSONResponse:
+    ar = load_messages(messages_dir, "ar")
+    en = load_messages(messages_dir, "en")
+    key = code if ar.has("errors", code) else "internal"
+    body = ErrorResponse(
+        error=ErrorBody(
+            code=code, message_ar=ar.get("errors", key, **vars), message_en=en.get("errors", key, **vars)
+        )
+    )
+    return JSONResponse(status_code=status, content=body.model_dump())
+
+
+def create_app(cfg: Settings | None = None) -> FastAPI:
+    cfg = cfg or default_settings
+    limiter = RateLimiter(cfg.rate_limit_per_min)
+
+    @asynccontextmanager
+    async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+        app.state.ready = False
+        app.state.pipeline = None
+        problems = self_check_templates(cfg.messages_dir)
+        if problems:
+            raise RuntimeError(f"forbidden lexicon in message templates: {problems}")
+        t0 = time.time()
+        # E-031: binary snapshot (mmap) → ~1 s boot, ~300 MB RSS; falls back to a full build + writes it
+        store, retriever = load_or_build(cfg.index_dir, write=cfg.snapshot_write)
+        manifest = json.loads(cfg.manifest_path.read_text(encoding="utf-8"))
+        meta = CorpusMeta.from_manifest(manifest, store.meta)
+        app.state.llm = make_llm(cfg.llm_provider)
+        app.state.vision = make_vision(cfg.vision_provider)
+        app.state.pipeline = Pipeline(store, retriever, app.state.llm, cfg, meta)
+        app.state.manifest = manifest
+        app.state.store = store
+        app.state.ready = True
+        log.info("ready in %.1fs rss=%d MB", time.time() - t0, _rss_mb())
+        yield
+        app.state.ready = False
+
+    app = FastAPI(
+        title="Basira API",
+        version=__version__,
+        lifespan=lifespan,
+        docs_url="/docs" if os.environ.get("BASIRA_DOCS", "1") == "1" else None,
+        redoc_url=None,
+    )
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=list(cfg.cors_origins),
+        allow_methods=["GET", "POST"],
+        allow_headers=["Content-Type", "X-Eval-Key"],
+        max_age=600,
+    )
+
+    # ------------------------------------------------------------- security headers (E-033)
+    # OWASP Secure Headers baseline. Inline <script> tags in index.html (dark-mode bootstrap,
+    # JSON-LD) are allowed ONLY through a per-request nonce (E-036): the SPA handler stamps the
+    # same nonce on every inline <script> while serving index.html. No 'unsafe-inline' for scripts.
+    def _csp(nonce: str) -> str:
+        return (
+            "default-src 'self'; "
+            "img-src 'self' data: blob:; "
+            "font-src 'self' data:; "
+            "style-src 'self' 'unsafe-inline'; "
+            f"script-src 'self' 'nonce-{nonce}'; "
+            "connect-src 'self'; "
+            "frame-ancestors 'none'; "
+            "base-uri 'self'; "
+            "form-action 'self'; "
+            "object-src 'none'; "
+            "upgrade-insecure-requests"
+        )
+
+    @app.middleware("http")
+    async def security_headers(request: Request, call_next: Any) -> Any:
+        nonce = secrets.token_urlsafe(16)
+        request.state.csp_nonce = nonce
+        resp = await call_next(request)
+        h = resp.headers
+        h.setdefault("X-Content-Type-Options", "nosniff")
+        h.setdefault("X-Frame-Options", "DENY")
+        h.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+        h.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=(), usb=()")
+        h.setdefault("Cross-Origin-Opener-Policy", "same-origin")
+        h.setdefault("Cross-Origin-Resource-Policy", "same-origin")
+        h.setdefault("Content-Security-Policy", _csp(nonce))
+        if request.url.scheme == "https" or request.headers.get("x-forwarded-proto") == "https":
+            h.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+        if request.url.path.startswith("/v1/"):
+            h.setdefault("Cache-Control", "no-store")
+        return resp
+
+    # ------------------------------------------------------------- error envelope
+
+    @app.exception_handler(ApiError)
+    async def _api_error(_: Request, exc: ApiError) -> JSONResponse:
+        return _error(exc.status, exc.code, cfg.messages_dir, **exc.vars)
+
+    @app.exception_handler(RequestValidationError)
+    async def _validation(_: Request, exc: RequestValidationError) -> JSONResponse:
+        for e in exc.errors():
+            if e.get("type") in {"string_too_long"}:
+                return _error(413, "text_too_long", cfg.messages_dir, max=cfg.max_text_chars)
+        return _error(422, "invalid_input", cfg.messages_dir)
+
+    @app.exception_handler(Exception)
+    async def _unhandled(_: Request, exc: Exception) -> JSONResponse:
+        log.exception("unhandled: %s", exc.__class__.__name__)  # class only — never the text
+        return _error(500, "internal", cfg.messages_dir)
+
+    # ------------------------------------------------------------- guards
+
+    def _client_key(request: Request) -> str:
+        fwd = request.headers.get("x-forwarded-for")
+        ip = fwd.split(",")[0].strip() if fwd else (request.client.host if request.client else "?")
+        return ip
+
+    def _guard(request: Request) -> Pipeline:
+        if not getattr(request.app.state, "ready", False) or request.app.state.pipeline is None:
+            raise ApiError(503, "degraded")
+        eval_key = request.headers.get("x-eval-key", "")
+        if not (cfg.eval_key and eval_key == cfg.eval_key) and not limiter.allow(_client_key(request)):
+            raise ApiError(429, "rate_limited")
+        pipeline: Pipeline = request.app.state.pipeline
+        return pipeline
+
+    # ------------------------------------------------------------- routes
+
+    @app.get("/health", response_model=HealthResponse, responses={503: {"model": ErrorResponse}})
+    async def health(request: Request) -> Any:
+        ready = getattr(request.app.state, "ready", False)
+        if not ready:
+            return JSONResponse(
+                status_code=503,
+                content=HealthResponse(
+                    status="loading",
+                    build_sha=cfg.build_sha,
+                    corpus={},
+                    corpus_loaded=False,
+                    counts={},
+                    rss_mb=_rss_mb(),
+                    providers={"llm": cfg.llm_provider, "vision": cfg.vision_provider},
+                ).model_dump(),
+            )
+        store = request.app.state.store
+        pipeline: Pipeline = request.app.state.pipeline
+        return HealthResponse(
+            status="ok",
+            build_sha=cfg.build_sha,
+            corpus=pipeline.meta.versions(),
+            corpus_loaded=True,
+            counts=store.counts,
+            rss_mb=_rss_mb(),
+            providers={"llm": request.app.state.llm.name, "vision": request.app.state.vision.name},
+            index_sha256=str(LAST_BOOT["index_sha256"]),
+            boot=LAST_BOOT["mode"],
+            boot_seconds=float(LAST_BOOT["seconds"]),
+        )
+
+    @app.post(
+        "/v1/check",
+        response_model=CheckResponse,
+        responses={
+            413: {"model": ErrorResponse},
+            422: {"model": ErrorResponse},
+            429: {"model": ErrorResponse},
+        },
+    )
+    async def check(req: CheckRequest, request: Request) -> CheckResponse:
+        pipeline = _guard(request)
+        if len(req.text) > cfg.max_text_chars:
+            raise ApiError(413, "text_too_long", max=cfg.max_text_chars)
+        if not req.text.strip():
+            raise ApiError(422, "invalid_input")
+        return await pipeline.check(req)
+
+    @app.post(
+        "/v1/check/image",
+        response_model=CheckResponse,
+        responses={
+            413: {"model": ErrorResponse},
+            422: {"model": ErrorResponse},
+            429: {"model": ErrorResponse},
+        },
+    )
+    async def check_image(
+        request: Request,
+        image: UploadFile = File(...),  # noqa: B008
+        ui_lang: str = Form("ar"),
+    ) -> CheckResponse:
+        pipeline = _guard(request)
+        mime = (image.content_type or "").lower()
+        if mime not in ALLOWED_IMAGE_MIME:
+            raise ApiError(422, "invalid_input")
+        data = await image.read(MAX_IMAGE_BYTES + 1)
+        if len(data) > MAX_IMAGE_BYTES:
+            raise ApiError(413, "image_too_large", max_mb=MAX_IMAGE_BYTES // (1024 * 1024))
+        try:
+            ocr = await request.app.state.vision.ocr(data, mime=mime)
+        except ProviderError:
+            # OCR unavailable → honest empty result, flagged (never a guess)
+            resp = await pipeline.check(
+                CheckRequest(text=" ", ui_lang="ar" if ui_lang != "en" else "en", source_modality="image")
+            )
+            resp.extraction_degraded = True
+            return resp
+        text = ocr.text.strip()[: cfg.max_text_chars] or " "
+        req = CheckRequest(text=text, ui_lang="ar" if ui_lang != "en" else "en", source_modality="image")
+        notices: list[str] = []
+        if request.app.state.vision.name == "mock":
+            notices.append("ocr_mock")  # never present fixture text as if it were read from the image
+        resp = await pipeline.check(req, extra_notices=notices)
+        resp.ocr_text = text.strip() or None
+        return resp
+
+    @app.get("/v1/sources", response_model=list[SourceInfo])
+    async def sources(request: Request) -> list[SourceInfo]:
+        manifest = getattr(request.app.state, "manifest", None) or json.loads(
+            cfg.manifest_path.read_text(encoding="utf-8")
+        )
+        counts = request.app.state.store.counts if getattr(request.app.state, "ready", False) else {}
+        out: list[SourceInfo] = []
+        for s in manifest.get("sources", []):
+            sid = str(s["id"])
+            records = counts.get(
+                "tanzil"
+                if sid.startswith("tanzil")
+                else ("hadeethenc" if sid.startswith("hadeethenc") else sid),
+                0,
+            )
+            out.append(
+                SourceInfo(
+                    id=sid,
+                    name=str(s.get("name", sid)),
+                    type=str(s.get("type", "")),
+                    url=str(s.get("url") or s.get("repo") or ""),
+                    version=str(s.get("version") or s.get("commit") or ""),
+                    license=str(s.get("license", "")),
+                    license_url=str(s.get("license_url", "")),
+                    purpose=str(s.get("purpose", "")),
+                    in_repo=False,  # data files are never committed; only the manifest is
+                    records=int(records),
+                    downloaded_at=s.get("downloaded_at"),
+                )
+            )
+        return out
+
+    @app.get("/v1/messages/{lang}")
+    async def messages(lang: str) -> dict[str, Any]:
+        if lang not in ("ar", "en"):
+            raise ApiError(422, "invalid_input")
+        raw = json.loads((cfg.messages_dir / f"{lang}.json").read_text(encoding="utf-8"))
+        raw.pop("$comment", None)
+        return dict(raw)
+
+    # ------------------------------------------------------------- static frontend (E-034)
+    # When `frontend/dist` exists (Docker image), serve it from the same origin: no CORS, one URL,
+    # SPA fallback to index.html for client routes. API/health keep priority (registered first).
+    static_dir = cfg.static_dir
+    if static_dir is not None and (static_dir / "index.html").exists():
+        from fastapi.responses import FileResponse  # noqa: PLC0415
+        from fastapi.staticfiles import StaticFiles  # noqa: PLC0415
+
+        app.mount("/assets", StaticFiles(directory=static_dir / "assets"), name="assets")
+        if (static_dir / "brand").exists():
+            app.mount("/brand", StaticFiles(directory=static_dir / "brand"), name="brand")
+
+        index_html = (static_dir / "index.html").read_text(encoding="utf-8")
+
+        @app.get("/{full_path:path}", include_in_schema=False)
+        async def spa(full_path: str, request: Request) -> Any:
+            candidate = (static_dir / full_path).resolve()
+            if full_path and candidate.is_file() and static_dir.resolve() in candidate.parents:
+                headers = {"Cache-Control": "public, max-age=31536000, immutable"} if "." in full_path else {}
+                return FileResponse(candidate, headers=headers)
+            nonce = getattr(request.state, "csp_nonce", "")
+            return HTMLResponse(stamp_nonce(index_html, nonce), headers={"Cache-Control": "no-cache"})
+
+    return app
+
+
+app = create_app()

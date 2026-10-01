@@ -1,0 +1,24 @@
+services:
+  basira:
+    build: .
+    image: basira:latest
+    ports: ["8000:8000"]
+    environment:
+      # offline by default; set these for real extraction/OCR (any OpenAI-compatible endpoint)
+      LLM_PROVIDER: ${LLM_PROVIDER:-mock}
+      LLM_BASE_URL: ${LLM_BASE_URL:-}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-}
+      VISION_PROVIDER: ${VISION_PROVIDER:-mock}
+      BASIRA_RATE_LIMIT_PER_MIN: ${BASIRA_RATE_LIMIT_PER_MIN:-30}
+      BASIRA_CORS_ORIGINS: ${BASIRA_CORS_ORIGINS:-http://localhost:8000}
+      BUILD_SHA: ${BUILD_SHA:-compose}
+    read_only: true
+    tmpfs: [/tmp]
+    mem_limit: 512m
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8000/health',timeout=4)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

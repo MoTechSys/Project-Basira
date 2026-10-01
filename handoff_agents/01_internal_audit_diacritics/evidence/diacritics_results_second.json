@@ -1,0 +1,2388 @@
+{
+  "date": "2026-10-01",
+  "source_sha256": "bf4f57b968d03f4131c070b1e285da9be0e0a108a21c910e872801ca273312c8",
+  "source_url": "https://tanzil.net/pub/download/index.php?quranType=uthmani&outType=txt-2&agree=true",
+  "source_license_url": "https://tanzil.net/docs/text_license",
+  "corpus_records": 6236,
+  "targeted_cases": [
+    {
+      "id": "missing_0x64b",
+      "pass": true,
+      "expected": "vocalization_incomplete",
+      "actual": "vocalization_incomplete",
+      "input": "ب",
+      "reference": "بً"
+    },
+    {
+      "id": "duplicate_0x64b",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "بًً",
+      "reference": "بً"
+    },
+    {
+      "id": "missing_0x64c",
+      "pass": true,
+      "expected": "vocalization_incomplete",
+      "actual": "vocalization_incomplete",
+      "input": "ب",
+      "reference": "بٌ"
+    },
+    {
+      "id": "duplicate_0x64c",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "بٌٌ",
+      "reference": "بٌ"
+    },
+    {
+      "id": "missing_0x64d",
+      "pass": true,
+      "expected": "vocalization_incomplete",
+      "actual": "vocalization_incomplete",
+      "input": "ب",
+      "reference": "بٍ"
+    },
+    {
+      "id": "duplicate_0x64d",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "بٍٍ",
+      "reference": "بٍ"
+    },
+    {
+      "id": "missing_0x64e",
+      "pass": true,
+      "expected": "vocalization_incomplete",
+      "actual": "vocalization_incomplete",
+      "input": "ب",
+      "reference": "بَ"
+    },
+    {
+      "id": "duplicate_0x64e",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "بََ",
+      "reference": "بَ"
+    },
+    {
+      "id": "missing_0x64f",
+      "pass": true,
+      "expected": "vocalization_incomplete",
+      "actual": "vocalization_incomplete",
+      "input": "ب",
+      "reference": "بُ"
+    },
+    {
+      "id": "duplicate_0x64f",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "بُُ",
+      "reference": "بُ"
+    },
+    {
+      "id": "missing_0x650",
+      "pass": true,
+      "expected": "vocalization_incomplete",
+      "actual": "vocalization_incomplete",
+      "input": "ب",
+      "reference": "بِ"
+    },
+    {
+      "id": "duplicate_0x650",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "بِِ",
+      "reference": "بِ"
+    },
+    {
+      "id": "missing_0x651",
+      "pass": true,
+      "expected": "vocalization_incomplete",
+      "actual": "vocalization_incomplete",
+      "input": "ب",
+      "reference": "بّ"
+    },
+    {
+      "id": "duplicate_0x651",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "بّّ",
+      "reference": "بّ"
+    },
+    {
+      "id": "missing_0x652",
+      "pass": true,
+      "expected": "vocalization_incomplete",
+      "actual": "vocalization_incomplete",
+      "input": "ب",
+      "reference": "بْ"
+    },
+    {
+      "id": "duplicate_0x652",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "بْْ",
+      "reference": "بْ"
+    },
+    {
+      "id": "replace_0x64e",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "بُ",
+      "reference": "بَ"
+    },
+    {
+      "id": "replace_0x64f",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "بَ",
+      "reference": "بُ"
+    },
+    {
+      "id": "replace_0x650",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "بُ",
+      "reference": "بِ"
+    },
+    {
+      "id": "replace_0x652",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "بُ",
+      "reference": "بْ"
+    },
+    {
+      "id": "replace_0x64b",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "بُ",
+      "reference": "بً"
+    },
+    {
+      "id": "replace_0x64c",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "بُ",
+      "reference": "بٌ"
+    },
+    {
+      "id": "replace_0x64d",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "بُ",
+      "reference": "بٍ"
+    },
+    {
+      "id": "final_vowel",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "اللَّهُ",
+      "reference": "اللَّهَ"
+    },
+    {
+      "id": "internal_vowel",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "يُغْفِرُ",
+      "reference": "يَغْفِرُ"
+    },
+    {
+      "id": "missing_nun",
+      "pass": true,
+      "expected": "vocalization_incomplete",
+      "actual": "vocalization_incomplete",
+      "input": "الذُّنوبَ",
+      "reference": "الذُّنُوبَ"
+    },
+    {
+      "id": "shadda_order",
+      "pass": true,
+      "expected": "matching_with_notices",
+      "actual": "matching_with_notices",
+      "input": "بَّ",
+      "reference": "بَّ"
+    },
+    {
+      "id": "decomposed_hamza",
+      "pass": true,
+      "expected": "matching_with_notices",
+      "actual": "matching_with_notices",
+      "input": "أ",
+      "reference": "أ"
+    },
+    {
+      "id": "hamza_removed",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "ا",
+      "reference": "أ"
+    },
+    {
+      "id": "superscript_alef_missing",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "على",
+      "reference": "علىٰ"
+    },
+    {
+      "id": "zero_is_not_sukun",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "اْ",
+      "reference": "ا۟"
+    },
+    {
+      "id": "pause_missing",
+      "pass": true,
+      "expected": "matching_with_notices",
+      "actual": "matching_with_notices",
+      "input": "اللَّهِ إِنَّ",
+      "reference": "اللَّهِ ۚ إِنَّ"
+    },
+    {
+      "id": "stop_relocated",
+      "pass": true,
+      "expected": "matching_with_notices",
+      "actual": "matching_with_notices",
+      "input": "ۚ قُلْ هُوَ",
+      "reference": "قُلْ ۚ هُوَ"
+    },
+    {
+      "id": "latin_insert",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "قُلْ HELLO هُوَ",
+      "reference": "قُلْ هُوَ"
+    },
+    {
+      "id": "number_insert",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "قُلْ 123 هُوَ",
+      "reference": "قُلْ هُوَ"
+    },
+    {
+      "id": "bidi_control",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "قُلْ‮ هُوَ",
+      "reference": "قُلْ هُوَ"
+    },
+    {
+      "id": "joiner",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "قُ‍لْ",
+      "reference": "قُلْ"
+    },
+    {
+      "id": "orphan",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "ُ قُلْ",
+      "reference": "قُلْ"
+    },
+    {
+      "id": "empty",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "",
+      "reference": ""
+    },
+    {
+      "id": "latin_reference",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "HELLO",
+      "reference": "HELLO"
+    },
+    {
+      "id": "missing_letter",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "قُلْ هُ",
+      "reference": "قُلْ هُوَ"
+    },
+    {
+      "id": "word_boundary",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "قُلْهُوَ",
+      "reference": "قُلْ هُوَ"
+    },
+    {
+      "id": "astral_offsets",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "🙂 اللَّهُ",
+      "reference": "اللَّهَ"
+    },
+    {
+      "id": "foreign_combining",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "ب́",
+      "reference": "ب"
+    },
+    {
+      "id": "presentation_ligature",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "ﻻ",
+      "reference": "لا"
+    },
+    {
+      "id": "user_literal_example",
+      "pass": true,
+      "expected": "vocalization_incomplete",
+      "actual": "vocalization_incomplete",
+      "input": "﴿ ۞ قُلْ يَا عِبَادِيَ الَّذِينَ أَسرَفُوا عَلَىٰ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ  إِنَّ اللهَ يَغْفِرُ الذُّنوبَ جَمِيعًا ۚ إِنَّهُ هُوَ الْغَفُورُ الرَّحِيمُ﴾",
+      "reference": "﴿ ۞ قُلْ يَا عِبَادِيَ الَّذِينَ أَسْرَفُوا عَلَىٰ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ ۚ إِنَّ اللَّهَ يَغْفِرُ الذُّنُوبَ جَمِيعًا ۚ إِنَّهُ هُوَ الْغَفُورُ الرَّحِيمُ﴾"
+    },
+    {
+      "id": "fully_stripped",
+      "pass": true,
+      "expected": "vocalization_incomplete",
+      "actual": "vocalization_incomplete",
+      "input": "﴿ ۞ قل يا عبادي الذين أسرفوا علىٰ أنفسهم لا تقنطوا من رحمة الله ۚ إن الله يغفر الذنوب جميعا ۚ إنه هو الغفور الرحيم﴾",
+      "reference": "﴿ ۞ قُلْ يَا عِبَادِيَ الَّذِينَ أَسْرَفُوا عَلَىٰ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ ۚ إِنَّ اللَّهَ يَغْفِرُ الذُّنُوبَ جَمِيعًا ۚ إِنَّهُ هُوَ الْغَفُورُ الرَّحِيمُ﴾"
+    },
+    {
+      "id": "case16_same_orthography",
+      "pass": true,
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "input": "إِنَّمَا يَخْشَى اللَّهُ مِنْ عِبَادِهِ الْعُلَمَاءَ",
+      "reference": "إِنَّمَا يَخْشَى اللَّهَ مِنْ عِبَادِهِ الْعُلَمَاءُ"
+    }
+  ],
+  "targeted_passed": 48,
+  "corpus_checks": {
+    "identity_total": 6236,
+    "identity_passed": 6230,
+    "canonical_nfd_total": 6236,
+    "canonical_nfd_passed": 6230,
+    "last_mark_deletion_total": 6235,
+    "last_mark_deletion_passed": 6229,
+    "last_mark_substitution_total": 6235,
+    "last_mark_substitution_passed": 6235,
+    "last_mark_duplication_total": 6235,
+    "last_mark_duplication_passed": 6235
+  },
+  "corpus_failures": [
+    {
+      "test": "identity",
+      "ref": "2:72",
+      "status": "needs_review",
+      "events": [
+        {
+          "kind": "foreign_or_unsupported_content",
+          "severity": "review",
+          "user_range": [
+            33,
+            38
+          ],
+          "source_range": [
+            0,
+            0
+          ],
+          "user_utf16": [
+            33,
+            38
+          ],
+          "source_utf16": [
+            0,
+            0
+          ],
+          "observed": "رَْٰٔ",
+          "expected": "",
+          "observed_codepoints": [
+            "U+0631",
+            "U+064E",
+            "U+0670",
+            "U+0654",
+            "U+0652"
+          ],
+          "expected_codepoints": []
+        },
+        {
+          "kind": "duplicate_or_conflicting_marks",
+          "severity": "review",
+          "user_range": [
+            33,
+            38
+          ],
+          "source_range": [
+            0,
+            0
+          ],
+          "user_utf16": [
+            33,
+            38
+          ],
+          "source_utf16": [
+            0,
+            0
+          ],
+          "observed": "رَْٰٔ",
+          "expected": "",
+          "observed_codepoints": [
+            "U+0631",
+            "U+064E",
+            "U+0670",
+            "U+0654",
+            "U+0652"
+          ],
+          "expected_codepoints": []
+        },
+        {
+          "kind": "source_foreign_or_unsupported_content",
+          "severity": "review",
+          "user_range": [
+            0,
+            0
+          ],
+          "source_range": [
+            33,
+            38
+          ],
+          "user_utf16": [
+            0,
+            0
+          ],
+          "source_utf16": [
+            33,
+            38
+          ],
+          "observed": "",
+          "expected": "رَْٰٔ",
+          "observed_codepoints": [],
+          "expected_codepoints": [
+            "U+0631",
+            "U+064E",
+            "U+0670",
+            "U+0654",
+            "U+0652"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "canonical_nfd",
+      "ref": "2:72",
+      "status": "needs_review",
+      "events": [
+        {
+          "kind": "foreign_or_unsupported_content",
+          "severity": "review",
+          "user_range": [
+            34,
+            39
+          ],
+          "source_range": [
+            0,
+            0
+          ],
+          "user_utf16": [
+            34,
+            39
+          ],
+          "source_utf16": [
+            0,
+            0
+          ],
+          "observed": "رَْٰٔ",
+          "expected": "",
+          "observed_codepoints": [
+            "U+0631",
+            "U+064E",
+            "U+0652",
+            "U+0670",
+            "U+0654"
+          ],
+          "expected_codepoints": []
+        },
+        {
+          "kind": "duplicate_or_conflicting_marks",
+          "severity": "review",
+          "user_range": [
+            34,
+            39
+          ],
+          "source_range": [
+            0,
+            0
+          ],
+          "user_utf16": [
+            34,
+            39
+          ],
+          "source_utf16": [
+            0,
+            0
+          ],
+          "observed": "رَْٰٔ",
+          "expected": "",
+          "observed_codepoints": [
+            "U+0631",
+            "U+064E",
+            "U+0652",
+            "U+0670",
+            "U+0654"
+          ],
+          "expected_codepoints": []
+        },
+        {
+          "kind": "source_foreign_or_unsupported_content",
+          "severity": "review",
+          "user_range": [
+            0,
+            0
+          ],
+          "source_range": [
+            33,
+            38
+          ],
+          "user_utf16": [
+            0,
+            0
+          ],
+          "source_utf16": [
+            33,
+            38
+          ],
+          "observed": "",
+          "expected": "رَْٰٔ",
+          "observed_codepoints": [],
+          "expected_codepoints": [
+            "U+0631",
+            "U+064E",
+            "U+0670",
+            "U+0654",
+            "U+0652"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "last_mark_deletion",
+      "ref": "2:72",
+      "status": "needs_review",
+      "events": [
+        {
+          "kind": "foreign_or_unsupported_content",
+          "severity": "review",
+          "user_range": [
+            33,
+            38
+          ],
+          "source_range": [
+            0,
+            0
+          ],
+          "user_utf16": [
+            33,
+            38
+          ],
+          "source_utf16": [
+            0,
+            0
+          ],
+          "observed": "رَْٰٔ",
+          "expected": "",
+          "observed_codepoints": [
+            "U+0631",
+            "U+064E",
+            "U+0670",
+            "U+0654",
+            "U+0652"
+          ],
+          "expected_codepoints": []
+        },
+        {
+          "kind": "duplicate_or_conflicting_marks",
+          "severity": "review",
+          "user_range": [
+            33,
+            38
+          ],
+          "source_range": [
+            0,
+            0
+          ],
+          "user_utf16": [
+            33,
+            38
+          ],
+          "source_utf16": [
+            0,
+            0
+          ],
+          "observed": "رَْٰٔ",
+          "expected": "",
+          "observed_codepoints": [
+            "U+0631",
+            "U+064E",
+            "U+0670",
+            "U+0654",
+            "U+0652"
+          ],
+          "expected_codepoints": []
+        },
+        {
+          "kind": "source_foreign_or_unsupported_content",
+          "severity": "review",
+          "user_range": [
+            0,
+            0
+          ],
+          "source_range": [
+            33,
+            38
+          ],
+          "user_utf16": [
+            0,
+            0
+          ],
+          "source_utf16": [
+            33,
+            38
+          ],
+          "observed": "",
+          "expected": "رَْٰٔ",
+          "observed_codepoints": [],
+          "expected_codepoints": [
+            "U+0631",
+            "U+064E",
+            "U+0670",
+            "U+0654",
+            "U+0652"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "identity",
+      "ref": "7:196",
+      "status": "needs_review",
+      "events": [
+        {
+          "kind": "orphan_mark",
+          "severity": "review",
+          "user_range": [
+            10,
+            14
+          ],
+          "source_range": [
+            0,
+            0
+          ],
+          "user_utf16": [
+            10,
+            14
+          ],
+          "source_utf16": [
+            0,
+            0
+          ],
+          "observed": "ـِّۧ",
+          "expected": "",
+          "observed_codepoints": [
+            "U+0640",
+            "U+06E7",
+            "U+0651",
+            "U+0650"
+          ],
+          "expected_codepoints": []
+        },
+        {
+          "kind": "source_orphan_mark",
+          "severity": "review",
+          "user_range": [
+            0,
+            0
+          ],
+          "source_range": [
+            10,
+            14
+          ],
+          "user_utf16": [
+            0,
+            0
+          ],
+          "source_utf16": [
+            10,
+            14
+          ],
+          "observed": "",
+          "expected": "ـِّۧ",
+          "observed_codepoints": [],
+          "expected_codepoints": [
+            "U+0640",
+            "U+06E7",
+            "U+0651",
+            "U+0650"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "canonical_nfd",
+      "ref": "7:196",
+      "status": "needs_review",
+      "events": [
+        {
+          "kind": "orphan_mark",
+          "severity": "review",
+          "user_range": [
+            11,
+            15
+          ],
+          "source_range": [
+            0,
+            0
+          ],
+          "user_utf16": [
+            11,
+            15
+          ],
+          "source_utf16": [
+            0,
+            0
+          ],
+          "observed": "ـِّۧ",
+          "expected": "",
+          "observed_codepoints": [
+            "U+0640",
+            "U+0650",
+            "U+0651",
+            "U+06E7"
+          ],
+          "expected_codepoints": []
+        },
+        {
+          "kind": "source_orphan_mark",
+          "severity": "review",
+          "user_range": [
+            0,
+            0
+          ],
+          "source_range": [
+            10,
+            14
+          ],
+          "user_utf16": [
+            0,
+            0
+          ],
+          "source_utf16": [
+            10,
+            14
+          ],
+          "observed": "",
+          "expected": "ـِّۧ",
+          "observed_codepoints": [],
+          "expected_codepoints": [
+            "U+0640",
+            "U+06E7",
+            "U+0651",
+            "U+0650"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "last_mark_deletion",
+      "ref": "7:196",
+      "status": "needs_review",
+      "events": [
+        {
+          "kind": "orphan_mark",
+          "severity": "review",
+          "user_range": [
+            10,
+            14
+          ],
+          "source_range": [
+            0,
+            0
+          ],
+          "user_utf16": [
+            10,
+            14
+          ],
+          "source_utf16": [
+            0,
+            0
+          ],
+          "observed": "ـِّۧ",
+          "expected": "",
+          "observed_codepoints": [
+            "U+0640",
+            "U+06E7",
+            "U+0651",
+            "U+0650"
+          ],
+          "expected_codepoints": []
+        },
+        {
+          "kind": "source_orphan_mark",
+          "severity": "review",
+          "user_range": [
+            0,
+            0
+          ],
+          "source_range": [
+            10,
+            14
+          ],
+          "user_utf16": [
+            0,
+            0
+          ],
+          "source_utf16": [
+            10,
+            14
+          ],
+          "observed": "",
+          "expected": "ـِّۧ",
+          "observed_codepoints": [],
+          "expected_codepoints": [
+            "U+0640",
+            "U+06E7",
+            "U+0651",
+            "U+0650"
+          ]
+        },
+        {
+          "kind": "missing_vowel",
+          "severity": "notice",
+          "user_range": [
+            81,
+            82
+          ],
+          "source_range": [
+            81,
+            83
+          ],
+          "user_utf16": [
+            81,
+            82
+          ],
+          "source_utf16": [
+            81,
+            83
+          ],
+          "observed": "",
+          "expected": "َ",
+          "observed_codepoints": [],
+          "expected_codepoints": [
+            "U+064E"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "identity",
+      "ref": "25:49",
+      "status": "needs_review",
+      "events": [
+        {
+          "kind": "orphan_mark",
+          "severity": "review",
+          "user_range": [
+            7,
+            10
+          ],
+          "source_range": [
+            0,
+            0
+          ],
+          "user_utf16": [
+            7,
+            10
+          ],
+          "source_utf16": [
+            0,
+            0
+          ],
+          "observed": "ـِۧ",
+          "expected": "",
+          "observed_codepoints": [
+            "U+0640",
+            "U+06E7",
+            "U+0650"
+          ],
+          "expected_codepoints": []
+        },
+        {
+          "kind": "source_orphan_mark",
+          "severity": "review",
+          "user_range": [
+            0,
+            0
+          ],
+          "source_range": [
+            7,
+            10
+          ],
+          "user_utf16": [
+            0,
+            0
+          ],
+          "source_utf16": [
+            7,
+            10
+          ],
+          "observed": "",
+          "expected": "ـِۧ",
+          "observed_codepoints": [],
+          "expected_codepoints": [
+            "U+0640",
+            "U+06E7",
+            "U+0650"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "canonical_nfd",
+      "ref": "25:49",
+      "status": "needs_review",
+      "events": [
+        {
+          "kind": "orphan_mark",
+          "severity": "review",
+          "user_range": [
+            7,
+            10
+          ],
+          "source_range": [
+            0,
+            0
+          ],
+          "user_utf16": [
+            7,
+            10
+          ],
+          "source_utf16": [
+            0,
+            0
+          ],
+          "observed": "ـِۧ",
+          "expected": "",
+          "observed_codepoints": [
+            "U+0640",
+            "U+0650",
+            "U+06E7"
+          ],
+          "expected_codepoints": []
+        },
+        {
+          "kind": "source_orphan_mark",
+          "severity": "review",
+          "user_range": [
+            0,
+            0
+          ],
+          "source_range": [
+            7,
+            10
+          ],
+          "user_utf16": [
+            0,
+            0
+          ],
+          "source_utf16": [
+            7,
+            10
+          ],
+          "observed": "",
+          "expected": "ـِۧ",
+          "observed_codepoints": [],
+          "expected_codepoints": [
+            "U+0640",
+            "U+06E7",
+            "U+0650"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "last_mark_deletion",
+      "ref": "25:49",
+      "status": "needs_review",
+      "events": [
+        {
+          "kind": "orphan_mark",
+          "severity": "review",
+          "user_range": [
+            7,
+            10
+          ],
+          "source_range": [
+            0,
+            0
+          ],
+          "user_utf16": [
+            7,
+            10
+          ],
+          "source_utf16": [
+            0,
+            0
+          ],
+          "observed": "ـِۧ",
+          "expected": "",
+          "observed_codepoints": [
+            "U+0640",
+            "U+06E7",
+            "U+0650"
+          ],
+          "expected_codepoints": []
+        },
+        {
+          "kind": "source_orphan_mark",
+          "severity": "review",
+          "user_range": [
+            0,
+            0
+          ],
+          "source_range": [
+            7,
+            10
+          ],
+          "user_utf16": [
+            0,
+            0
+          ],
+          "source_utf16": [
+            7,
+            10
+          ],
+          "observed": "",
+          "expected": "ـِۧ",
+          "observed_codepoints": [],
+          "expected_codepoints": [
+            "U+0640",
+            "U+06E7",
+            "U+0650"
+          ]
+        },
+        {
+          "kind": "missing_vowel",
+          "severity": "notice",
+          "user_range": [
+            98,
+            99
+          ],
+          "source_range": [
+            98,
+            100
+          ],
+          "user_utf16": [
+            98,
+            99
+          ],
+          "source_utf16": [
+            98,
+            100
+          ],
+          "observed": "",
+          "expected": "ً",
+          "observed_codepoints": [],
+          "expected_codepoints": [
+            "U+064B"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "identity",
+      "ref": "27:36",
+      "status": "needs_review",
+      "events": [
+        {
+          "kind": "orphan_mark",
+          "severity": "review",
+          "user_range": [
+            73,
+            75
+          ],
+          "source_range": [
+            0,
+            0
+          ],
+          "user_utf16": [
+            73,
+            75
+          ],
+          "source_utf16": [
+            0,
+            0
+          ],
+          "observed": "ۦَ",
+          "expected": "",
+          "observed_codepoints": [
+            "U+06E6",
+            "U+064E"
+          ],
+          "expected_codepoints": []
+        },
+        {
+          "kind": "source_orphan_mark",
+          "severity": "review",
+          "user_range": [
+            0,
+            0
+          ],
+          "source_range": [
+            73,
+            75
+          ],
+          "user_utf16": [
+            0,
+            0
+          ],
+          "source_utf16": [
+            73,
+            75
+          ],
+          "observed": "",
+          "expected": "ۦَ",
+          "observed_codepoints": [],
+          "expected_codepoints": [
+            "U+06E6",
+            "U+064E"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "canonical_nfd",
+      "ref": "27:36",
+      "status": "needs_review",
+      "events": [
+        {
+          "kind": "orphan_mark",
+          "severity": "review",
+          "user_range": [
+            74,
+            76
+          ],
+          "source_range": [
+            0,
+            0
+          ],
+          "user_utf16": [
+            74,
+            76
+          ],
+          "source_utf16": [
+            0,
+            0
+          ],
+          "observed": "ۦَ",
+          "expected": "",
+          "observed_codepoints": [
+            "U+06E6",
+            "U+064E"
+          ],
+          "expected_codepoints": []
+        },
+        {
+          "kind": "source_orphan_mark",
+          "severity": "review",
+          "user_range": [
+            0,
+            0
+          ],
+          "source_range": [
+            73,
+            75
+          ],
+          "user_utf16": [
+            0,
+            0
+          ],
+          "source_utf16": [
+            73,
+            75
+          ],
+          "observed": "",
+          "expected": "ۦَ",
+          "observed_codepoints": [],
+          "expected_codepoints": [
+            "U+06E6",
+            "U+064E"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "last_mark_deletion",
+      "ref": "27:36",
+      "status": "needs_review",
+      "events": [
+        {
+          "kind": "orphan_mark",
+          "severity": "review",
+          "user_range": [
+            73,
+            75
+          ],
+          "source_range": [
+            0,
+            0
+          ],
+          "user_utf16": [
+            73,
+            75
+          ],
+          "source_utf16": [
+            0,
+            0
+          ],
+          "observed": "ۦَ",
+          "expected": "",
+          "observed_codepoints": [
+            "U+06E6",
+            "U+064E"
+          ],
+          "expected_codepoints": []
+        },
+        {
+          "kind": "source_orphan_mark",
+          "severity": "review",
+          "user_range": [
+            0,
+            0
+          ],
+          "source_range": [
+            73,
+            75
+          ],
+          "user_utf16": [
+            0,
+            0
+          ],
+          "source_utf16": [
+            73,
+            75
+          ],
+          "observed": "",
+          "expected": "ۦَ",
+          "observed_codepoints": [],
+          "expected_codepoints": [
+            "U+06E6",
+            "U+064E"
+          ]
+        },
+        {
+          "kind": "missing_vowel",
+          "severity": "notice",
+          "user_range": [
+            148,
+            149
+          ],
+          "source_range": [
+            148,
+            150
+          ],
+          "user_utf16": [
+            148,
+            149
+          ],
+          "source_utf16": [
+            148,
+            150
+          ],
+          "observed": "",
+          "expected": "َ",
+          "observed_codepoints": [],
+          "expected_codepoints": [
+            "U+064E"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "identity",
+      "ref": "46:33",
+      "status": "needs_review",
+      "events": [
+        {
+          "kind": "orphan_mark",
+          "severity": "review",
+          "user_range": [
+            127,
+            130
+          ],
+          "source_range": [
+            0,
+            0
+          ],
+          "user_utf16": [
+            127,
+            130
+          ],
+          "source_utf16": [
+            0,
+            0
+          ],
+          "observed": "ـِۧ",
+          "expected": "",
+          "observed_codepoints": [
+            "U+0640",
+            "U+06E7",
+            "U+0650"
+          ],
+          "expected_codepoints": []
+        },
+        {
+          "kind": "source_orphan_mark",
+          "severity": "review",
+          "user_range": [
+            0,
+            0
+          ],
+          "source_range": [
+            127,
+            130
+          ],
+          "user_utf16": [
+            0,
+            0
+          ],
+          "source_utf16": [
+            127,
+            130
+          ],
+          "observed": "",
+          "expected": "ـِۧ",
+          "observed_codepoints": [],
+          "expected_codepoints": [
+            "U+0640",
+            "U+06E7",
+            "U+0650"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "canonical_nfd",
+      "ref": "46:33",
+      "status": "needs_review",
+      "events": [
+        {
+          "kind": "orphan_mark",
+          "severity": "review",
+          "user_range": [
+            131,
+            134
+          ],
+          "source_range": [
+            0,
+            0
+          ],
+          "user_utf16": [
+            131,
+            134
+          ],
+          "source_utf16": [
+            0,
+            0
+          ],
+          "observed": "ـِۧ",
+          "expected": "",
+          "observed_codepoints": [
+            "U+0640",
+            "U+0650",
+            "U+06E7"
+          ],
+          "expected_codepoints": []
+        },
+        {
+          "kind": "source_orphan_mark",
+          "severity": "review",
+          "user_range": [
+            0,
+            0
+          ],
+          "source_range": [
+            127,
+            130
+          ],
+          "user_utf16": [
+            0,
+            0
+          ],
+          "source_utf16": [
+            127,
+            130
+          ],
+          "observed": "",
+          "expected": "ـِۧ",
+          "observed_codepoints": [],
+          "expected_codepoints": [
+            "U+0640",
+            "U+06E7",
+            "U+0650"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "last_mark_deletion",
+      "ref": "46:33",
+      "status": "needs_review",
+      "events": [
+        {
+          "kind": "orphan_mark",
+          "severity": "review",
+          "user_range": [
+            127,
+            130
+          ],
+          "source_range": [
+            0,
+            0
+          ],
+          "user_utf16": [
+            127,
+            130
+          ],
+          "source_utf16": [
+            0,
+            0
+          ],
+          "observed": "ـِۧ",
+          "expected": "",
+          "observed_codepoints": [
+            "U+0640",
+            "U+06E7",
+            "U+0650"
+          ],
+          "expected_codepoints": []
+        },
+        {
+          "kind": "source_orphan_mark",
+          "severity": "review",
+          "user_range": [
+            0,
+            0
+          ],
+          "source_range": [
+            127,
+            130
+          ],
+          "user_utf16": [
+            0,
+            0
+          ],
+          "source_utf16": [
+            127,
+            130
+          ],
+          "observed": "",
+          "expected": "ـِۧ",
+          "observed_codepoints": [],
+          "expected_codepoints": [
+            "U+0640",
+            "U+06E7",
+            "U+0650"
+          ]
+        },
+        {
+          "kind": "missing_vowel",
+          "severity": "notice",
+          "user_range": [
+            187,
+            188
+          ],
+          "source_range": [
+            187,
+            189
+          ],
+          "user_utf16": [
+            187,
+            188
+          ],
+          "source_utf16": [
+            187,
+            189
+          ],
+          "observed": "",
+          "expected": "ٌ",
+          "observed_codepoints": [],
+          "expected_codepoints": [
+            "U+064C"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "identity",
+      "ref": "75:40",
+      "status": "needs_review",
+      "events": [
+        {
+          "kind": "orphan_mark",
+          "severity": "review",
+          "user_range": [
+            43,
+            46
+          ],
+          "source_range": [
+            0,
+            0
+          ],
+          "user_utf16": [
+            43,
+            46
+          ],
+          "source_utf16": [
+            0,
+            0
+          ],
+          "observed": "ـِۧ",
+          "expected": "",
+          "observed_codepoints": [
+            "U+0640",
+            "U+06E7",
+            "U+0650"
+          ],
+          "expected_codepoints": []
+        },
+        {
+          "kind": "source_orphan_mark",
+          "severity": "review",
+          "user_range": [
+            0,
+            0
+          ],
+          "source_range": [
+            43,
+            46
+          ],
+          "user_utf16": [
+            0,
+            0
+          ],
+          "source_utf16": [
+            43,
+            46
+          ],
+          "observed": "",
+          "expected": "ـِۧ",
+          "observed_codepoints": [],
+          "expected_codepoints": [
+            "U+0640",
+            "U+06E7",
+            "U+0650"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "canonical_nfd",
+      "ref": "75:40",
+      "status": "needs_review",
+      "events": [
+        {
+          "kind": "orphan_mark",
+          "severity": "review",
+          "user_range": [
+            45,
+            48
+          ],
+          "source_range": [
+            0,
+            0
+          ],
+          "user_utf16": [
+            45,
+            48
+          ],
+          "source_utf16": [
+            0,
+            0
+          ],
+          "observed": "ـِۧ",
+          "expected": "",
+          "observed_codepoints": [
+            "U+0640",
+            "U+0650",
+            "U+06E7"
+          ],
+          "expected_codepoints": []
+        },
+        {
+          "kind": "source_orphan_mark",
+          "severity": "review",
+          "user_range": [
+            0,
+            0
+          ],
+          "source_range": [
+            43,
+            46
+          ],
+          "user_utf16": [
+            0,
+            0
+          ],
+          "source_utf16": [
+            43,
+            46
+          ],
+          "observed": "",
+          "expected": "ـِۧ",
+          "observed_codepoints": [],
+          "expected_codepoints": [
+            "U+0640",
+            "U+06E7",
+            "U+0650"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "last_mark_deletion",
+      "ref": "75:40",
+      "status": "needs_review",
+      "events": [
+        {
+          "kind": "orphan_mark",
+          "severity": "review",
+          "user_range": [
+            43,
+            46
+          ],
+          "source_range": [
+            0,
+            0
+          ],
+          "user_utf16": [
+            43,
+            46
+          ],
+          "source_utf16": [
+            0,
+            0
+          ],
+          "observed": "ـِۧ",
+          "expected": "",
+          "observed_codepoints": [
+            "U+0640",
+            "U+06E7",
+            "U+0650"
+          ],
+          "expected_codepoints": []
+        },
+        {
+          "kind": "source_orphan_mark",
+          "severity": "review",
+          "user_range": [
+            0,
+            0
+          ],
+          "source_range": [
+            43,
+            46
+          ],
+          "user_utf16": [
+            0,
+            0
+          ],
+          "source_utf16": [
+            43,
+            46
+          ],
+          "observed": "",
+          "expected": "ـِۧ",
+          "observed_codepoints": [],
+          "expected_codepoints": [
+            "U+0640",
+            "U+06E7",
+            "U+0650"
+          ]
+        },
+        {
+          "kind": "missing_vowel",
+          "severity": "notice",
+          "user_range": [
+            56,
+            57
+          ],
+          "source_range": [
+            56,
+            58
+          ],
+          "user_utf16": [
+            56,
+            57
+          ],
+          "source_utf16": [
+            56,
+            58
+          ],
+          "observed": "",
+          "expected": "َ",
+          "observed_codepoints": [],
+          "expected_codepoints": [
+            "U+064E"
+          ]
+        }
+      ]
+    }
+  ],
+  "unsupported_identity_refs": [
+    "2:72",
+    "7:196",
+    "25:49",
+    "27:36",
+    "46:33",
+    "75:40"
+  ],
+  "corpus_seconds": 54.2072194780003,
+  "same_rasm_pair_latency_ms": {
+    "n": 200,
+    "p50": 2.7306755000608973,
+    "p95": 3.100170999459806,
+    "max": 3.4962909994646907
+  },
+  "user_literal": "﴿ ۞ قُلْ يَا عِبَادِيَ الَّذِينَ أَسرَفُوا عَلَىٰ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ  إِنَّ اللهَ يَغْفِرُ الذُّنوبَ جَمِيعًا ۚ إِنَّهُ هُوَ الْغَفُورُ الرَّحِيمُ﴾",
+  "supplied_reference_literal": "﴿ ۞ قُلْ يَا عِبَادِيَ الَّذِينَ أَسْرَفُوا عَلَىٰ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ ۚ إِنَّ اللَّهَ يَغْفِرُ الذُّنُوبَ جَمِيعًا ۚ إِنَّهُ هُوَ الْغَفُورُ الرَّحِيمُ﴾",
+  "sample_result": {
+    "comparison_status": "vocalization_incomplete",
+    "same_letter_and_word_sequence": true,
+    "fully_identical_raw": false,
+    "events": [
+      {
+        "kind": "missing_vowel",
+        "severity": "notice",
+        "user_range": [
+          35,
+          36
+        ],
+        "source_range": [
+          35,
+          37
+        ],
+        "user_utf16": [
+          35,
+          36
+        ],
+        "source_utf16": [
+          35,
+          37
+        ],
+        "observed": "",
+        "expected": "ْ",
+        "observed_codepoints": [],
+        "expected_codepoints": [
+          "U+0652"
+        ]
+      },
+      {
+        "kind": "missing_vowel",
+        "severity": "notice",
+        "user_range": [
+          108,
+          109
+        ],
+        "source_range": [
+          110,
+          113
+        ],
+        "user_utf16": [
+          108,
+          109
+        ],
+        "source_utf16": [
+          110,
+          113
+        ],
+        "observed": "",
+        "expected": "َ",
+        "observed_codepoints": [],
+        "expected_codepoints": [
+          "U+064E"
+        ]
+      },
+      {
+        "kind": "missing_shadda",
+        "severity": "notice",
+        "user_range": [
+          108,
+          109
+        ],
+        "source_range": [
+          110,
+          113
+        ],
+        "user_utf16": [
+          108,
+          109
+        ],
+        "source_utf16": [
+          110,
+          113
+        ],
+        "observed": "",
+        "expected": "ّ",
+        "observed_codepoints": [],
+        "expected_codepoints": [
+          "U+0651"
+        ]
+      },
+      {
+        "kind": "missing_vowel",
+        "severity": "notice",
+        "user_range": [
+          126,
+          127
+        ],
+        "source_range": [
+          130,
+          132
+        ],
+        "user_utf16": [
+          126,
+          127
+        ],
+        "source_utf16": [
+          130,
+          132
+        ],
+        "observed": "",
+        "expected": "ُ",
+        "observed_codepoints": [],
+        "expected_codepoints": [
+          "U+064F"
+        ]
+      },
+      {
+        "kind": "pause_mark_missing",
+        "severity": "notice",
+        "user_range": [
+          98,
+          98
+        ],
+        "source_range": [
+          99,
+          101
+        ],
+        "user_utf16": [
+          98,
+          98
+        ],
+        "source_utf16": [
+          99,
+          101
+        ],
+        "observed": "",
+        "expected": "ۚ",
+        "observed_codepoints": [],
+        "expected_codepoints": [
+          "U+06DA"
+        ]
+      }
+    ],
+    "user_sha256": "71dccfaa1c9722c8106c370ca8fd4496b614890505ab12c0e9c9b81dbf91500a",
+    "source_sha256": "02607ab1be14ee193ab19f35dc40912c7f3b46797c190aa86bbd067fcda7d6a9",
+    "unicode_database": "15.1.0",
+    "grapheme_library": "2026.7.19",
+    "source_authentication": "not_performed_by_comparator",
+    "scope": "same orthography; differences are textual, not meaning or authenticity judgments"
+  },
+  "user_vs_pinned_uthmani": {
+    "comparison_status": "needs_review",
+    "same_letter_and_word_sequence": false,
+    "fully_identical_raw": false,
+    "events": [
+      {
+        "kind": "letter_or_word_boundary_difference",
+        "severity": "review",
+        "user_range": [
+          11,
+          13
+        ],
+        "source_range": [
+          8,
+          8
+        ],
+        "user_utf16": [
+          11,
+          13
+        ],
+        "source_utf16": [
+          8,
+          8
+        ],
+        "observed": "ا ",
+        "expected": "",
+        "observed_codepoints": [
+          "U+0627",
+          "U+0020"
+        ],
+        "expected_codepoints": []
+      },
+      {
+        "kind": "letter_or_word_boundary_difference",
+        "severity": "review",
+        "user_range": [
+          20,
+          22
+        ],
+        "source_range": [
+          15,
+          17
+        ],
+        "user_utf16": [
+          20,
+          22
+        ],
+        "source_utf16": [
+          15,
+          17
+        ],
+        "observed": "يَ",
+        "expected": "ىَ",
+        "observed_codepoints": [
+          "U+064A",
+          "U+064E"
+        ],
+        "expected_codepoints": [
+          "U+0649",
+          "U+064E"
+        ]
+      },
+      {
+        "kind": "letter_or_word_boundary_difference",
+        "severity": "review",
+        "user_range": [
+          23,
+          24
+        ],
+        "source_range": [
+          18,
+          19
+        ],
+        "user_utf16": [
+          23,
+          24
+        ],
+        "source_utf16": [
+          18,
+          19
+        ],
+        "observed": "ا",
+        "expected": "ٱ",
+        "observed_codepoints": [
+          "U+0627"
+        ],
+        "expected_codepoints": [
+          "U+0671"
+        ]
+      },
+      {
+        "kind": "letter_or_word_boundary_difference",
+        "severity": "review",
+        "user_range": [
+          91,
+          92
+        ],
+        "source_range": [
+          90,
+          91
+        ],
+        "user_utf16": [
+          91,
+          92
+        ],
+        "source_utf16": [
+          90,
+          91
+        ],
+        "observed": "ا",
+        "expected": "ٱ",
+        "observed_codepoints": [
+          "U+0627"
+        ],
+        "expected_codepoints": [
+          "U+0671"
+        ]
+      },
+      {
+        "kind": "letter_or_word_boundary_difference",
+        "severity": "review",
+        "user_range": [
+          106,
+          107
+        ],
+        "source_range": [
+          104,
+          105
+        ],
+        "user_utf16": [
+          106,
+          107
+        ],
+        "source_utf16": [
+          104,
+          105
+        ],
+        "observed": "ا",
+        "expected": "ٱ",
+        "observed_codepoints": [
+          "U+0627"
+        ],
+        "expected_codepoints": [
+          "U+0671"
+        ]
+      },
+      {
+        "kind": "letter_or_word_boundary_difference",
+        "severity": "review",
+        "user_range": [
+          121,
+          122
+        ],
+        "source_range": [
+          121,
+          122
+        ],
+        "user_utf16": [
+          121,
+          122
+        ],
+        "source_utf16": [
+          121,
+          122
+        ],
+        "observed": "ا",
+        "expected": "ٱ",
+        "observed_codepoints": [
+          "U+0627"
+        ],
+        "expected_codepoints": [
+          "U+0671"
+        ]
+      },
+      {
+        "kind": "letter_or_word_boundary_difference",
+        "severity": "review",
+        "user_range": [
+          155,
+          156
+        ],
+        "source_range": [
+          155,
+          156
+        ],
+        "user_utf16": [
+          155,
+          156
+        ],
+        "source_utf16": [
+          155,
+          156
+        ],
+        "observed": "ا",
+        "expected": "ٱ",
+        "observed_codepoints": [
+          "U+0627"
+        ],
+        "expected_codepoints": [
+          "U+0671"
+        ]
+      },
+      {
+        "kind": "letter_or_word_boundary_difference",
+        "severity": "review",
+        "user_range": [
+          166,
+          167
+        ],
+        "source_range": [
+          166,
+          167
+        ],
+        "user_utf16": [
+          166,
+          167
+        ],
+        "source_utf16": [
+          166,
+          167
+        ],
+        "observed": "ا",
+        "expected": "ٱ",
+        "observed_codepoints": [
+          "U+0627"
+        ],
+        "expected_codepoints": [
+          "U+0671"
+        ]
+      },
+      {
+        "kind": "orthographic_mark_difference",
+        "severity": "review",
+        "user_range": [
+          9,
+          11
+        ],
+        "source_range": [
+          5,
+          8
+        ],
+        "user_utf16": [
+          9,
+          11
+        ],
+        "source_utf16": [
+          5,
+          8
+        ],
+        "observed": "",
+        "expected": "ٰ",
+        "observed_codepoints": [],
+        "expected_codepoints": [
+          "U+0670"
+        ]
+      },
+      {
+        "kind": "missing_vowel",
+        "severity": "notice",
+        "user_range": [
+          35,
+          36
+        ],
+        "source_range": [
+          30,
+          32
+        ],
+        "user_utf16": [
+          35,
+          36
+        ],
+        "source_utf16": [
+          30,
+          32
+        ],
+        "observed": "",
+        "expected": "ْ",
+        "observed_codepoints": [],
+        "expected_codepoints": [
+          "U+0652"
+        ]
+      },
+      {
+        "kind": "orthographic_mark_difference",
+        "severity": "review",
+        "user_range": [
+          41,
+          42
+        ],
+        "source_range": [
+          37,
+          39
+        ],
+        "user_utf16": [
+          41,
+          42
+        ],
+        "source_utf16": [
+          37,
+          39
+        ],
+        "observed": "",
+        "expected": "۟",
+        "observed_codepoints": [],
+        "expected_codepoints": [
+          "U+06DF"
+        ]
+      },
+      {
+        "kind": "orthographic_mark_difference",
+        "severity": "review",
+        "user_range": [
+          47,
+          49
+        ],
+        "source_range": [
+          44,
+          47
+        ],
+        "user_utf16": [
+          47,
+          49
+        ],
+        "source_utf16": [
+          44,
+          47
+        ],
+        "observed": "ٰ",
+        "expected": "ٰٓ",
+        "observed_codepoints": [
+          "U+0670"
+        ],
+        "expected_codepoints": [
+          "U+0670",
+          "U+0653"
+        ]
+      },
+      {
+        "kind": "orthographic_mark_difference",
+        "severity": "review",
+        "user_range": [
+          75,
+          76
+        ],
+        "source_range": [
+          73,
+          75
+        ],
+        "user_utf16": [
+          75,
+          76
+        ],
+        "source_utf16": [
+          73,
+          75
+        ],
+        "observed": "",
+        "expected": "۟",
+        "observed_codepoints": [],
+        "expected_codepoints": [
+          "U+06DF"
+        ]
+      },
+      {
+        "kind": "missing_vowel",
+        "severity": "notice",
+        "user_range": [
+          108,
+          109
+        ],
+        "source_range": [
+          106,
+          109
+        ],
+        "user_utf16": [
+          108,
+          109
+        ],
+        "source_utf16": [
+          106,
+          109
+        ],
+        "observed": "",
+        "expected": "َ",
+        "observed_codepoints": [],
+        "expected_codepoints": [
+          "U+064E"
+        ]
+      },
+      {
+        "kind": "missing_shadda",
+        "severity": "notice",
+        "user_range": [
+          108,
+          109
+        ],
+        "source_range": [
+          106,
+          109
+        ],
+        "user_utf16": [
+          108,
+          109
+        ],
+        "source_utf16": [
+          106,
+          109
+        ],
+        "observed": "",
+        "expected": "ّ",
+        "observed_codepoints": [],
+        "expected_codepoints": [
+          "U+0651"
+        ]
+      },
+      {
+        "kind": "missing_vowel",
+        "severity": "notice",
+        "user_range": [
+          126,
+          127
+        ],
+        "source_range": [
+          126,
+          128
+        ],
+        "user_utf16": [
+          126,
+          127
+        ],
+        "source_utf16": [
+          126,
+          128
+        ],
+        "observed": "",
+        "expected": "ُ",
+        "observed_codepoints": [],
+        "expected_codepoints": [
+          "U+064F"
+        ]
+      }
+    ],
+    "user_sha256": "71dccfaa1c9722c8106c370ca8fd4496b614890505ab12c0e9c9b81dbf91500a",
+    "source_sha256": "e073806d2585cffbd962f85052a138e0be0c7c8d4c54a85e60b10805315c242b",
+    "unicode_database": "15.1.0",
+    "grapheme_library": "2026.7.19",
+    "source_authentication": "not_performed_by_comparator",
+    "scope": "same orthography; differences are textual, not meaning or authenticity judgments"
+  },
+  "notes": [
+    "Mechanical same-source mutations; not independent religious review.",
+    "Supplied second string is a comparison fixture, not independently authenticated full-vocalized Imlaei source.",
+    "No cross-rasm equivalence, reading authentication, retrieval, attribution, or OCR is provided by this comparator."
+  ]
+}

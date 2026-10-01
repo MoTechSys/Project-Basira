@@ -1,0 +1,386 @@
+{
+  "sequential_n": 60,
+  "p50_ms": 16.637999999999998,
+  "p95_nearest_rank_ms": 22.629,
+  "max_ms": 29.254,
+  "http_errors": 0,
+  "concurrency": 4,
+  "concurrent_n": 12,
+  "concurrent_wall_ms": 253.90035200007333,
+  "concurrent_request_ms": [
+    23.557,
+    84.506,
+    82.658,
+    84.495,
+    83.052,
+    64.891,
+    84.248,
+    84.887,
+    85.532,
+    83.936,
+    83.41,
+    82.516
+  ],
+  "samples": [
+    {
+      "sample": 0,
+      "kind": 0,
+      "http_status": 200,
+      "wall_ms": 8.795
+    },
+    {
+      "sample": 1,
+      "kind": 1,
+      "http_status": 200,
+      "wall_ms": 29.254
+    },
+    {
+      "sample": 2,
+      "kind": 2,
+      "http_status": 200,
+      "wall_ms": 20.999
+    },
+    {
+      "sample": 3,
+      "kind": 3,
+      "http_status": 200,
+      "wall_ms": 5.667
+    },
+    {
+      "sample": 4,
+      "kind": 4,
+      "http_status": 200,
+      "wall_ms": 27.549
+    },
+    {
+      "sample": 5,
+      "kind": 5,
+      "http_status": 200,
+      "wall_ms": 16.373
+    },
+    {
+      "sample": 6,
+      "kind": 0,
+      "http_status": 200,
+      "wall_ms": 6.017
+    },
+    {
+      "sample": 7,
+      "kind": 1,
+      "http_status": 200,
+      "wall_ms": 21.23
+    },
+    {
+      "sample": 8,
+      "kind": 2,
+      "http_status": 200,
+      "wall_ms": 18.463
+    },
+    {
+      "sample": 9,
+      "kind": 3,
+      "http_status": 200,
+      "wall_ms": 4.783
+    },
+    {
+      "sample": 10,
+      "kind": 4,
+      "http_status": 200,
+      "wall_ms": 21.832
+    },
+    {
+      "sample": 11,
+      "kind": 5,
+      "http_status": 200,
+      "wall_ms": 16.512
+    },
+    {
+      "sample": 12,
+      "kind": 0,
+      "http_status": 200,
+      "wall_ms": 6.323
+    },
+    {
+      "sample": 13,
+      "kind": 1,
+      "http_status": 200,
+      "wall_ms": 20.403
+    },
+    {
+      "sample": 14,
+      "kind": 2,
+      "http_status": 200,
+      "wall_ms": 16.764
+    },
+    {
+      "sample": 15,
+      "kind": 3,
+      "http_status": 200,
+      "wall_ms": 4.317
+    },
+    {
+      "sample": 16,
+      "kind": 4,
+      "http_status": 200,
+      "wall_ms": 23.125
+    },
+    {
+      "sample": 17,
+      "kind": 5,
+      "http_status": 200,
+      "wall_ms": 16.014
+    },
+    {
+      "sample": 18,
+      "kind": 0,
+      "http_status": 200,
+      "wall_ms": 5.818
+    },
+    {
+      "sample": 19,
+      "kind": 1,
+      "http_status": 200,
+      "wall_ms": 21.645
+    },
+    {
+      "sample": 20,
+      "kind": 2,
+      "http_status": 200,
+      "wall_ms": 17.657
+    },
+    {
+      "sample": 21,
+      "kind": 3,
+      "http_status": 200,
+      "wall_ms": 4.874
+    },
+    {
+      "sample": 22,
+      "kind": 4,
+      "http_status": 200,
+      "wall_ms": 22.058
+    },
+    {
+      "sample": 23,
+      "kind": 5,
+      "http_status": 200,
+      "wall_ms": 16.356
+    },
+    {
+      "sample": 24,
+      "kind": 0,
+      "http_status": 200,
+      "wall_ms": 5.911
+    },
+    {
+      "sample": 25,
+      "kind": 1,
+      "http_status": 200,
+      "wall_ms": 20.853
+    },
+    {
+      "sample": 26,
+      "kind": 2,
+      "http_status": 200,
+      "wall_ms": 17.318
+    },
+    {
+      "sample": 27,
+      "kind": 3,
+      "http_status": 200,
+      "wall_ms": 4.593
+    },
+    {
+      "sample": 28,
+      "kind": 4,
+      "http_status": 200,
+      "wall_ms": 22.629
+    },
+    {
+      "sample": 29,
+      "kind": 5,
+      "http_status": 200,
+      "wall_ms": 16.108
+    },
+    {
+      "sample": 30,
+      "kind": 0,
+      "http_status": 200,
+      "wall_ms": 5.815
+    },
+    {
+      "sample": 31,
+      "kind": 1,
+      "http_status": 200,
+      "wall_ms": 21.078
+    },
+    {
+      "sample": 32,
+      "kind": 2,
+      "http_status": 200,
+      "wall_ms": 20.566
+    },
+    {
+      "sample": 33,
+      "kind": 3,
+      "http_status": 200,
+      "wall_ms": 4.671
+    },
+    {
+      "sample": 34,
+      "kind": 4,
+      "http_status": 200,
+      "wall_ms": 21.466
+    },
+    {
+      "sample": 35,
+      "kind": 5,
+      "http_status": 200,
+      "wall_ms": 15.838
+    },
+    {
+      "sample": 36,
+      "kind": 0,
+      "http_status": 200,
+      "wall_ms": 5.768
+    },
+    {
+      "sample": 37,
+      "kind": 1,
+      "http_status": 200,
+      "wall_ms": 20.369
+    },
+    {
+      "sample": 38,
+      "kind": 2,
+      "http_status": 200,
+      "wall_ms": 17.125
+    },
+    {
+      "sample": 39,
+      "kind": 3,
+      "http_status": 200,
+      "wall_ms": 4.601
+    },
+    {
+      "sample": 40,
+      "kind": 4,
+      "http_status": 200,
+      "wall_ms": 21.764
+    },
+    {
+      "sample": 41,
+      "kind": 5,
+      "http_status": 200,
+      "wall_ms": 16.077
+    },
+    {
+      "sample": 42,
+      "kind": 0,
+      "http_status": 200,
+      "wall_ms": 6.353
+    },
+    {
+      "sample": 43,
+      "kind": 1,
+      "http_status": 200,
+      "wall_ms": 20.88
+    },
+    {
+      "sample": 44,
+      "kind": 2,
+      "http_status": 200,
+      "wall_ms": 17.105
+    },
+    {
+      "sample": 45,
+      "kind": 3,
+      "http_status": 200,
+      "wall_ms": 4.391
+    },
+    {
+      "sample": 46,
+      "kind": 4,
+      "http_status": 200,
+      "wall_ms": 21.741
+    },
+    {
+      "sample": 47,
+      "kind": 5,
+      "http_status": 200,
+      "wall_ms": 16.095
+    },
+    {
+      "sample": 48,
+      "kind": 0,
+      "http_status": 200,
+      "wall_ms": 5.877
+    },
+    {
+      "sample": 49,
+      "kind": 1,
+      "http_status": 200,
+      "wall_ms": 21.86
+    },
+    {
+      "sample": 50,
+      "kind": 2,
+      "http_status": 200,
+      "wall_ms": 16.86
+    },
+    {
+      "sample": 51,
+      "kind": 3,
+      "http_status": 200,
+      "wall_ms": 4.617
+    },
+    {
+      "sample": 52,
+      "kind": 4,
+      "http_status": 200,
+      "wall_ms": 22.266
+    },
+    {
+      "sample": 53,
+      "kind": 5,
+      "http_status": 200,
+      "wall_ms": 16.352
+    },
+    {
+      "sample": 54,
+      "kind": 0,
+      "http_status": 200,
+      "wall_ms": 5.966
+    },
+    {
+      "sample": 55,
+      "kind": 1,
+      "http_status": 200,
+      "wall_ms": 21.026
+    },
+    {
+      "sample": 56,
+      "kind": 2,
+      "http_status": 200,
+      "wall_ms": 17.019
+    },
+    {
+      "sample": 57,
+      "kind": 3,
+      "http_status": 200,
+      "wall_ms": 4.435
+    },
+    {
+      "sample": 58,
+      "kind": 4,
+      "http_status": 200,
+      "wall_ms": 21.388
+    },
+    {
+      "sample": 59,
+      "kind": 5,
+      "http_status": 200,
+      "wall_ms": 15.723
+    }
+  ]
+}

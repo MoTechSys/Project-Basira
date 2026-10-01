@@ -1,0 +1,1598 @@
+[
+  {
+    "id": "dedup_hamza",
+    "input": "قال تعالى: ﴿قل هو الله أحد﴾. وقال تعالى: ﴿قل هو الله احد﴾.",
+    "http_status": 200,
+    "wall_ms": 8.895,
+    "response": {
+      "request_id": "bb28df21-39cd-4c1f-95c7-4c39e60403ff",
+      "disclaimer_key": "footer",
+      "transparency_key": "transparency_notice",
+      "corpus": {
+        "tanzil": "1.1",
+        "ohd_commit": "1515f6cb",
+        "hadeethenc": "1.7.0"
+      },
+      "extraction_degraded": false,
+      "extraction_provider": "mock",
+      "flags": {
+        "chain_message": false,
+        "refusal": false,
+        "pii_suspected": false
+      },
+      "quotes": [
+        {
+          "id": "q1",
+          "span": {
+            "start": 12,
+            "end": 26
+          },
+          "quoted_text": "قل هو الله أحد",
+          "kind": "quran",
+          "language": "ar",
+          "source_modality": "text",
+          "claimed_source": null,
+          "claimed_source_mismatch": false,
+          "status": "found",
+          "review_reason": null,
+          "score": 1.0,
+          "message_key": "found",
+          "notice_keys": [
+            "repeated_in_text"
+          ],
+          "matches": [
+            {
+              "corpus": "tanzil",
+              "ref": {
+                "surah": 112,
+                "ayah": 1
+              },
+              "ref_label_ar": "سورة الإخلاص، الآية 1",
+              "ref_label_en": "Surah Al-Ikhlas (112:1)",
+              "collection_tier": "quran",
+              "source_text": "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ قُلْ هُوَ ٱللَّهُ أَحَدٌ",
+              "source_text_range": [
+                39,
+                62
+              ],
+              "source_url": "https://quranpedia.net/surah/1/112/1",
+              "links": [
+                {
+                  "name": "quranpedia.net",
+                  "url": "https://quranpedia.net/surah/1/112/1"
+                }
+              ],
+              "diff": [],
+              "diff_kinds": [],
+              "score": 1.0,
+              "grade": null,
+              "continues_to": null
+            }
+          ],
+          "total_positions": 1,
+          "external_search_links": [],
+          "segments": [
+            {
+              "type": "Ayah",
+              "start": 12,
+              "end": 26
+            }
+          ],
+          "repeated_spans": [
+            {
+              "start": 42,
+              "end": 56
+            }
+          ]
+        }
+      ],
+      "validator_rejections": 0,
+      "timings_ms": {
+        "extract": 3,
+        "retrieve": 0,
+        "match": 1,
+        "total": 6
+      },
+      "ocr_text": null,
+      "determinism_hash": "bea8e2fe3948d8f5fec11bc80d36dc942e490ad2fbfdb8302f3d283f2fdbb7b4"
+    }
+  },
+  {
+    "id": "hamza_alone",
+    "input": "قال تعالى: ﴿قل هو الله احد﴾.",
+    "http_status": 200,
+    "wall_ms": 7.273,
+    "response": {
+      "request_id": "6bb32ffc-599b-4d8c-900f-6d5774376ff6",
+      "disclaimer_key": "footer",
+      "transparency_key": "transparency_notice",
+      "corpus": {
+        "tanzil": "1.1",
+        "ohd_commit": "1515f6cb",
+        "hadeethenc": "1.7.0"
+      },
+      "extraction_degraded": false,
+      "extraction_provider": "mock",
+      "flags": {
+        "chain_message": false,
+        "refusal": false,
+        "pii_suspected": false
+      },
+      "quotes": [
+        {
+          "id": "q1",
+          "span": {
+            "start": 12,
+            "end": 26
+          },
+          "quoted_text": "قل هو الله احد",
+          "kind": "quran",
+          "language": "ar",
+          "source_modality": "text",
+          "claimed_source": null,
+          "claimed_source_mismatch": false,
+          "status": "needs_review",
+          "review_reason": "orthographic_difference",
+          "score": 1.0,
+          "message_key": "needs_review_quran",
+          "notice_keys": [],
+          "matches": [
+            {
+              "corpus": "tanzil",
+              "ref": {
+                "surah": 112,
+                "ayah": 1
+              },
+              "ref_label_ar": "سورة الإخلاص، الآية 1",
+              "ref_label_en": "Surah Al-Ikhlas (112:1)",
+              "collection_tier": "quran",
+              "source_text": "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ قُلْ هُوَ ٱللَّهُ أَحَدٌ",
+              "source_text_range": [
+                39,
+                62
+              ],
+              "source_url": "https://quranpedia.net/surah/1/112/1",
+              "links": [
+                {
+                  "name": "quranpedia.net",
+                  "url": "https://quranpedia.net/surah/1/112/1"
+                }
+              ],
+              "diff": [
+                {
+                  "op": "equal",
+                  "quote_range": [
+                    0,
+                    3
+                  ],
+                  "source_range": [
+                    0,
+                    3
+                  ],
+                  "quote_chars": [
+                    0,
+                    10
+                  ],
+                  "source_chars": [
+                    39,
+                    55
+                  ],
+                  "quote_letters": [],
+                  "source_letters": []
+                },
+                {
+                  "op": "replace",
+                  "quote_range": [
+                    3,
+                    4
+                  ],
+                  "source_range": [
+                    3,
+                    4
+                  ],
+                  "quote_chars": [
+                    11,
+                    14
+                  ],
+                  "source_chars": [
+                    57,
+                    62
+                  ],
+                  "quote_letters": [
+                    [
+                      11,
+                      12
+                    ]
+                  ],
+                  "source_letters": [
+                    [
+                      57,
+                      59
+                    ]
+                  ]
+                }
+              ],
+              "diff_kinds": [
+                "word_replaced"
+              ],
+              "score": 1.0,
+              "grade": null,
+              "continues_to": null
+            }
+          ],
+          "total_positions": 1,
+          "external_search_links": [
+            {
+              "name": "ابحث في موسوعة القرآن",
+              "url": "https://quranpedia.net/search?q=%D9%82%D9%84%20%D9%87%D9%88%20%D8%A7%D9%84%D9%84%D9%87%20%D8%A7%D8%AD%D8%AF"
+            }
+          ],
+          "segments": [
+            {
+              "type": "Ayah",
+              "start": 12,
+              "end": 26
+            }
+          ],
+          "repeated_spans": []
+        }
+      ],
+      "validator_rejections": 0,
+      "timings_ms": {
+        "extract": 1,
+        "retrieve": 0,
+        "match": 1,
+        "total": 4
+      },
+      "ocr_text": null,
+      "determinism_hash": "cc94240b789ab64a7a68bc18d7cc81aaf8cd9e80705bb8c5c6bd4d7e0986cedb"
+    }
+  },
+  {
+    "id": "dedup_diacritics",
+    "input": "قال تعالى: ﴿إنما يخشى الله من عباده العلماء﴾. قال تعالى: ﴿إِنَّمَا يَخْشَى اللَّهُ مِنْ عِبَادِهِ الْعُلَمَاءَ﴾.",
+    "http_status": 200,
+    "wall_ms": 8.562,
+    "response": {
+      "request_id": "9f65e98f-79df-4ee0-b01b-ee88be86a42e",
+      "disclaimer_key": "footer",
+      "transparency_key": "transparency_notice",
+      "corpus": {
+        "tanzil": "1.1",
+        "ohd_commit": "1515f6cb",
+        "hadeethenc": "1.7.0"
+      },
+      "extraction_degraded": false,
+      "extraction_provider": "mock",
+      "flags": {
+        "chain_message": false,
+        "refusal": false,
+        "pii_suspected": false
+      },
+      "quotes": [
+        {
+          "id": "q1",
+          "span": {
+            "start": 12,
+            "end": 43
+          },
+          "quoted_text": "إنما يخشى الله من عباده العلماء",
+          "kind": "quran",
+          "language": "ar",
+          "source_modality": "text",
+          "claimed_source": null,
+          "claimed_source_mismatch": false,
+          "status": "found",
+          "review_reason": null,
+          "score": 1.0,
+          "message_key": "found",
+          "notice_keys": [
+            "quran_fragment",
+            "repeated_in_text"
+          ],
+          "matches": [
+            {
+              "corpus": "tanzil",
+              "ref": {
+                "surah": 35,
+                "ayah": 28
+              },
+              "ref_label_ar": "سورة فاطر، الآية 28",
+              "ref_label_en": "Surah Fatir (35:28)",
+              "collection_tier": "quran",
+              "source_text": "وَمِنَ ٱلنَّاسِ وَٱلدَّوَآبِّ وَٱلْأَنْعَٰمِ مُخْتَلِفٌ أَلْوَٰنُهُۥ كَذَٰلِكَ إِنَّمَا يَخْشَى ٱللَّهَ مِنْ عِبَادِهِ ٱلْعُلَمَٰٓؤُا۟ إِنَّ ٱللَّهَ عَزِيزٌ غَفُورٌ",
+              "source_text_range": [
+                80,
+                134
+              ],
+              "source_url": "https://quranpedia.net/surah/1/35/28",
+              "links": [
+                {
+                  "name": "quranpedia.net",
+                  "url": "https://quranpedia.net/surah/1/35/28"
+                }
+              ],
+              "diff": [],
+              "diff_kinds": [],
+              "score": 1.0,
+              "grade": null,
+              "continues_to": null
+            }
+          ],
+          "total_positions": 1,
+          "external_search_links": [],
+          "segments": [
+            {
+              "type": "Ayah",
+              "start": 12,
+              "end": 43
+            }
+          ],
+          "repeated_spans": [
+            {
+              "start": 58,
+              "end": 110
+            }
+          ]
+        }
+      ],
+      "validator_rejections": 0,
+      "timings_ms": {
+        "extract": 4,
+        "retrieve": 0,
+        "match": 0,
+        "total": 6
+      },
+      "ocr_text": null,
+      "determinism_hash": "7ee49d2d1c93371c9cb916d511bf692cf77c3ecf1e866e6561810a5911bd39ac"
+    }
+  },
+  {
+    "id": "repeated_claim",
+    "input": "قال تعالى: ﴿قل هو الله أحد﴾ [الإخلاص: 1]. قال تعالى: ﴿قل هو الله أحد﴾ [الفاتحة: 1].",
+    "http_status": 200,
+    "wall_ms": 8.34,
+    "response": {
+      "request_id": "c9e24dcc-a02b-45fc-ad22-cfd638a00c7e",
+      "disclaimer_key": "footer",
+      "transparency_key": "transparency_notice",
+      "corpus": {
+        "tanzil": "1.1",
+        "ohd_commit": "1515f6cb",
+        "hadeethenc": "1.7.0"
+      },
+      "extraction_degraded": false,
+      "extraction_provider": "mock",
+      "flags": {
+        "chain_message": false,
+        "refusal": false,
+        "pii_suspected": false
+      },
+      "quotes": [
+        {
+          "id": "q1",
+          "span": {
+            "start": 12,
+            "end": 26
+          },
+          "quoted_text": "قل هو الله أحد",
+          "kind": "quran",
+          "language": "ar",
+          "source_modality": "text",
+          "claimed_source": {
+            "raw": "الإخلاص: 1",
+            "parsed": {
+              "surah": 112,
+              "ayah": 1,
+              "ayah_to": null
+            }
+          },
+          "claimed_source_mismatch": false,
+          "status": "found",
+          "review_reason": null,
+          "score": 1.0,
+          "message_key": "found",
+          "notice_keys": [
+            "repeated_in_text"
+          ],
+          "matches": [
+            {
+              "corpus": "tanzil",
+              "ref": {
+                "surah": 112,
+                "ayah": 1
+              },
+              "ref_label_ar": "سورة الإخلاص، الآية 1",
+              "ref_label_en": "Surah Al-Ikhlas (112:1)",
+              "collection_tier": "quran",
+              "source_text": "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ قُلْ هُوَ ٱللَّهُ أَحَدٌ",
+              "source_text_range": [
+                39,
+                62
+              ],
+              "source_url": "https://quranpedia.net/surah/1/112/1",
+              "links": [
+                {
+                  "name": "quranpedia.net",
+                  "url": "https://quranpedia.net/surah/1/112/1"
+                }
+              ],
+              "diff": [],
+              "diff_kinds": [],
+              "score": 1.0,
+              "grade": null,
+              "continues_to": null
+            }
+          ],
+          "total_positions": 1,
+          "external_search_links": [],
+          "segments": [
+            {
+              "type": "Ayah",
+              "start": 12,
+              "end": 26
+            },
+            {
+              "type": "claimed_source",
+              "start": 29,
+              "end": 39
+            }
+          ],
+          "repeated_spans": [
+            {
+              "start": 54,
+              "end": 68
+            }
+          ]
+        }
+      ],
+      "validator_rejections": 0,
+      "timings_ms": {
+        "extract": 2,
+        "retrieve": 0,
+        "match": 2,
+        "total": 5
+      },
+      "ocr_text": null,
+      "determinism_hash": "6b6ae17f09b2980cc55c42432f9cbaef03b3bd4ed7fffa10036dbed2bf1bfeaa"
+    }
+  },
+  {
+    "id": "valid_later_ref",
+    "input": "قال تعالى: ﴿فبأي آلاء ربكما تكذبان﴾ [الرحمن: 77].",
+    "http_status": 200,
+    "wall_ms": 5.23,
+    "response": {
+      "request_id": "811fc464-6c47-4172-931e-04fdc3a1d23a",
+      "disclaimer_key": "footer",
+      "transparency_key": "transparency_notice",
+      "corpus": {
+        "tanzil": "1.1",
+        "ohd_commit": "1515f6cb",
+        "hadeethenc": "1.7.0"
+      },
+      "extraction_degraded": false,
+      "extraction_provider": "mock",
+      "flags": {
+        "chain_message": false,
+        "refusal": false,
+        "pii_suspected": false
+      },
+      "quotes": [
+        {
+          "id": "q1",
+          "span": {
+            "start": 12,
+            "end": 34
+          },
+          "quoted_text": "فبأي آلاء ربكما تكذبان",
+          "kind": "quran",
+          "language": "ar",
+          "source_modality": "text",
+          "claimed_source": {
+            "raw": "الرحمن: 77",
+            "parsed": {
+              "surah": 55,
+              "ayah": 77,
+              "ayah_to": null
+            }
+          },
+          "claimed_source_mismatch": true,
+          "status": "found",
+          "review_reason": null,
+          "score": 1.0,
+          "message_key": "found_multi",
+          "notice_keys": [
+            "claimed_ayah_mismatch",
+            "many_positions"
+          ],
+          "matches": [
+            {
+              "corpus": "tanzil",
+              "ref": {
+                "surah": 55,
+                "ayah": 13
+              },
+              "ref_label_ar": "سورة الرحمن، الآية 13",
+              "ref_label_en": "Surah Ar-Rahman (55:13)",
+              "collection_tier": "quran",
+              "source_text": "فَبِأَىِّ ءَالَآءِ رَبِّكُمَا تُكَذِّبَانِ",
+              "source_text_range": [
+                0,
+                42
+              ],
+              "source_url": "https://quranpedia.net/surah/1/55/13",
+              "links": [
+                {
+                  "name": "quranpedia.net",
+                  "url": "https://quranpedia.net/surah/1/55/13"
+                }
+              ],
+              "diff": [],
+              "diff_kinds": [],
+              "score": 1.0,
+              "grade": null,
+              "continues_to": null
+            },
+            {
+              "corpus": "tanzil",
+              "ref": {
+                "surah": 55,
+                "ayah": 16
+              },
+              "ref_label_ar": "سورة الرحمن، الآية 16",
+              "ref_label_en": "Surah Ar-Rahman (55:16)",
+              "collection_tier": "quran",
+              "source_text": "فَبِأَىِّ ءَالَآءِ رَبِّكُمَا تُكَذِّبَانِ",
+              "source_text_range": [
+                0,
+                42
+              ],
+              "source_url": "https://quranpedia.net/surah/1/55/16",
+              "links": [
+                {
+                  "name": "quranpedia.net",
+                  "url": "https://quranpedia.net/surah/1/55/16"
+                }
+              ],
+              "diff": [],
+              "diff_kinds": [],
+              "score": 1.0,
+              "grade": null,
+              "continues_to": null
+            },
+            {
+              "corpus": "tanzil",
+              "ref": {
+                "surah": 55,
+                "ayah": 18
+              },
+              "ref_label_ar": "سورة الرحمن، الآية 18",
+              "ref_label_en": "Surah Ar-Rahman (55:18)",
+              "collection_tier": "quran",
+              "source_text": "فَبِأَىِّ ءَالَآءِ رَبِّكُمَا تُكَذِّبَانِ",
+              "source_text_range": [
+                0,
+                42
+              ],
+              "source_url": "https://quranpedia.net/surah/1/55/18",
+              "links": [
+                {
+                  "name": "quranpedia.net",
+                  "url": "https://quranpedia.net/surah/1/55/18"
+                }
+              ],
+              "diff": [],
+              "diff_kinds": [],
+              "score": 1.0,
+              "grade": null,
+              "continues_to": null
+            }
+          ],
+          "total_positions": 31,
+          "external_search_links": [],
+          "segments": [
+            {
+              "type": "Ayah",
+              "start": 12,
+              "end": 34
+            },
+            {
+              "type": "claimed_source",
+              "start": 37,
+              "end": 47
+            }
+          ],
+          "repeated_spans": []
+        }
+      ],
+      "validator_rejections": 0,
+      "timings_ms": {
+        "extract": 1,
+        "retrieve": 0,
+        "match": 0,
+        "total": 3
+      },
+      "ocr_text": null,
+      "determinism_hash": "63a8bb6cfc764e3621805fadebf4b57bb17c8273cf5e364f075f6302623b256e"
+    }
+  },
+  {
+    "id": "oversized_range",
+    "input": "قال تعالى: ﴿قل هو الله أحد﴾ [الإخلاص: 1-999].",
+    "http_status": 200,
+    "wall_ms": 12.765,
+    "response": {
+      "request_id": "589a00be-681a-4ce2-aaa3-76d92799fcd4",
+      "disclaimer_key": "footer",
+      "transparency_key": "transparency_notice",
+      "corpus": {
+        "tanzil": "1.1",
+        "ohd_commit": "1515f6cb",
+        "hadeethenc": "1.7.0"
+      },
+      "extraction_degraded": false,
+      "extraction_provider": "mock",
+      "flags": {
+        "chain_message": false,
+        "refusal": false,
+        "pii_suspected": false
+      },
+      "quotes": [
+        {
+          "id": "q1",
+          "span": {
+            "start": 12,
+            "end": 26
+          },
+          "quoted_text": "قل هو الله أحد",
+          "kind": "quran",
+          "language": "ar",
+          "source_modality": "text",
+          "claimed_source": {
+            "raw": "الإخلاص: 1-999",
+            "parsed": {
+              "surah": 112,
+              "ayah": 1,
+              "ayah_to": 999
+            }
+          },
+          "claimed_source_mismatch": false,
+          "status": "found",
+          "review_reason": null,
+          "score": 1.0,
+          "message_key": "found",
+          "notice_keys": [],
+          "matches": [
+            {
+              "corpus": "tanzil",
+              "ref": {
+                "surah": 112,
+                "ayah": 1
+              },
+              "ref_label_ar": "سورة الإخلاص، الآية 1",
+              "ref_label_en": "Surah Al-Ikhlas (112:1)",
+              "collection_tier": "quran",
+              "source_text": "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ قُلْ هُوَ ٱللَّهُ أَحَدٌ",
+              "source_text_range": [
+                39,
+                62
+              ],
+              "source_url": "https://quranpedia.net/surah/1/112/1",
+              "links": [
+                {
+                  "name": "quranpedia.net",
+                  "url": "https://quranpedia.net/surah/1/112/1"
+                }
+              ],
+              "diff": [],
+              "diff_kinds": [],
+              "score": 1.0,
+              "grade": null,
+              "continues_to": null
+            }
+          ],
+          "total_positions": 1,
+          "external_search_links": [],
+          "segments": [
+            {
+              "type": "Ayah",
+              "start": 12,
+              "end": 26
+            },
+            {
+              "type": "claimed_source",
+              "start": 29,
+              "end": 43
+            }
+          ],
+          "repeated_spans": []
+        }
+      ],
+      "validator_rejections": 0,
+      "timings_ms": {
+        "extract": 3,
+        "retrieve": 0,
+        "match": 4,
+        "total": 9
+      },
+      "ocr_text": null,
+      "determinism_hash": "7e4f3eb35fd71e121222f9b53b10e0f37736811993c890d2a4162b2bb149b1b5"
+    }
+  },
+  {
+    "id": "latin_insertion",
+    "input": "قال تعالى: ﴿قل هو HELLO الله أحد﴾.",
+    "http_status": 200,
+    "wall_ms": 12.081,
+    "response": {
+      "request_id": "6396e126-a84c-4412-9624-93f6f10968d5",
+      "disclaimer_key": "footer",
+      "transparency_key": "transparency_notice",
+      "corpus": {
+        "tanzil": "1.1",
+        "ohd_commit": "1515f6cb",
+        "hadeethenc": "1.7.0"
+      },
+      "extraction_degraded": false,
+      "extraction_provider": "mock",
+      "flags": {
+        "chain_message": false,
+        "refusal": false,
+        "pii_suspected": false
+      },
+      "quotes": [
+        {
+          "id": "q1",
+          "span": {
+            "start": 12,
+            "end": 32
+          },
+          "quoted_text": "قل هو HELLO الله أحد",
+          "kind": "quran",
+          "language": "ar",
+          "source_modality": "text",
+          "claimed_source": null,
+          "claimed_source_mismatch": false,
+          "status": "found",
+          "review_reason": null,
+          "score": 1.0,
+          "message_key": "found",
+          "notice_keys": [],
+          "matches": [
+            {
+              "corpus": "tanzil",
+              "ref": {
+                "surah": 112,
+                "ayah": 1
+              },
+              "ref_label_ar": "سورة الإخلاص، الآية 1",
+              "ref_label_en": "Surah Al-Ikhlas (112:1)",
+              "collection_tier": "quran",
+              "source_text": "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ قُلْ هُوَ ٱللَّهُ أَحَدٌ",
+              "source_text_range": [
+                39,
+                62
+              ],
+              "source_url": "https://quranpedia.net/surah/1/112/1",
+              "links": [
+                {
+                  "name": "quranpedia.net",
+                  "url": "https://quranpedia.net/surah/1/112/1"
+                }
+              ],
+              "diff": [],
+              "diff_kinds": [],
+              "score": 1.0,
+              "grade": null,
+              "continues_to": null
+            }
+          ],
+          "total_positions": 1,
+          "external_search_links": [],
+          "segments": [
+            {
+              "type": "Ayah",
+              "start": 12,
+              "end": 32
+            }
+          ],
+          "repeated_spans": []
+        }
+      ],
+      "validator_rejections": 0,
+      "timings_ms": {
+        "extract": 3,
+        "retrieve": 0,
+        "match": 3,
+        "total": 9
+      },
+      "ocr_text": null,
+      "determinism_hash": "0151f7e8f28e755c2db7de3635f0497b82a3b2c18fe3737a908f86452bac429a"
+    }
+  },
+  {
+    "id": "numeric_insertion",
+    "input": "قال تعالى: ﴿قل هو 123 الله أحد﴾.",
+    "http_status": 200,
+    "wall_ms": 15.307,
+    "response": {
+      "request_id": "6603340d-aef7-4a75-b978-d60895154e0f",
+      "disclaimer_key": "footer",
+      "transparency_key": "transparency_notice",
+      "corpus": {
+        "tanzil": "1.1",
+        "ohd_commit": "1515f6cb",
+        "hadeethenc": "1.7.0"
+      },
+      "extraction_degraded": false,
+      "extraction_provider": "mock",
+      "flags": {
+        "chain_message": false,
+        "refusal": false,
+        "pii_suspected": false
+      },
+      "quotes": [
+        {
+          "id": "q1",
+          "span": {
+            "start": 12,
+            "end": 30
+          },
+          "quoted_text": "قل هو 123 الله أحد",
+          "kind": "quran",
+          "language": "ar",
+          "source_modality": "text",
+          "claimed_source": null,
+          "claimed_source_mismatch": false,
+          "status": "found",
+          "review_reason": null,
+          "score": 1.0,
+          "message_key": "found",
+          "notice_keys": [],
+          "matches": [
+            {
+              "corpus": "tanzil",
+              "ref": {
+                "surah": 112,
+                "ayah": 1
+              },
+              "ref_label_ar": "سورة الإخلاص، الآية 1",
+              "ref_label_en": "Surah Al-Ikhlas (112:1)",
+              "collection_tier": "quran",
+              "source_text": "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ قُلْ هُوَ ٱللَّهُ أَحَدٌ",
+              "source_text_range": [
+                39,
+                62
+              ],
+              "source_url": "https://quranpedia.net/surah/1/112/1",
+              "links": [
+                {
+                  "name": "quranpedia.net",
+                  "url": "https://quranpedia.net/surah/1/112/1"
+                }
+              ],
+              "diff": [],
+              "diff_kinds": [],
+              "score": 1.0,
+              "grade": null,
+              "continues_to": null
+            }
+          ],
+          "total_positions": 1,
+          "external_search_links": [],
+          "segments": [
+            {
+              "type": "Ayah",
+              "start": 12,
+              "end": 30
+            }
+          ],
+          "repeated_spans": []
+        }
+      ],
+      "validator_rejections": 0,
+      "timings_ms": {
+        "extract": 3,
+        "retrieve": 0,
+        "match": 4,
+        "total": 12
+      },
+      "ocr_text": null,
+      "determinism_hash": "3c36755df119f95075fd66c1cbc94497c25b0e1d0ce23fb7b38cf7b8e67818bb"
+    }
+  },
+  {
+    "id": "short_marked",
+    "input": "قال رسول الله ﷺ: «إنما الأعمال بالأموال».",
+    "http_status": 200,
+    "wall_ms": 36.367,
+    "response": {
+      "request_id": "6abc6c4c-b300-4622-a9b1-e11561a65b1a",
+      "disclaimer_key": "footer",
+      "transparency_key": "transparency_notice",
+      "corpus": {
+        "tanzil": "1.1",
+        "ohd_commit": "1515f6cb",
+        "hadeethenc": "1.7.0"
+      },
+      "extraction_degraded": false,
+      "extraction_provider": "mock",
+      "flags": {
+        "chain_message": false,
+        "refusal": false,
+        "pii_suspected": false
+      },
+      "quotes": [
+        {
+          "id": "q1",
+          "span": {
+            "start": 18,
+            "end": 39
+          },
+          "quoted_text": "إنما الأعمال بالأموال",
+          "kind": "hadith_matn",
+          "language": "ar",
+          "source_modality": "text",
+          "claimed_source": null,
+          "claimed_source_mismatch": false,
+          "status": "not_found",
+          "review_reason": null,
+          "score": 0.6667,
+          "message_key": "not_found",
+          "notice_keys": [],
+          "matches": [],
+          "total_positions": 0,
+          "external_search_links": [
+            {
+              "name": "ابحث في الدرر السنية",
+              "url": "https://dorar.net/hadith/search?q=%D8%A5%D9%86%D9%85%D8%A7%20%D8%A7%D9%84%D8%A3%D8%B9%D9%85%D8%A7%D9%84%20%D8%A8%D8%A7%D9%84%D8%A3%D9%85%D9%88%D8%A7%D9%84"
+            },
+            {
+              "name": "ابحث في المكتبة الشاملة",
+              "url": "https://shamela.ws/search?q=%D8%A5%D9%86%D9%85%D8%A7%20%D8%A7%D9%84%D8%A3%D8%B9%D9%85%D8%A7%D9%84%20%D8%A8%D8%A7%D9%84%D8%A3%D9%85%D9%88%D8%A7%D9%84"
+            }
+          ],
+          "segments": [
+            {
+              "type": "matn",
+              "start": 18,
+              "end": 39
+            }
+          ],
+          "repeated_spans": []
+        }
+      ],
+      "validator_rejections": 0,
+      "timings_ms": {
+        "extract": 5,
+        "retrieve": 25,
+        "match": 0,
+        "total": 33
+      },
+      "ocr_text": null,
+      "determinism_hash": "5a486a9e8438e9c03c8957437a29bbfe28c270efd3165425d3f21e3951abc358"
+    }
+  },
+  {
+    "id": "quran_claim_hadith_fuzzy",
+    "input": "قال تعالى: ﴿إنما الأعمال بالأموال﴾.",
+    "http_status": 200,
+    "wall_ms": 29.872,
+    "response": {
+      "request_id": "31e4eb53-deb4-472a-bb44-a64f5f95ef6a",
+      "disclaimer_key": "footer",
+      "transparency_key": "transparency_notice",
+      "corpus": {
+        "tanzil": "1.1",
+        "ohd_commit": "1515f6cb",
+        "hadeethenc": "1.7.0"
+      },
+      "extraction_degraded": false,
+      "extraction_provider": "mock",
+      "flags": {
+        "chain_message": false,
+        "refusal": false,
+        "pii_suspected": false
+      },
+      "quotes": [
+        {
+          "id": "q1",
+          "span": {
+            "start": 12,
+            "end": 33
+          },
+          "quoted_text": "إنما الأعمال بالأموال",
+          "kind": "quran",
+          "language": "ar",
+          "source_modality": "text",
+          "claimed_source": null,
+          "claimed_source_mismatch": false,
+          "status": "not_found",
+          "review_reason": null,
+          "score": 0.6667,
+          "message_key": "not_found_quran",
+          "notice_keys": [],
+          "matches": [],
+          "total_positions": 0,
+          "external_search_links": [
+            {
+              "name": "ابحث في موسوعة القرآن",
+              "url": "https://quranpedia.net/search?q=%D8%A5%D9%86%D9%85%D8%A7%20%D8%A7%D9%84%D8%A3%D8%B9%D9%85%D8%A7%D9%84%20%D8%A8%D8%A7%D9%84%D8%A3%D9%85%D9%88%D8%A7%D9%84"
+            }
+          ],
+          "segments": [
+            {
+              "type": "Ayah",
+              "start": 12,
+              "end": 33
+            }
+          ],
+          "repeated_spans": []
+        }
+      ],
+      "validator_rejections": 0,
+      "timings_ms": {
+        "extract": 2,
+        "retrieve": 22,
+        "match": 0,
+        "total": 27
+      },
+      "ocr_text": null,
+      "determinism_hash": "e23cbbecb475e7b3d1d3203f6c1ac766563db546500417f34a1721091a89f8cb"
+    }
+  },
+  {
+    "id": "hadith_diacritics",
+    "input": "قال رسول الله ﷺ: «إِنَّمَا الأَعْمَالُ بِالنِّيَّاتَ».",
+    "http_status": 200,
+    "wall_ms": 9.288,
+    "response": {
+      "request_id": "e178b461-3383-4766-8d32-cda993bdbdd5",
+      "disclaimer_key": "footer",
+      "transparency_key": "transparency_notice",
+      "corpus": {
+        "tanzil": "1.1",
+        "ohd_commit": "1515f6cb",
+        "hadeethenc": "1.7.0"
+      },
+      "extraction_degraded": false,
+      "extraction_provider": "mock",
+      "flags": {
+        "chain_message": false,
+        "refusal": false,
+        "pii_suspected": false
+      },
+      "quotes": [
+        {
+          "id": "q1",
+          "span": {
+            "start": 18,
+            "end": 52
+          },
+          "quoted_text": "إِنَّمَا الأَعْمَالُ بِالنِّيَّاتَ",
+          "kind": "hadith_matn",
+          "language": "ar",
+          "source_modality": "text",
+          "claimed_source": null,
+          "claimed_source_mismatch": false,
+          "status": "found",
+          "review_reason": null,
+          "score": 1.0,
+          "message_key": "found_multi",
+          "notice_keys": [
+            "many_positions",
+            "ohd_numbering",
+            "ohd_display_note",
+            "other_nine_referral",
+            "no_grade"
+          ],
+          "matches": [
+            {
+              "corpus": "ohd",
+              "ref": {
+                "book": "sahih_al-bukhari",
+                "num": 1,
+                "numbering": "ohd"
+              },
+              "ref_label_ar": "صحيح البخاري، رقم 1 (ترقيم مجموعة Open-Hadith-Data)",
+              "ref_label_en": "Sahih al-Bukhari, no. 1 (Open-Hadith-Data numbering)",
+              "collection_tier": "sahihain",
+              "source_text": " حَدَّثَنَا  الْحُمَيْدِيُّ عَبْدُ اللَّهِ بْنُ الزُّبَيْرِ  قَالَ حَدَّثَنَا  سُفْيَانُ  قَالَ حَدَّثَنَا  يَحْيَى بْنُ سَعِيدٍ الْأَنْصَارِيُّ  قَالَ أَخْبَرَنِي  مُحَمَّدُ بْنُ إِبْرَاهِيمَ التَّيْمِيُّ  أَنَّهُ سَمِعَ  عَلْقَمَةَ بْنَ وَقَّاصٍ اللَّيْثِيَّ  يَقُولُ سَمِعْتُ  عُمَرَ بْنَ الْخَطَّابِ  رَضِيَ اللَّهُ عَنْهُ  عَلَى الْمِنْبَرِ  قَالَ سَمِعْتُ رَسُولَ اللَّهِ  صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ  يَقُولُ  إِنَّمَا الْأَعْمَالُ  بِالنِّيَّاتِ  وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى فَمَنْ كَانَتْ هِجْرَتُهُ إِلَى دُنْيَا  يُصِيبُهَا  أَوْ إِلَى امْرَأَةٍ يَنْكِحُهَا فَهِجْرَتُهُ إِلَى مَا هَاجَرَ إِلَيْهِ ",
+              "source_text_range": [
+                423,
+                458
+              ],
+              "source_url": "https://github.com/mhashim6/Open-Hadith-Data/blob/1515f6cb/Sahih_Al-Bukhari/sahih_al-bukhari_ahadith_mushakkala_mufassala.utf8.csv",
+              "links": [
+                {
+                  "name": "Open-Hadith-Data",
+                  "url": "https://github.com/mhashim6/Open-Hadith-Data/blob/1515f6cb/Sahih_Al-Bukhari/sahih_al-bukhari_ahadith_mushakkala_mufassala.utf8.csv"
+                }
+              ],
+              "diff": [],
+              "diff_kinds": [],
+              "score": 1.0,
+              "grade": null,
+              "continues_to": null
+            },
+            {
+              "corpus": "ohd",
+              "ref": {
+                "book": "sunan_abu-dawud",
+                "num": 1882,
+                "numbering": "ohd"
+              },
+              "ref_label_ar": "سنن أبي داود، رقم 1882 (ترقيم مجموعة Open-Hadith-Data)",
+              "ref_label_en": "Sunan Abu Dawud, no. 1882 (Open-Hadith-Data numbering)",
+              "collection_tier": "other_nine",
+              "source_text": " حَدَّثَنَا  مُحَمَّدُ بْنُ كَثِيرٍ  أَخْبَرَنَا  سُفْيَانُ  حَدَّثَنِي  يَحْيَى بْنُ سَعِيدٍ  عَنْ  مُحَمَّدِ بْنِ إِبْرَاهِيمَ التَّيْمِيِّ  عَنْ  عَلْقَمَةَ بْنِ وَقَّاصٍ اللَّيْثِيِّ  قَالَ سَمِعْتُ  عُمَرَ بْنَ الْخَطَّابِ  يَقُولُ  قَالَ رَسُولُ اللَّهِ  صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ  إِنَّمَا الْأَعْمَالُ  بِالنِّيَّاتِ  وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى فَمَنْ كَانَتْ هِجْرَتُهُ إِلَى اللَّهِ وَرَسُولِهِ فَهِجْرَتُهُ إِلَى اللَّهِ وَرَسُولِهِ وَمَنْ كَانَتْ هِجْرَتُهُ لِدُنْيَا يُصِيبُهَا أَوْ امْرَأَةٍ يَتَزَوَّجُهَا فَهِجْرَتُهُ إِلَى مَا هَاجَرَ إِلَيْهِ ",
+              "source_text_range": [
+                296,
+                331
+              ],
+              "source_url": "https://github.com/mhashim6/Open-Hadith-Data/blob/1515f6cb/Sunan_Abu-Dawud/sunan_abu-dawud_ahadith_mushakkala_mufassala.utf8.csv",
+              "links": [
+                {
+                  "name": "Open-Hadith-Data",
+                  "url": "https://github.com/mhashim6/Open-Hadith-Data/blob/1515f6cb/Sunan_Abu-Dawud/sunan_abu-dawud_ahadith_mushakkala_mufassala.utf8.csv"
+                }
+              ],
+              "diff": [],
+              "diff_kinds": [],
+              "score": 1.0,
+              "grade": null,
+              "continues_to": null
+            },
+            {
+              "corpus": "ohd",
+              "ref": {
+                "book": "sunan_ibn-maja",
+                "num": 4217,
+                "numbering": "ohd"
+              },
+              "ref_label_ar": "سنن ابن ماجه، رقم 4217 (ترقيم مجموعة Open-Hadith-Data)",
+              "ref_label_en": "Sunan Ibn Majah, no. 4217 (Open-Hadith-Data numbering)",
+              "collection_tier": "other_nine",
+              "source_text": " حَدَّثَنَا  أَبُو بَكْرِ بْنُ أَبِي شَيْبَةَ  حَدَّثَنَا  يَزِيدُ بْنُ هَارُونَ  ح  و حَدَّثَنَا  مُحَمَّدُ بْنُ رُمْحٍ  أَنْبَأَنَا  اللَّيْثُ بْنُ سَعْدٍ  قَالَا أَنْبَأَنَا  يَحْيَى بْنُ سَعِيدٍ  أَنَّ  مُحَمَّدَ بْنَ إِبْرَاهِيمَ التَّيْمِيَّ  أَخْبَرَهُ أَنَّهُ سَمِعَ  عَلْقَمَةَ بْنَ وَقَّاصٍ  أَنَّهُ سَمِعَ  عُمَرَ بْنَ الْخَطَّابِ  وَهُوَ يَخْطُبُ النَّاسَ  فَقَالَ  سَمِعْتُ رَسُولَ اللَّهِ  صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ  يَقُولُ  إِنَّمَا الْأَعْمَالُ  بِالنِّيَّاتِ  وَلِكُلِّ امْرِئٍ مَا نَوَى فَمَنْ كَانَتْ هِجْرَتُهُ إِلَى اللَّهِ وَإِلَى رَسُولِهِ فَهِجْرَتُهُ إِلَى اللَّهِ وَإِلَى رَسُولِهِ وَمَنْ كَانَتْ هِجْرَتُهُ لِدُنْيَا يُصِيبُهَا أَوْ امْرَأَةٍ يَتَزَوَّجُهَا فَهِجْرَتُهُ إِلَى مَا هَاجَرَ إِلَيْهِ ",
+              "source_text_range": [
+                448,
+                483
+              ],
+              "source_url": "https://github.com/mhashim6/Open-Hadith-Data/blob/1515f6cb/Sunan_Ibn-Maja/sunan_ibn-maja_ahadith_mushakkala_mufassala.utf8.csv",
+              "links": [
+                {
+                  "name": "Open-Hadith-Data",
+                  "url": "https://github.com/mhashim6/Open-Hadith-Data/blob/1515f6cb/Sunan_Ibn-Maja/sunan_ibn-maja_ahadith_mushakkala_mufassala.utf8.csv"
+                }
+              ],
+              "diff": [],
+              "diff_kinds": [],
+              "score": 1.0,
+              "grade": null,
+              "continues_to": null
+            }
+          ],
+          "total_positions": 7,
+          "external_search_links": [],
+          "segments": [
+            {
+              "type": "matn",
+              "start": 18,
+              "end": 52
+            }
+          ],
+          "repeated_spans": []
+        }
+      ],
+      "validator_rejections": 0,
+      "timings_ms": {
+        "extract": 3,
+        "retrieve": 0,
+        "match": 0,
+        "total": 6
+      },
+      "ocr_text": null,
+      "determinism_hash": "4530c0c1365db7d779c59db0b430a1832adc457b21bf6fed4f02572de7f26457"
+    }
+  },
+  {
+    "id": "refusal",
+    "input": "أفتوني هل يجوز بيع الذهب بالتقسيط؟",
+    "http_status": 200,
+    "wall_ms": 3.375,
+    "response": {
+      "request_id": "62d883a1-605a-4ad0-96c1-b13477dd9d61",
+      "disclaimer_key": "footer",
+      "transparency_key": "transparency_notice",
+      "corpus": {
+        "tanzil": "1.1",
+        "ohd_commit": "1515f6cb",
+        "hadeethenc": "1.7.0"
+      },
+      "extraction_degraded": false,
+      "extraction_provider": "mock",
+      "flags": {
+        "chain_message": false,
+        "refusal": true,
+        "pii_suspected": false
+      },
+      "quotes": [],
+      "validator_rejections": 0,
+      "timings_ms": {
+        "extract": 0,
+        "retrieve": 0,
+        "match": 0,
+        "total": 1
+      },
+      "ocr_text": null,
+      "determinism_hash": "792beea1a3d51a253174aff4e53216922e4ea2f58a7619fecf79d2d8348a7123"
+    }
+  },
+  {
+    "id": "multi_range_bad_end",
+    "input": "﴿قل هو الله أحد الله الصمد﴾ [الإخلاص: 1].",
+    "http_status": 200,
+    "wall_ms": 5.848,
+    "response": {
+      "request_id": "a3459fca-dfc8-445f-8b2e-7d53a76ec543",
+      "disclaimer_key": "footer",
+      "transparency_key": "transparency_notice",
+      "corpus": {
+        "tanzil": "1.1",
+        "ohd_commit": "1515f6cb",
+        "hadeethenc": "1.7.0"
+      },
+      "extraction_degraded": false,
+      "extraction_provider": "mock",
+      "flags": {
+        "chain_message": false,
+        "refusal": false,
+        "pii_suspected": false
+      },
+      "quotes": [
+        {
+          "id": "q1",
+          "span": {
+            "start": 1,
+            "end": 26
+          },
+          "quoted_text": "قل هو الله أحد الله الصمد",
+          "kind": "quran",
+          "language": "ar",
+          "source_modality": "text",
+          "claimed_source": {
+            "raw": "الإخلاص: 1",
+            "parsed": {
+              "surah": 112,
+              "ayah": 1,
+              "ayah_to": null
+            }
+          },
+          "claimed_source_mismatch": false,
+          "status": "found",
+          "review_reason": null,
+          "score": 1.0,
+          "message_key": "found",
+          "notice_keys": [],
+          "matches": [
+            {
+              "corpus": "tanzil",
+              "ref": {
+                "surah": 112,
+                "ayah": 1
+              },
+              "ref_label_ar": "سورة الإخلاص، الآيات 1–2",
+              "ref_label_en": "Surah Al-Ikhlas (112:1–2)",
+              "collection_tier": "quran",
+              "source_text": "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ قُلْ هُوَ ٱللَّهُ أَحَدٌ",
+              "source_text_range": [
+                39,
+                62
+              ],
+              "source_url": "https://quranpedia.net/surah/1/112/1",
+              "links": [
+                {
+                  "name": "quranpedia.net",
+                  "url": "https://quranpedia.net/surah/1/112/1"
+                }
+              ],
+              "diff": [],
+              "diff_kinds": [],
+              "score": 1.0,
+              "grade": null,
+              "continues_to": {
+                "surah": 112,
+                "ayah": 2
+              }
+            }
+          ],
+          "total_positions": 1,
+          "external_search_links": [],
+          "segments": [
+            {
+              "type": "Ayah",
+              "start": 1,
+              "end": 26
+            },
+            {
+              "type": "claimed_source",
+              "start": 29,
+              "end": 39
+            }
+          ],
+          "repeated_spans": []
+        }
+      ],
+      "validator_rejections": 0,
+      "timings_ms": {
+        "extract": 1,
+        "retrieve": 0,
+        "match": 0,
+        "total": 3
+      },
+      "ocr_text": null,
+      "determinism_hash": "649afe73c9921acec82b5a5c3f4ad288e19577e9e27c343f691fbe038852adc2"
+    }
+  },
+  {
+    "id": "overflow_31",
+    "input": "قال تعالى: ﴿إن مع العسر فرجا0﴾. قال تعالى: ﴿إن مع العسر فرجا1﴾. قال تعالى: ﴿إن مع العسر فرجا2﴾. قال تعالى: ﴿إن مع العسر فرجا3﴾. قال تعالى: ﴿إن مع العسر فرجا4﴾. قال تعالى: ﴿إن مع العسر فرجا5﴾. قال تعالى: ﴿إن مع العسر فرجا6﴾. قال تعالى: ﴿إن مع العسر فرجا7﴾. قال تعالى: ﴿إن مع العسر فرجا8﴾. قال تعالى: ﴿إن مع العسر فرجا9﴾. قال تعالى: ﴿إن مع العسر فرجا10﴾. قال تعالى: ﴿إن مع العسر فرجا11﴾. قال تعالى: ﴿إن مع العسر فرجا12﴾. قال تعالى: ﴿إن مع العسر فرجا13﴾. قال تعالى: ﴿إن مع العسر فرجا14﴾. قال تعالى: ﴿إن مع العسر فرجا15﴾. قال تعالى: ﴿إن مع العسر فرجا16﴾. قال تعالى: ﴿إن مع العسر فرجا17﴾. قال تعالى: ﴿إن مع العسر فرجا18﴾. قال تعالى: ﴿إن مع العسر فرجا19﴾. قال تعالى: ﴿إن مع العسر فرجا20﴾. قال تعالى: ﴿إن مع العسر فرجا21﴾. قال تعالى: ﴿إن مع العسر فرجا22﴾. قال تعالى: ﴿إن مع العسر فرجا23﴾. قال تعالى: ﴿إن مع العسر فرجا24﴾. قال تعالى: ﴿إن مع العسر فرجا25﴾. قال تعالى: ﴿إن مع العسر فرجا26﴾. قال تعالى: ﴿إن مع العسر فرجا27﴾. قال تعالى: ﴿إن مع العسر فرجا28﴾. قال تعالى: ﴿إن مع العسر فرجا29﴾. قال تعالى: ﴿إن مع العسر فرجا30﴾.",
+    "http_status": 200,
+    "wall_ms": 139.709,
+    "response": {
+      "request_id": "3d91e0bd-df4b-4efd-a873-5268d4311141",
+      "disclaimer_key": "footer",
+      "transparency_key": "transparency_notice",
+      "corpus": {
+        "tanzil": "1.1",
+        "ohd_commit": "1515f6cb",
+        "hadeethenc": "1.7.0"
+      },
+      "extraction_degraded": false,
+      "extraction_provider": "mock",
+      "flags": {
+        "chain_message": false,
+        "refusal": false,
+        "pii_suspected": false
+      },
+      "quotes": [
+        {
+          "id": "q1",
+          "span": {
+            "start": 12,
+            "end": 29
+          },
+          "quoted_text": "إن مع العسر فرجا0",
+          "kind": "quran",
+          "language": "ar",
+          "source_modality": "text",
+          "claimed_source": null,
+          "claimed_source_mismatch": false,
+          "status": "needs_review",
+          "review_reason": "near_miss",
+          "score": 0.75,
+          "message_key": "needs_review_quran",
+          "notice_keys": [
+            "repeated_in_text"
+          ],
+          "matches": [
+            {
+              "corpus": "tanzil",
+              "ref": {
+                "surah": 94,
+                "ayah": 6
+              },
+              "ref_label_ar": "سورة الشرح، الآية 6",
+              "ref_label_en": "Surah Ash-Sharh (94:6)",
+              "collection_tier": "quran",
+              "source_text": "إِنَّ مَعَ ٱلْعُسْرِ يُسْرًا",
+              "source_text_range": [
+                0,
+                19
+              ],
+              "source_url": "https://quranpedia.net/surah/1/94/6",
+              "links": [
+                {
+                  "name": "quranpedia.net",
+                  "url": "https://quranpedia.net/surah/1/94/6"
+                }
+              ],
+              "diff": [
+                {
+                  "op": "equal",
+                  "quote_range": [
+                    0,
+                    3
+                  ],
+                  "source_range": [
+                    0,
+                    3
+                  ],
+                  "quote_chars": [
+                    0,
+                    11
+                  ],
+                  "source_chars": [
+                    0,
+                    19
+                  ],
+                  "quote_letters": [],
+                  "source_letters": []
+                },
+                {
+                  "op": "delete",
+                  "quote_range": [
+                    3,
+                    4
+                  ],
+                  "source_range": [
+                    3,
+                    3
+                  ],
+                  "quote_chars": [
+                    12,
+                    16
+                  ],
+                  "source_chars": [
+                    19,
+                    19
+                  ],
+                  "quote_letters": [],
+                  "source_letters": []
+                }
+              ],
+              "diff_kinds": [
+                "word_added_in_quote"
+              ],
+              "score": 0.75,
+              "grade": null,
+              "continues_to": null
+            }
+          ],
+          "total_positions": 1,
+          "external_search_links": [
+            {
+              "name": "ابحث في موسوعة القرآن",
+              "url": "https://quranpedia.net/search?q=%D8%A5%D9%86%20%D9%85%D8%B9%20%D8%A7%D9%84%D8%B9%D8%B3%D8%B1%20%D9%81%D8%B1%D8%AC%D8%A70"
+            }
+          ],
+          "segments": [
+            {
+              "type": "Ayah",
+              "start": 12,
+              "end": 29
+            }
+          ],
+          "repeated_spans": [
+            {
+              "start": 44,
+              "end": 61
+            },
+            {
+              "start": 76,
+              "end": 93
+            },
+            {
+              "start": 108,
+              "end": 125
+            },
+            {
+              "start": 140,
+              "end": 157
+            },
+            {
+              "start": 172,
+              "end": 189
+            },
+            {
+              "start": 204,
+              "end": 221
+            },
+            {
+              "start": 236,
+              "end": 253
+            },
+            {
+              "start": 268,
+              "end": 285
+            },
+            {
+              "start": 300,
+              "end": 317
+            },
+            {
+              "start": 332,
+              "end": 350
+            },
+            {
+              "start": 365,
+              "end": 383
+            },
+            {
+              "start": 398,
+              "end": 416
+            },
+            {
+              "start": 431,
+              "end": 449
+            },
+            {
+              "start": 464,
+              "end": 482
+            },
+            {
+              "start": 497,
+              "end": 515
+            },
+            {
+              "start": 530,
+              "end": 548
+            },
+            {
+              "start": 563,
+              "end": 581
+            },
+            {
+              "start": 596,
+              "end": 614
+            },
+            {
+              "start": 629,
+              "end": 647
+            },
+            {
+              "start": 662,
+              "end": 680
+            },
+            {
+              "start": 695,
+              "end": 713
+            },
+            {
+              "start": 728,
+              "end": 746
+            },
+            {
+              "start": 761,
+              "end": 779
+            },
+            {
+              "start": 794,
+              "end": 812
+            },
+            {
+              "start": 827,
+              "end": 845
+            },
+            {
+              "start": 860,
+              "end": 878
+            },
+            {
+              "start": 893,
+              "end": 911
+            },
+            {
+              "start": 926,
+              "end": 944
+            },
+            {
+              "start": 959,
+              "end": 977
+            }
+          ]
+        }
+      ],
+      "validator_rejections": 0,
+      "timings_ms": {
+        "extract": 93,
+        "retrieve": 35,
+        "match": 0,
+        "total": 137
+      },
+      "ocr_text": null,
+      "determinism_hash": "13b5f89e2c1baf900c9e0016435ac99b139c51f17a4ee9eaa5de85a3729003c9"
+    }
+  }
+]

@@ -1,0 +1,65 @@
+# --- Secrets & environment ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.dev.vars
+
+# --- Dependencies ---
+node_modules/
+.pnpm-store/
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# --- Build output ---
+dist/
+build/
+.wrangler/
+.output/
+coverage/
+*.tsbuildinfo
+
+# --- Logs & runtime ---
+logs/
+*.log
+npm-debug.log*
+pm2.log
+.pm2/
+supervisord.log
+supervisord.pid
+*.sock
+
+# --- Editors / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Test artifacts ---
+playwright-report/
+test-results/
+.pytest_cache/
+
+# --- Intake package (confidential organizer docs, chat logs) — NEVER commit ---
+.intake/
+
+# --- Corpus data & built indexes (downloaded at build time; only manifest.json is committed) ---
+corpus/data/
+corpus/index/
+*.MISMATCH
+.hypothesis/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+.scratch/
+corpus/fixture/
+eval/results/
+frontend/node_modules/
+frontend/dist/
+frontend/test-results/
+frontend/playwright-report/
+frontend/e2e/*.png
+docs/manual-test/images/05_too_big.png

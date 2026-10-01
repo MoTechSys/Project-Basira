@@ -1,0 +1,13 @@
+{
+  "source_commit": "d285bf10e8a23b653b2f739ac7984bfc910afbd3",
+  "source_tracked_tree_clean": true,
+  "audit_repo_private": true,
+  "case_count": 30,
+  "pass_count": 15,
+  "fail_count": 15,
+  "provider_mode": "mock",
+  "source_implementation_modified": false,
+  "runtime_service_stopped": true,
+  "credential_pattern_scan_hits": 0,
+  "note": "Pattern scan is not a comprehensive secret audit; no organizer source PDFs or full corpora included."
+}

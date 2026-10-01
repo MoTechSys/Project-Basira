@@ -1,0 +1,56 @@
+/* Basira — verification report via the browser's own print engine (UX spec §5-A).
+   Loaded with <link rel="stylesheet" media="print"> → zero cost on screen, zero kB of PDF libraries,
+   full Arabic shaping (every in-browser PDF library breaks ligatures or rasterises the page).
+   Corpus text stays byte-identical: we only hide chrome and force colours. */
+@media print {
+
+@page {
+  size: A4;
+  margin: 18mm 16mm 22mm;
+}
+
+html { color-scheme: light; }
+body { background: #fff !important; color: #12183f !important; font-size: 11pt; }
+* { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+
+/* hide interactive chrome */
+.header-actions, .input-row .actions, .skip-link, .btn, .file-btn, .progress, .links a[target="_blank"]::after,
+.annotated-bar, .footer .sources, .stage-note button { display: none !important; }
+textarea.input { display: none !important; }
+
+/* report header: brand + meta (rendered by the app inside .print-header, hidden on screen) */
+.print-header { display: block !important; border-block-end: 2px solid #6150ea; padding-block-end: 6mm; margin-block-end: 6mm; }
+.print-header h1 { font-size: 18pt; margin: 0; }
+.print-header dl { display: grid; grid-template-columns: max-content 1fr; gap: 2pt 10pt; font-size: 9.5pt; color: #3b4270; margin: 4mm 0 0; }
+.print-header dt { font-weight: 600; }
+.print-header dd { margin: 0; font-family: ui-monospace, Menlo, Consolas, monospace; }
+
+/* annotated text: colours AND an underline so a monochrome printer still shows status */
+.annotated { border: 1px solid #d9dcf2; break-inside: avoid; }
+.annotated .hl { box-shadow: inset 0 -2px 0 currentColor; }
+.annotated .hl[data-status="found"]         { text-decoration: underline solid #0f7b5f 2px; }
+.annotated .hl[data-status="partial_match"] { text-decoration: underline dashed #8a5a00 2px; }
+.annotated .hl[data-status="needs_review"]  { text-decoration: underline dotted #6150ea 2px; }
+.annotated .hl[data-status="not_found"]     { text-decoration: underline wavy #5c6080 1.5px; }
+
+/* cards: open every <details>, no page break inside a card */
+.quote-card { break-inside: avoid; border: 1px solid #d9dcf2; margin-block: 4mm; }
+.quote-card details > summary { display: none; }
+.quote-card details > * { display: block; }
+.ayah-clamp { max-block-size: none !important; mask-image: none !important; -webkit-mask-image: none !important; }
+.diff-text { font-size: 12.5pt; }
+
+/* fixed disclaimer on every page (the app renders .print-footer once; position:fixed repeats it) */
+.print-footer {
+  display: block !important; position: fixed; inset-block-end: 0; inset-inline: 0;
+  font-size: 8.5pt; color: #3b4270; border-block-start: 1px solid #d9dcf2; padding-block-start: 2mm; background: #fff;
+}
+
+/* QR + share URL block */
+.print-share { display: flex !important; gap: 6mm; align-items: center; margin-block-start: 6mm; font-size: 8.5pt; word-break: break-all; }
+.print-share svg { inline-size: 26mm; block-size: 26mm; flex: none; }
+
+a { color: inherit; text-decoration: none; }
+.links a::after { content: " (" attr(href) ")"; font-size: 8pt; color: #3b4270; }
+
+}

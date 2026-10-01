@@ -1,0 +1,86 @@
+{
+  "validator_tamper": {
+    "status": "found",
+    "rejections": 0,
+    "span_end": 999999,
+    "message_key": "nonexistent_key"
+  },
+  "short_marked_state": "partial_match",
+  "short_unmarked_state": "needs_review",
+  "final_vowel_conflicts": 0,
+  "active_rate_keys": 10002,
+  "xff_rate_same_ip": [
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    200,
+    429
+  ],
+  "xff_rate_changed_ip": 200,
+  "fake_png": {
+    "status": 422,
+    "body": {
+      "error": {
+        "code": "invalid_input",
+        "message_ar": "المدخل غير صالح.",
+        "message_en": "Invalid input."
+      }
+    }
+  },
+  "case28_image": {
+    "status": 422,
+    "body": {
+      "error": {
+        "code": "invalid_input",
+        "message_ar": "المدخل غير صالح.",
+        "message_en": "Invalid input."
+      }
+    }
+  },
+  "bad_mime": {
+    "status": 422,
+    "body": {
+      "error": {
+        "code": "invalid_input",
+        "message_ar": "المدخل غير صالح.",
+        "message_en": "Invalid input."
+      }
+    }
+  },
+  "oversized": {
+    "status": 422,
+    "body": {
+      "error": {
+        "code": "invalid_input",
+        "message_ar": "المدخل غير صالح.",
+        "message_en": "Invalid input."
+      }
+    }
+  }
+}

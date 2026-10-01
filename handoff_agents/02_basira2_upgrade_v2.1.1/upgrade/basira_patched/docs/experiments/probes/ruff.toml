@@ -1,0 +1,6 @@
+# Probe scripts are verbatim evidence snapshots of one-off experiments (docs/experiments/README.md).
+# They are intentionally NOT held to production lint so they stay byte-identical to what was run.
+# Production code lives in backend/ and scripts/agents/ and is fully linted.
+extend = "../../../backend/pyproject.toml"
+[lint]
+ignore = ["E401","E701","E702","E741","F401","I001","PLC0415","PLR0911","PLR0912","C901","SIM","B","UP","N","RUF","W"]
