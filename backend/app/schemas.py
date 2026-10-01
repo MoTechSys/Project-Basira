@@ -109,6 +109,7 @@ class QuoteResult(BaseModel):
     total_positions: int = 0
     external_search_links: list[Link] = Field(default_factory=list)
     segments: list[SegmentModel] = Field(default_factory=list)
+    repeated_spans: list[Span] = Field(default_factory=list)  # N-1: same quote again later in the text
 
 
 class Flags(BaseModel):
@@ -135,7 +136,10 @@ class CheckResponse(BaseModel):
     quotes: list[QuoteResult]
     validator_rejections: int = 0
     timings_ms: Timings
-    ocr_text: str | None = None  # image path only: the text as read, so the user can verify it (ADR-003)
+    ocr_text: str | None = None
+    # E-032: sha256(index records sha + normalized input + every quote verdict). Same input on the same
+    # corpus build ⇒ same hash — a judge can re-run and compare. Excludes request_id/timings.
+    determinism_hash: str = ""  # image path only: the text as read, so the user can verify it (ADR-003)
 
 
 class ErrorBody(BaseModel):
@@ -170,3 +174,6 @@ class HealthResponse(BaseModel):
     counts: dict[str, int]
     rss_mb: int
     providers: dict[str, str]
+    index_sha256: str = ""  # sha256 of corpus/index/records.jsonl — pin for reproducibility
+    boot: Literal["snapshot", "build", ""] = ""  # how the store was loaded (E-031)
+    boot_seconds: float = 0.0

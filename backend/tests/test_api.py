@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import base64
+import hashlib
 import io
+from pathlib import Path
 
 from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
 
-from app.main import RateLimiter, create_app
+from app.main import RateLimiter, _inline_script_hashes, create_app
 
 
 async def test_health_ok_after_lifespan(client: AsyncClient) -> None:
@@ -132,3 +135,35 @@ async def test_cors_preflight(client: AsyncClient) -> None:
     )
     assert r.status_code == 200
     assert r.headers.get("access-control-allow-origin") == "http://localhost:5173"
+
+
+async def test_security_headers_present(client) -> None:  # type: ignore[no-untyped-def]
+    r = await client.get("/health")
+    for h in (
+        "x-content-type-options",
+        "x-frame-options",
+        "referrer-policy",
+        "permissions-policy",
+        "content-security-policy",
+        "cross-origin-opener-policy",
+    ):
+        assert h in r.headers, h
+    assert r.headers["x-frame-options"] == "DENY"
+    assert r.json()["index_sha256"]
+
+
+def test_csp_hashes_cover_only_executable_inline_scripts(tmp_path: Path) -> None:
+    """E-041: the theme pre-paint script gets a sha256 token; JSON-LD (data) and external scripts do not."""
+    theme = "(function(){try{var t=localStorage.getItem('x')}catch(e){}})();"
+    html = (
+        "<html><head>"
+        '<script type="application/ld+json">{"@context":"https://schema.org"}</script>'
+        f"<script>{theme}</script>"
+        '<script type="module" src="/assets/index.js"></script>'
+        "</head></html>"
+    )
+    (tmp_path / "index.html").write_text(html, encoding="utf-8")
+    hashes = _inline_script_hashes(tmp_path)
+    expected = "sha256-" + base64.b64encode(hashlib.sha256(theme.encode()).digest()).decode()
+    assert hashes == [expected]
+    assert _inline_script_hashes(None) == [] and _inline_script_hashes(tmp_path / "missing") == []

@@ -82,6 +82,31 @@ class _CsrBuilder:
 class ChannelIndex:
     """One corpus half (Quran or hadith): word BM25 + trigram BM25 over the same doc list."""
 
+    @classmethod
+    def from_arrays(
+        cls,
+        *,
+        docs: list[RetrievalDoc],
+        name: str,
+        words: Csr,
+        grams: Csr,
+        doc_len: F32,
+        gram_len: F32,
+        avg_len: float,
+        avg_gram_len: float,
+    ) -> ChannelIndex:
+        """Rehydrate from a snapshot (app.snapshot) without re-tokenising the corpus."""
+        self = cls.__new__(cls)
+        self.docs = docs
+        self.name = name
+        self.words = words
+        self.grams = grams
+        self.doc_len = doc_len
+        self.gram_len = gram_len
+        self.avg_len = avg_len
+        self.avg_gram_len = avg_gram_len
+        return self
+
     def __init__(self, store: Store, docs: list[RetrievalDoc], name: str) -> None:
         t0 = time.time()
         self.docs = docs
@@ -163,3 +188,10 @@ class Retriever:
     def __init__(self, store: Store) -> None:
         self.quran = ChannelIndex(store, store.rdocs_quran, "quran")
         self.hadith = ChannelIndex(store, store.rdocs_hadith, "hadith")
+
+    @classmethod
+    def from_channels(cls, quran: ChannelIndex, hadith: ChannelIndex) -> Retriever:
+        self = cls.__new__(cls)
+        self.quran = quran
+        self.hadith = hadith
+        return self

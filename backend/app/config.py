@@ -55,6 +55,10 @@ class Settings:
     ohd_mode: str = field(default_factory=lambda: _env("OHD_MODE", "display"))  # display | off (kill-switch)
     retrieval_vectors: bool = field(default_factory=lambda: _env_bool("RETRIEVAL_VECTORS", False))
     anchor_detect: bool = field(default_factory=lambda: _env_bool("ANCHOR_DETECT", True))
+    static_dir: Path | None = field(
+        default_factory=lambda: Path(_env("BASIRA_STATIC_DIR", str(REPO_ROOT / "frontend" / "dist"))) or None
+    )
+    snapshot_write: bool = field(default_factory=lambda: _env_bool("BASIRA_SNAPSHOT_WRITE", True))
     max_text_chars: int = field(default_factory=lambda: int(_env("BASIRA_MAX_TEXT_CHARS", "5000")))
     max_quotes: int = 30
     max_positions_shown: int = 5

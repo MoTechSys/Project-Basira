@@ -1,0 +1,20 @@
+# Category N — scholar-lens probes (full index). Run: python eval/scholar_probe.py
+# Each case: text → expected status + required notices (present) + forbidden notices (absent).
+- {id: N-001, text: "قال تعالى: ﴿إِنَّ مَعَ الْعُسْرِ يُسْرًا﴾ [البقرة: 5]", status: found, ref: {surah: 94, ayah: 6}, notices: [claimed_ayah_mismatch], mismatch: true}
+- {id: N-002, text: "قال تعالى: ﴿إِنَّ مَعَ الْعُسْرِ يُسْرًا﴾ [الشرح: 6]", status: found, mismatch: false, absent: [claimed_ayah_mismatch]}
+- {id: N-003, text: "قال رسول الله ﷺ: «إن مع العسر يسرا»", status: found, notices: [attribution_quran_not_hadith]}
+- {id: N-004, text: "قال تعالى: ﴿إنما الأعمال بالنيات﴾", status: found, notices: [attribution_hadith_not_quran]}
+- {id: N-005, text: "قال الله تعالى في الحديث القدسي: «أنا عند ظن عبدي بي، وأنا معه إذا ذكرني»", status: found, absent: [attribution_quran_not_hadith, attribution_hadith_not_quran]}
+- {id: N-006, text: "قال تعالى: ﴿مَلِكِ يَوْمِ الدِّينِ﴾", status: found, ref: {surah: 1, ayah: 4}, notices: [qiraah_note]}
+- {id: N-007, text: "قال تعالى: ﴿مَٰلِكِ يَوْمِ ٱلدِّينِ﴾", status: found, absent: [qiraah_note]}
+- {id: N-008, text: "قال تعالى: ﴿وَلَا تَقْرَبُوا الصَّلَاةَ﴾", status: needs_review, notices: [partial_ayah_context]}
+- {id: N-009, text: "اللهم ربنا آتنا في الدنيا حسنة وفي الآخرة حسنة وقنا عذاب النار", status: found, ref: {surah: 2, ayah: 201}, notices: [quran_scan_found]}
+- {id: N-010, text: "توفي جارنا رحمه الله، إنا لله وإنا إليه راجعون", status: found, ref: {surah: 2, ayah: 156}, notices: [quran_scan_found]}
+- {id: N-011, text: "أعلنت الوزارة اليوم عن فتح باب التسجيل في البرنامج الجديد لجميع الطلاب", status: none}
+- {id: N-012, text: "جزاكم الله خيرا على هذه الجهود المباركة ونفع الله بكم", status: none}
+- {id: N-013, text: "﴿بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ﴾", status: found, notices: [basmala_note]}
+- {id: N-014, text: "قال تعالى ﴿قل هو الله أحد﴾ ثم كرر ﴿قل هو الله أحد﴾", status: found, notices: [repeated_in_text], quotes: 1}
+- {id: N-015, text: "The Prophet (PBUH) said: Actions are judged by intentions.", status: needs_review, message_key: needs_review_non_arabic}
+- {id: N-016, text: "قال ﷺ: «اطلبوا العلم ولو في الصين»", status: not_found}
+- {id: N-017, text: "قال ﷺ: «إنما الأعمال بالنيات» رواه مسلم", status: found, notices: [claimed_source_mismatch], mismatch: true}
+- {id: N-018, text: "قال تعالى: ﴿فَبِأَيِّ آلَاءِ رَبِّكُمَا تُكَذِّبَانِ﴾", status: found, total_positions: 31}

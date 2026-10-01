@@ -19,7 +19,7 @@ Both packs were cut from `main@5fb118f`-era code (85 tests, before E-023..E-038)
 
 Not verified: «1462 ayat + 400 hadith, 0 FA» (their harness not included). Numbers kept out of our docs until re-run.
 
-## Pack A — `basira_upgrade_pack_v2` (XKWJ1R1F) → **ported to branch `review/packA` (6fc203a), NOT merged yet**
+## Pack A — `basira_upgrade_pack_v2` (XKWJ1R1F) → **MERGED into main (E-041)** after the plan below was executed
 
 | Claim | Verified | Result |
 |---|---|---|
