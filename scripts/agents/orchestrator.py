@@ -158,7 +158,7 @@ def _extract(spec: RoleSpec, d: dict[str, Any]) -> tuple[str, dict[str, Any]]:
     return text, d.get("usage", {})
 
 
-async def run_role(role: str, brief: str, files: list[str] | None = None, *, client: httpx.AsyncClient | None = None, run_id: str | None = None) -> AgentResult:
+async def run_role(role: str, brief: str, files: list[str] | None = None, *, client: httpx.AsyncClient | None = None, run_id: str | None = None, label: str | None = None) -> AgentResult:
     """Run one role once. Honors the shared semaphore and 429 backoff."""
     _require_env()
     spec = ROSTER[role]
@@ -188,15 +188,19 @@ async def run_role(role: str, brief: str, files: list[str] | None = None, *, cli
     if run_id:
         out = OUT_DIR / run_id
         out.mkdir(parents=True, exist_ok=True)
-        (out / f"{role}.md").write_text(f"# {role} — {spec.model}\n\n{res.text or res.error}\n", encoding="utf-8")
-        (out / f"{role}.meta.json").write_text(json.dumps({k: v for k, v in res.__dict__.items() if k != "text"}, indent=1), encoding="utf-8")
+        name = f"{role}-{label}" if label else role
+        (out / f"{name}.md").write_text(f"# {role} — {spec.model}\n\n{res.text or res.error}\n", encoding="utf-8")
+        (out / f"{name}.meta.json").write_text(json.dumps({k: v for k, v in res.__dict__.items() if k != "text"}, indent=1), encoding="utf-8")
     return res
 
 
 async def run_many(jobs: Sequence[tuple[str, str, list[str] | None]], run_id: str) -> list[AgentResult]:
-    """Run many (role, brief, files) jobs concurrently under the shared cap."""
+    """Run many (role, brief, files) jobs concurrently under the shared cap.
+
+    Each job gets a unique output label (role-NN) so parallel same-role jobs never overwrite each other.
+    """
     async with httpx.AsyncClient(timeout=900) as c:
-        return list(await asyncio.gather(*[run_role(r, b, f, client=c, run_id=run_id) for r, b, f in jobs]))
+        return list(await asyncio.gather(*[run_role(r, b, f, client=c, run_id=run_id, label=f"{i:02d}") for i, (r, b, f) in enumerate(jobs)]))
 
 
 # --------------------------------------------------------------------------- self-test

@@ -25,7 +25,7 @@ original sandbox; `docs/internal/` is its complete substitute. Never publish `do
 **Per-session ritual:** `make gates && make smoke` at start; commit after every logical change; update this file at end.
 
 ## 0.5 Team & models (D-008/D-009)
-**New agent? Read `docs/AGENT_PLAYBOOK.md` first.** Multi-model team charter: `docs/TEAM.md`. Experiments log: `docs/experiments/`. Sub-agent runner: `scripts/agents/orchestrator.py --selftest`. Evidence-based model selection: `docs/model-analysis/` (README = verdict; 01–06 = axes, weaknesses, roster). Live proxy capacity: `docs/CAPABILITIES.md`.
+**New agent? Read `docs/agent/README.md` then `docs/AGENT_PLAYBOOK.md`.** Risk register: `docs/RISKS.md`. Multi-model team charter: `docs/TEAM.md`. Experiments log: `docs/experiments/`. Sub-agent runner: `scripts/agents/orchestrator.py --selftest`. Evidence-based model selection: `docs/model-analysis/` (README = verdict; 01–06 = axes, weaknesses, roster). Live proxy capacity: `docs/CAPABILITIES.md`.
 
 ## 1. Done (verified, committed)
 | Layer | File(s) | Status | Evidence |
@@ -59,6 +59,9 @@ Quality gates at last commit: `ruff` ✅ · `mypy --strict` ✅ · `pytest` 38/3
 8. Frontend scaffold `frontend/` (Vite+React+TS, RTL, imports `messages/*.json`): `Check.tsx`, `QuoteCard`, `DiffView`, `StatusBadge`, `SourcesFooter`.
 9. Delivery docs: `SOURCES.md` (generate from manifest — script `corpus/gen_sources_md.py`), `SAFETY.md` (rewritten), `AI_USAGE.md` (D-006 wording), `CHANGELOG.md`, `LICENSE` (Apache-2.0 placeholder, Q1), `THIRD_PARTY_NOTICES.md`, `.env.example`, `Makefile`, `docs/API.md`, `docs/ARCHITECTURE.md`, `backend/README.md`.
 10. Memory optimization (P1): retriever peak ~1 GB during build → stream trigram CSR without `gram_rows` list; target <700 MB peak.
+12. Test that `docs/agent/context/RED_LINES.md` code block == `orchestrator.RED_LINES` (drift guard).
+13. `orchestrator.py`: treat HTTP 524 like 429 (retry w/ backoff); default long reviews to `high` not `xhigh` (R-O2).
+14. Review owner's template from yesterday's agent (SK-09) when provided; merge best parts into TEAM.md.
 11. Widen `make lint` to cover `corpus/*.py` and `scripts/*.py` (currently backend-only). `build_index.py` has one `PLC0415`
     (lazy `import openpyxl` — intentional, keep stdlib-only import path for fetch; add a targeted `# noqa: PLC0415` with reason).
 

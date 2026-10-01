@@ -6,6 +6,7 @@
 
 ## Reading order (mandatory)
 1. `AGENTS.md` (this) — role, rules, map.
+1a. **`docs/agent/README.md` → `context/IDENTITY.md` → `context/OWNER.md`** — the agent's own long-term memory (identity, owner intents, red lines, session protocol, discoveries, verified research, skills, defenses). 3 minutes.
 1b. **`docs/AGENT_PLAYBOOK.md` — how to discover your own capabilities in 10 min (machine, 300 gsk tools, model proxies, measured concurrency cap, sub-agent orchestrator). Run its §1 before touching anything.**
 2. `docs/STATE.md` — **where we are right now**: done / in progress / next. Updated at the end of every session.
 3. `docs/DECISIONS.md` — every owner decision and every engineering decision, dated, with reason. Never re-ask a decided question.
@@ -38,6 +39,8 @@ docs/GLOSSARY.md           terminology
 docs/adr/                  architecture decision records
 docs/internal/             audits & annex triage — NEVER PUBLISH
 docs/ENVIRONMENT_ANALYSIS.md
+docs/agent/                AGENT MEMORY: context/ discoveries/ research/ skills/ defenses/
+docs/RISKS.md              living risk register (Astra + orchestrator)
 docs/AGENT_PLAYBOOK.md     self-discovery + sub-agent playbook (read 2nd)
 docs/CAPABILITIES.md       measured proxy/model/concurrency facts
 docs/TEAM.md               multi-model team charter + protocol
