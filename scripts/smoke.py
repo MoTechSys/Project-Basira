@@ -9,11 +9,11 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
-from app.config import Thresholds  # noqa: E402
-from app.match.exact import dedupe_hits, find_exact  # noqa: E402
-from app.normalize import loose_tokens, strict_tokens  # noqa: E402
-from app.state import Evidence, QuoteFacts, decide  # noqa: E402
-from app.store import load_store  # noqa: E402
+from app.config import Thresholds
+from app.match.exact import dedupe_hits, find_exact
+from app.normalize import loose_tokens, strict_tokens
+from app.state import Evidence, QuoteFacts, decide
+from app.store import load_store
 
 # (text, expected status, expected reason)
 CASES = [

@@ -30,6 +30,7 @@
 | E-010 | 2026-09-30 | Display Quran in **Uthmani** rasm (Tanzil), index both rasms. | Annex approves King Fahd Complex (Uthmani). | ADR-002 |
 | E-011 | 2026-09-30 | `/health` returns 503 until corpus loaded; reports doc counts, RSS, build sha. | Audit T6. | ADR-001 |
 | E-012 | 2026-09-30 | Min quote length: 2 tokens Quran / 3 hadith unless quote-marked; ≤30 spans/request; positions shown ≤5 with total count. | Audit T13. | ADR-003 |
+| E-013 | 2026-10-01 | **`corpus/fetch.py` TLS policy**: on a *certificate* failure (expired/untrusted/hostname) and **only** for files with a pinned sha256, retry once without certificate verification, print a loud warning, then enforce the sha256 as usual. `--strict-tls` forbids the fallback. Unpinned sources never fall back. | tanzil.net served an **expired Let's Encrypt cert** (notAfter 2026-09-30 11:47 UTC) on 2026-10-01, breaking `bootstrap.sh` step 1 on a fresh sandbox. The sha256 pin already makes content integrity independent of the channel; a hard failure would block all work for an upstream ops lapse. Downloaded bytes re-verified identical to the pinned hashes. | ADR-001 (corpus pinning) |
 
 ## Open owner questions (need an answer; defaults applied until then)
 

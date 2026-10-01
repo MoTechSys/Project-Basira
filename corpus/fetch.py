@@ -9,6 +9,13 @@ Usage:
 Rules (see docs/adr/ADR-001, SOURCES policy):
   * Every file is verified against the sha256 pinned in manifest.json.
     Mismatch => non-zero exit, file renamed `*.MISMATCH`, build must fail.
+  * TLS: downloads are verified normally. If (and only if) the server's
+    certificate fails validation AND the file has a pinned sha256, the
+    download is retried once without certificate verification and a loud
+    warning is printed. Integrity is still guaranteed by the sha256 pin
+    (the channel is untrusted, the content is not). `--strict-tls` disables
+    this fallback. Unpinned sources (sha256: null) never fall back.
+    Rationale: E-013 — tanzil.net served an expired certificate on 2026-10-01.
   * HadeethEnc has `sha256: null` (server re-exports). First fetch prints the
     hash so it can be pinned; until pinned a mismatch is a WARNING only.
   * Nothing is modified. Files are stored byte-exact under corpus/data/
@@ -24,8 +31,9 @@ from __future__ import annotations
 import argparse
 import csv
 import hashlib
-import io
 import json
+import re
+import ssl
 import sys
 import urllib.error
 import urllib.request
@@ -44,6 +52,26 @@ class FetchError(RuntimeError):
     pass
 
 
+class _Policy:
+    """Process-wide download policy (set once from CLI args)."""
+
+    strict_tls: bool = False
+
+
+def _is_cert_error(exc: BaseException) -> bool:
+    """True when the failure is a TLS *certificate* problem (expired, untrusted, hostname)."""
+    seen: set[int] = set()
+    cur: BaseException | None = exc
+    while cur is not None and id(cur) not in seen:
+        seen.add(id(cur))
+        if isinstance(cur, ssl.SSLCertVerificationError):
+            return True
+        if isinstance(cur, ssl.SSLError) and "CERTIFICATE_VERIFY_FAILED" in str(cur):
+            return True
+        cur = cur.__cause__ or cur.__context__
+    return False
+
+
 def sha256_of(path: Path) -> str:
     h = hashlib.sha256()
     with path.open("rb") as fh:
@@ -52,18 +80,43 @@ def sha256_of(path: Path) -> str:
     return h.hexdigest()
 
 
-def download(url: str, dest: Path) -> None:
+def _stream_to(url: str, tmp: Path, *, context: ssl.SSLContext | None) -> None:
+    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    with urllib.request.urlopen(req, timeout=TIMEOUT_S, context=context) as resp, tmp.open("wb") as out:
+        while True:
+            chunk = resp.read(1 << 20)
+            if not chunk:
+                break
+            out.write(chunk)
+
+
+def download(url: str, dest: Path, *, pinned_sha256: str | None = None) -> None:
+    """Download `url` to `dest` atomically.
+
+    If TLS certificate validation fails and `pinned_sha256` is set (and
+    `--strict-tls` is not), retry once with verification disabled and warn.
+    The caller MUST verify `pinned_sha256` afterwards (handle_* do).
+    """
     dest.parent.mkdir(parents=True, exist_ok=True)
     tmp = dest.with_suffix(dest.suffix + ".part")
-    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     try:
-        with urllib.request.urlopen(req, timeout=TIMEOUT_S) as resp, tmp.open("wb") as out:
-            while True:
-                chunk = resp.read(1 << 20)
-                if not chunk:
-                    break
-                out.write(chunk)
-    except (urllib.error.URLError, TimeoutError) as exc:
+        try:
+            _stream_to(url, tmp, context=None)
+        except urllib.error.URLError as exc:
+            if not (_is_cert_error(exc) and pinned_sha256 and not _Policy.strict_tls):
+                raise
+            print(
+                f"  ! TLS certificate rejected for {url}\n"
+                f"    ({exc.reason})\n"
+                f"    retrying WITHOUT certificate verification; integrity relies on pinned sha256 "
+                f"{pinned_sha256[:12]}… (use --strict-tls to forbid)",
+                file=sys.stderr,
+            )
+            insecure = ssl.create_default_context()
+            insecure.check_hostname = False
+            insecure.verify_mode = ssl.CERT_NONE
+            _stream_to(url, tmp, context=insecure)
+    except (urllib.error.URLError, TimeoutError, OSError) as exc:
         tmp.unlink(missing_ok=True)
         raise FetchError(f"download failed: {url}: {exc}") from exc
     tmp.replace(dest)
@@ -95,8 +148,6 @@ def count_xlsx_rows(path: Path) -> int:
 
     HadeethEnc layout: row 1 = comment block, row 2 = headers, rows 3.. = data.
     """
-    import re
-
     with zipfile.ZipFile(path) as zf:
         names = [n for n in zf.namelist() if n.startswith("xl/worksheets/sheet")]
         if not names:
@@ -117,7 +168,7 @@ def handle_file_source(src: dict[str, Any], *, verify_only: bool) -> list[str]:
         if verify_only:
             return [f"{src['id']}: missing {dest.relative_to(ROOT)} (run without --verify)"]
         print(f"  ↓ {src['id']}: {src['url']}")
-        download(src["url"], dest)
+        download(src["url"], dest, pinned_sha256=src.get("sha256"))
 
     digest = sha256_of(dest)
     pinned = src.get("sha256")
@@ -159,7 +210,7 @@ def handle_ohd(src: dict[str, Any], *, verify_only: bool) -> list[str]:
                     continue
                 url = f"{base}/{book['dir']}/{fname}"
                 print(f"  ↓ ohd/{book['key']}/{role}")
-                download(url, dest)
+                download(url, dest, pinned_sha256=book.get(f"sha256_{role}"))
             pinned = book.get(f"sha256_{role}")
             digest = sha256_of(dest)
             if pinned and pinned != digest:
@@ -193,7 +244,13 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--verify", action="store_true", help="verify existing files only; no network")
     ap.add_argument("--only", nargs="*", default=None, help="source ids to process")
+    ap.add_argument(
+        "--strict-tls",
+        action="store_true",
+        help="never fall back to an unverified TLS connection, even for sha256-pinned files",
+    )
     args = ap.parse_args(argv)
+    _Policy.strict_tls = bool(args.strict_tls)
 
     manifest = load_manifest()
     DATA.mkdir(exist_ok=True)
