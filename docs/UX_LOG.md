@@ -49,3 +49,20 @@ Fixed (E-037): `label-content-name-mismatch` on the brand link; invalid `robots.
 **Pixel audit** (2× screenshots, 320–1440 px, light/dark, home/result): one defect — topbar overflow at 360 px (E-036), fixed and re-swept: `scrollWidth == clientWidth` at all 7 widths. Result card verified: Mushaf pane in Amiri Quran, user typo «علي» marked, source words «على» marked, byte-exact pane, referral links visible.
 
 **Speed** (E-035): `/v1/check` wall 8.0 s → **1.96 s** on the smoke text; 16 concurrent short checks p50 2.1 s / p95 2.3 s; 8 concurrent 1 500-char texts p95 8.3 s (LLM-bound; `match` ≤ 6 ms). Long texts remain the open latency item — see INTEGRATIONS §5.
+
+## 2026-10-01 — Results workspace (E-042) + CLS root cause (E-043)
+
+**What changed for the user**: results are no longer a list under the box. The checked text is shown with every quotation highlighted *where it is*; clicking a highlight opens its card (side panel on desktop, bottom sheet on mobile). Status chips on top filter the highlights.
+
+| Context | axe | targets <24 px | h-overflow |
+|---|---|---|---|
+| desktop light / dark (1366) | 0 / 0 | 0 | 0 |
+| mobile light (390) | 0 | 0 | 0 |
+| mobile dark, sheet open (390) | 0 | 0 | 0 |
+| 320 px | 0 | 0 | 0 |
+
+Lighthouse (production bundle): **mobile 98 / 100 / 100 / 100** (LCP 2.2 s, CLS **0**, TBT 70 ms) · **desktop 100 / 100 / 100 / 100**. Bundle 87.4 kB gz JS + 5.7 kB gz CSS.
+
+**CLS investigation**: 0.078 on mobile came from one shift at ~300 ms: the health label text swap. Trace: `PerformanceObserver` with `sources[]` under 4× CPU + slow-4G emulation. Fixed by reserving the label width. The font-metrics fallback was added anyway (correct engineering, no measurable effect here). `scrollbar-gutter: stable` was tried and **rejected** (CLS 0.156).
+
+Tests: vitest 13/13 (5 new for `buildRuns`: exact reproduction, overlap resolution, satellites, repeats, clamping); Playwright 2/2 (desktop panel switching; mobile sheet open → Escape → focus returns to the highlight → axe clean).

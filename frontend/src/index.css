@@ -20,6 +20,16 @@
   font-display: swap;
   unicode-range: U+0000-00FF, U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF, U+2000-206F, U+20A0-20CF;
 }
+/* Metric-matched fallback so the swap from the system font to Readex Pro does not shift layout
+   (CLS). Readex Pro: ascent 1000 / descent 250 / gap 0 per 1000 upm, xAvgCharWidth 596 (fontTools). */
+@font-face {
+  font-family: "Readex Pro Fallback";
+  src: local("Segoe UI"), local("Tahoma"), local("Arial");
+  ascent-override: 100%;
+  descent-override: 25%;
+  line-gap-override: 0%;
+  size-adjust: 104%;
+}
 /* Mushaf / hadith text. Amiri Quran (OFL 1.1) covers every Uthmani mark used by Tanzil
    (pause marks, small high letters, dagger alef, ۝) — verified with fontTools at build time. */
 @font-face {
@@ -32,6 +42,9 @@
 }
 
 /* ---------- app-level overrides of kit tokens (E-032) ---------- */
+:root {
+  --bs-font-ui: "Readex Pro", "Readex Pro Fallback", "Segoe UI", Tahoma, system-ui, sans-serif;
+}
 :root {
   --bs-font-mushaf: "Amiri Quran", "KFGQPC Uthmanic Script HAFS", "Scheherazade New", serif;
   /* not_found: neutral — "not in our sources" is information, not a judgment */
@@ -204,6 +217,31 @@ textarea {
   border-radius: var(--bs-radius-pill);
   border: 1px solid var(--bs-border);
   min-block-size: 36px;
+  /* the label changes from «الخادم يحمّل المدوّنة…» to «جاهز» ~300 ms after mount; without a reserved
+     width that re-flows the whole top bar (measured CLS 0.079 on mobile). The slot never resizes. */
+  flex-shrink: 0;
+}
+.health__label {
+  display: inline-block;
+  inline-size: 9.5em; /* fits «الخادم يحمّل المدوّنة…» at the caption size */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* phones: reserve less so logo + 3 controls fit; ≤400 the label is visually hidden (dot only) —
+   declared here, after the base rule, so the cascade is unambiguous */
+@media (max-width: 600px) {
+  .health__label {
+    inline-size: 4em;
+  }
+}
+@media (max-width: 400px) {
+  .health__label {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    clip-path: inset(50%);
+  }
 }
 .health::before {
   content: "";
@@ -518,6 +556,9 @@ kbd {
 }
 
 /* ---------- results ---------- */
+main.container:has(.workspace) {
+  inline-size: min(100% - 2 * var(--bs-sp-4), 1320px);
+}
 .results {
   margin-block-start: var(--bs-sp-5);
   display: flex;
@@ -538,6 +579,17 @@ kbd {
   display: inline-flex;
   gap: var(--bs-sp-3);
   align-items: center;
+  flex-wrap: wrap;
+  min-inline-size: 0;
+}
+@media (max-width: 480px) {
+  .summary {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .summary .btn {
+    justify-content: center;
+  }
 }
 
 /* quote card — the moment of truth */
@@ -857,4 +909,270 @@ mark.d-source {
       transform: none;
     }
   }
+}
+
+/* =====================================================================
+   Results workspace (E-042): highlights IN the user's text + details panel
+   ===================================================================== */
+.workspace {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bs-sp-4);
+}
+.workspace__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--bs-sp-4);
+  align-items: start;
+}
+@media (min-width: 960px) {
+  .workspace__grid {
+    grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1.1fr);
+  }
+  /* inside the side panel the two diff panes stack — the column is too narrow for side-by-side */
+  .panel .diff {
+    grid-template-columns: 1fr;
+  }
+  .panel {
+    position: sticky;
+    inset-block-start: 80px; /* below the sticky topbar */
+    max-block-size: calc(100dvh - 96px);
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+}
+
+/* status strip */
+.strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--bs-sp-2);
+  margin: 0;
+  padding: 2px 0;
+  list-style: none;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-block-size: 40px;
+  padding: 0 14px 0 10px;
+  border-radius: var(--bs-radius-pill);
+  border: 1.5px solid var(--bs-border);
+  background: var(--bs-surface);
+  color: var(--bs-text);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+}
+.chip b {
+  font-weight: 700;
+  min-inline-size: 1.4em;
+  text-align: center;
+  padding: 1px 7px;
+  border-radius: var(--bs-radius-pill);
+  background: var(--bs-bg-subtle);
+}
+.chip:hover {
+  transform: translateY(-1px);
+}
+.chip[aria-pressed="true"] {
+  border-color: var(--chip);
+  background: var(--chip-bg);
+}
+.chip .bs-icon {
+  color: var(--chip);
+}
+.chip[data-status="found"] { --chip: var(--bs-state-found); --chip-bg: var(--bs-state-found-bg); }
+.chip[data-status="partial_match"] { --chip: var(--bs-state-partial); --chip-bg: var(--bs-state-partial-bg); }
+.chip[data-status="needs_review"] { --chip: var(--bs-state-review); --chip-bg: var(--bs-state-review-bg); }
+.chip[data-status="not_found"] { --chip: var(--bs-state-notfound); --chip-bg: var(--bs-state-notfound-bg); }
+
+/* annotated text */
+.annotated__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0 0 var(--bs-sp-3);
+  font-size: 0.95rem;
+  color: var(--bs-text-muted);
+  font-weight: 600;
+}
+.annotated__title small {
+  font-weight: 400;
+  margin-inline-start: auto;
+}
+.annotated {
+  font-size: 1.2rem;
+  line-height: 2.2;
+  white-space: pre-wrap;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+/* The highlight is a real button but must read as text: no box, inherits font, keeps letter joins.
+   A 3px underline + soft tint instead of a filled block so connected Arabic glyphs stay clear. */
+.hl {
+  all: unset;
+  display: inline;
+  cursor: pointer;
+  border-radius: 4px;
+  padding-inline: 1px;
+  background: var(--hl-bg);
+  box-shadow: inset 0 -3px 0 var(--hl);
+  transition: background 0.15s, box-shadow 0.15s;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.hl:hover {
+  background: color-mix(in srgb, var(--hl) 22%, transparent);
+}
+.hl:focus-visible {
+  outline: 2px solid var(--bs-primary);
+  outline-offset: 2px;
+}
+.hl[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--hl) 28%, transparent);
+  box-shadow: inset 0 -3px 0 var(--hl), 0 0 0 2px color-mix(in srgb, var(--hl) 45%, transparent);
+}
+.hl[data-status="found"] { --hl: var(--bs-state-found); --hl-bg: var(--bs-state-found-bg); }
+.hl[data-status="partial_match"] { --hl: var(--bs-state-partial); --hl-bg: var(--bs-state-partial-bg); }
+.hl[data-status="needs_review"] { --hl: var(--bs-state-review); --hl-bg: var(--bs-state-review-bg); }
+.hl[data-status="not_found"] { --hl: var(--bs-state-notfound); --hl-bg: var(--bs-state-notfound-bg); }
+/* isnad / claimed source belong to the quote but are not the matn: dotted, no tint */
+.hl[data-seg="isnad"],
+.hl[data-seg="claimed_source"] {
+  background: transparent;
+  box-shadow: none;
+  text-decoration: underline dotted var(--hl) 2px;
+  text-underline-offset: 6px;
+}
+.hl[data-repeat] {
+  opacity: 0.75;
+}
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--bs-sp-3);
+  margin: var(--bs-sp-4) 0 0;
+  padding: var(--bs-sp-3) 0 0;
+  list-style: none;
+  border-block-start: 1px dashed var(--bs-border);
+  font-size: var(--bs-fs-caption);
+  color: var(--bs-text-muted);
+}
+.legend li::before {
+  content: "";
+  display: inline-block;
+  inline-size: 14px;
+  block-size: 10px;
+  margin-inline-end: 6px;
+  border-radius: 3px;
+  vertical-align: -1px;
+  background: var(--lg-bg);
+  box-shadow: inset 0 -3px 0 var(--lg);
+}
+.legend li[data-status="found"] { --lg: var(--bs-state-found); --lg-bg: var(--bs-state-found-bg); }
+.legend li[data-status="partial_match"] { --lg: var(--bs-state-partial); --lg-bg: var(--bs-state-partial-bg); }
+.legend li[data-status="needs_review"] { --lg: var(--bs-state-review); --lg-bg: var(--bs-state-review-bg); }
+.legend li[data-status="not_found"] { --lg: var(--bs-state-notfound); --lg-bg: var(--bs-state-notfound-bg); }
+
+/* details panel */
+.panel__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--bs-sp-2);
+  margin-block-end: var(--bs-sp-2);
+  color: var(--bs-text-muted);
+  font-size: var(--bs-fs-caption);
+}
+.panel__arrows {
+  display: inline-flex;
+  gap: 4px;
+}
+.panel__empty {
+  margin: 0;
+  padding: var(--bs-sp-6);
+  text-align: center;
+  color: var(--bs-text-muted);
+  border: 1px dashed var(--bs-border);
+  border-radius: var(--bs-radius-md);
+}
+.panel .quote {
+  margin: 0;
+}
+[dir="rtl"] .flip-x,
+.flip-x {
+  transform: scaleX(-1);
+}
+[dir="rtl"] .flip-x {
+  transform: none;
+}
+[dir="rtl"] .panel__arrows .bs-icon:not(.flip-x) {
+  transform: scaleX(-1);
+}
+
+/* bottom sheet (mobile) */
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgb(18 24 63 / 0.45);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: flex-end;
+  animation: fade-in 0.18s ease-out;
+}
+.sheet {
+  inline-size: 100%;
+  max-block-size: 88dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bs-surface);
+  border-radius: var(--bs-radius-lg) var(--bs-radius-lg) 0 0;
+  box-shadow: var(--bs-shadow-lg);
+  outline: none;
+  animation: sheet-up 0.26s cubic-bezier(0.2, 0.8, 0.2, 1);
+  padding-block-end: env(safe-area-inset-bottom);
+}
+.sheet__bar {
+  padding: 8px var(--bs-sp-4) 0;
+  border-block-end: 1px solid var(--bs-border);
+}
+.sheet__grip {
+  display: block;
+  inline-size: 40px;
+  block-size: 4px;
+  margin: 0 auto 10px;
+  border-radius: 2px;
+  background: var(--bs-border);
+}
+.sheet__body {
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: var(--bs-sp-3) var(--bs-sp-3) var(--bs-sp-6);
+  -webkit-overflow-scrolling: touch;
+}
+.sheet .quote {
+  box-shadow: none;
+  border: 0;
+  border-inline-start-width: 5px;
+}
+@keyframes sheet-up {
+  from { transform: translateY(24px); opacity: 0.6; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheet, .sheet-backdrop, .chip, .hl { animation: none; transition: none; }
+}
+.results-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bs-sp-4);
 }

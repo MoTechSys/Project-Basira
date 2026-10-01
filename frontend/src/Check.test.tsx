@@ -91,7 +91,9 @@ describe("Check page", () => {
     const user = userEvent.setup();
     render(<Check lang="ar" onLang={() => undefined} />);
     const ta = screen.getByLabelText(UI.ar["input_label"]!);
-    await user.type(ta, "نص تجريبي");
+    // the fixture's spans are offsets into this exact text (captured live, docs/manual-test)
+    await user.click(ta);
+    await user.paste("قال تعالى: إن الله علي كل شيء قدير. وقال ﷺ: «إنما الأعمال بالنيات» رواه مسلم");
     await screen.findByText(UI.ar["status_ok"]!);
     await user.click(screen.getByRole("button", { name: UI.ar["check"]! }));
     await screen.findAllByRole("status");
@@ -100,7 +102,12 @@ describe("Check page", () => {
     expect(screen.getByText(ar.fixed.footer)).toBeInTheDocument();
     expect(screen.getByText(ar.fixed.transparency_notice)).toBeInTheDocument();
     const results = screen.getByRole("main");
-    expect(within(results).getAllByTestId("quoted-text")).toHaveLength(2);
+    // E-042 workspace: every quote is highlighted inside the user's own text (jsdom has no matchMedia →
+    // desktop split mode → the panel shows exactly one card, the pre-selected "attention" quote)
+    const annotated = within(results).getByTestId("annotated-text");
+    const hls = annotated.querySelectorAll(".hl:not([data-seg='claimed_source']):not([data-seg='isnad'])");
+    expect(hls).toHaveLength(2);
+    expect(within(results).getAllByTestId("quoted-text")).toHaveLength(1);
   });
 
   it("renders the API error envelope in the UI language", async () => {

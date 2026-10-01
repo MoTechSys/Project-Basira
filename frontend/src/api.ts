@@ -53,6 +53,8 @@ export interface QuoteResult {
   message_key: string;
   notice_keys: string[];
   repeated_spans?: { start: number; end: number }[];
+  segments?: { type: "Ayah" | "matn" | "isnad" | "claimed_source"; start: number; end: number }[];
+  determinism_hash?: string;
   matches: Match[];
   total_positions: number;
   external_search_links: Link[];

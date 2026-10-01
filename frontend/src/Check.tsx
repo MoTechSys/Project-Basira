@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BasiraError, check, checkImage, health, type CheckResponse, type Lang } from "./api";
 import { Icon, LogoMark, type BasiraIconName } from "./brand";
-import { QuoteCard } from "./components/QuoteCard";
+import { ResultsView } from "./components/ResultsView";
 import { SourcesFooter } from "./components/SourcesFooter";
 import { MAX_CHARS, msg, ui } from "./i18n";
 
@@ -88,6 +88,7 @@ export default function Check({ lang, onLang }: { lang: Lang; onLang: (l: Lang) 
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<CheckResponse | null>(null);
+  const [checkedText, setCheckedText] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [healthState, corpus] = useHealth();
@@ -125,10 +126,12 @@ export default function Check({ lang, onLang }: { lang: Lang; onLang: (l: Lang) 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!text.trim() || busy) return;
+    setCheckedText(text);
     void run((signal) => check(text, lang, signal));
   };
   const onFile = (f: File | undefined) => {
     if (!f) return;
+    setCheckedText("");
     void run((signal) => checkImage(f, lang, signal));
   };
   const onCopy = async () => {
@@ -321,9 +324,7 @@ export default function Check({ lang, onLang }: { lang: Lang; onLang: (l: Lang) 
                   <span>{msg(lang, "notice", "no_quotes")}</span>
                 </div>
               )}
-              {result.quotes.map((q) => (
-                <QuoteCard key={q.id} q={q} lang={lang} />
-              ))}
+              {n > 0 && <ResultsView text={result.ocr_text ?? checkedText} result={result} lang={lang} />}
             </>
           )}
         </div>
