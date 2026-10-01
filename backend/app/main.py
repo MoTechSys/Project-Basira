@@ -54,10 +54,11 @@ ALLOWED_IMAGE_MIME = frozenset({"image/png", "image/jpeg", "image/webp"})
 
 
 class ApiError(Exception):
-    def __init__(self, status: int, code: str) -> None:
+    def __init__(self, status: int, code: str, **vars: Any) -> None:
         super().__init__(code)
         self.status = status
         self.code = code
+        self.vars = vars
 
 
 class RateLimiter:
@@ -87,12 +88,14 @@ def _rss_mb() -> int:
     return int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss // 1024)
 
 
-def _error(status: int, code: str, messages_dir: Path) -> JSONResponse:
+def _error(status: int, code: str, messages_dir: Path, **vars: Any) -> JSONResponse:
     ar = load_messages(messages_dir, "ar")
     en = load_messages(messages_dir, "en")
     key = code if ar.has("errors", code) else "internal"
     body = ErrorResponse(
-        error=ErrorBody(code=code, message_ar=ar.get("errors", key), message_en=en.get("errors", key))
+        error=ErrorBody(
+            code=code, message_ar=ar.get("errors", key, **vars), message_en=en.get("errors", key, **vars)
+        )
     )
     return JSONResponse(status_code=status, content=body.model_dump())
 
@@ -142,13 +145,13 @@ def create_app(cfg: Settings | None = None) -> FastAPI:
 
     @app.exception_handler(ApiError)
     async def _api_error(_: Request, exc: ApiError) -> JSONResponse:
-        return _error(exc.status, exc.code, cfg.messages_dir)
+        return _error(exc.status, exc.code, cfg.messages_dir, **exc.vars)
 
     @app.exception_handler(RequestValidationError)
     async def _validation(_: Request, exc: RequestValidationError) -> JSONResponse:
         for e in exc.errors():
             if e.get("type") in {"string_too_long"}:
-                return _error(413, "text_too_long", cfg.messages_dir)
+                return _error(413, "text_too_long", cfg.messages_dir, max=cfg.max_text_chars)
         return _error(422, "invalid_input", cfg.messages_dir)
 
     @app.exception_handler(Exception)
@@ -214,7 +217,7 @@ def create_app(cfg: Settings | None = None) -> FastAPI:
     async def check(req: CheckRequest, request: Request) -> CheckResponse:
         pipeline = _guard(request)
         if len(req.text) > cfg.max_text_chars:
-            raise ApiError(413, "text_too_long")
+            raise ApiError(413, "text_too_long", max=cfg.max_text_chars)
         if not req.text.strip():
             raise ApiError(422, "invalid_input")
         return await pipeline.check(req)
@@ -239,7 +242,7 @@ def create_app(cfg: Settings | None = None) -> FastAPI:
             raise ApiError(422, "invalid_input")
         data = await image.read(MAX_IMAGE_BYTES + 1)
         if len(data) > MAX_IMAGE_BYTES:
-            raise ApiError(413, "text_too_long")
+            raise ApiError(413, "image_too_large", max_mb=MAX_IMAGE_BYTES // (1024 * 1024))
         try:
             ocr = await request.app.state.vision.ocr(data, mime=mime)
         except ProviderError:
@@ -251,7 +254,10 @@ def create_app(cfg: Settings | None = None) -> FastAPI:
             return resp
         text = ocr.text.strip()[: cfg.max_text_chars] or " "
         req = CheckRequest(text=text, ui_lang="ar" if ui_lang != "en" else "en", source_modality="image")
-        return await pipeline.check(req, extra_notices=["image_extracted"])
+        notices = ["image_extracted"]
+        if request.app.state.vision.name == "mock":
+            notices.append("ocr_mock")  # never present fixture text as if it were read from the image
+        return await pipeline.check(req, extra_notices=notices)
 
     @app.get("/v1/sources", response_model=list[SourceInfo])
     async def sources(request: Request) -> list[SourceInfo]:

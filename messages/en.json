@@ -32,7 +32,8 @@
     "grade_line": "Grade as stated by {grade_source} (version {version}): \"{grade_text}\". Takhrij: {takhrij}.",
     "no_grade": "We do not show a grade for this hadith; we show its location in the sources only.",
     "hadeethenc_link_only": "This hadith is listed in the Prophetic Hadiths Encyclopedia; you can read it there.",
-    "many_positions": "Found at {total} places; the first {shown} are shown."
+    "many_positions": "Found at {total} places; the first {shown} are shown.",
+    "ocr_mock": "Demo mode: the image text was NOT actually read; a fixed sample text was used because no vision provider is configured."
   },
   "labels": {
     "found": "Found",
@@ -65,6 +66,7 @@
     "text_too_long": "The text exceeds the allowed length ({max} characters).",
     "rate_limited": "Too many requests in a short time; please try again shortly.",
     "degraded": "The service is loading or partially unavailable; please try again in a moment.",
-    "internal": "An unexpected error occurred."
+    "internal": "An unexpected error occurred.",
+    "image_too_large": "The image exceeds the allowed size ({max_mb} MB)."
   }
 }
