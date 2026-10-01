@@ -34,7 +34,10 @@ def spans_of(text: str) -> list[tuple[str, str, bool]]:
             [(f"{H} وإنما لكل امرئ ما نوى", "hadith_matn", False)],
         ),
         (f"اليوم جميل. {H} رواه البخاري. انشرها", [(H, "hadith_matn", False)]),
-        (f"قال رسول الله ﷺ: «{H}» رواه البخاري", [(H, "unknown", True)]),  # bracket wins, trailer skipped
+        (f"قال رسول الله ﷺ: «{H}» رواه البخاري", [(H, "hadith_matn", True)]),  # bracket wins; kind from context (E-029)
+        (f'قال تعالى: "{Q}"', [(Q, "quran", True)]),  # plain quotes + introducer → quran (E-029)
+        (f'"{Q}" [البقرة: 153]', [(Q, "quran", True)]),  # plain quotes + claimed surah:ayah → quran (E-029)
+        (f'"{H}"', [(H, "unknown", True)]),  # no context → unknown
         ("[البقرة: 255]", []),  # ref-only bracket is not a quote
         ("ذهبت إلى السوق واشتريت خبزا", []),
     ],
@@ -96,3 +99,23 @@ def test_honorific_never_becomes_a_quote(text: str) -> None:
         seg = text[s.start : s.end]
         assert "صل" not in seg[:4] and "عليه" not in seg[:6], seg
         assert seg.startswith(H)
+
+
+def test_bare_qala_is_not_an_introducer_without_saws() -> None:
+    """E-028: «قال فلان: …» (a scholar, a narrator) must not become a quote; «قال ﷺ: …» must."""
+    assert extract_spans("قال ابن عثيمين رحمه الله إن هذا الأمر واضح في كتب الفقه") == []
+    spans = extract_spans("قال ﷺ: الدين النصيحة لله ولكتابه ولرسوله")
+    assert len(spans) == 1 and spans[0].kind == "hadith_matn"
+    text = "قال ﷺ: الدين النصيحة لله ولكتابه ولرسوله"
+    assert text[spans[0].start : spans[0].end] == "الدين النصيحة لله ولكتابه ولرسوله"
+
+
+@pytest.mark.parametrize(
+    "inner",
+    ["رواه مسلم", "رواه البخاري ومسلم", "متفق عليه", "سورة البقرة, آية 257", "البقرة: 255", "عليه الصلاة والسلام", "2:255"],
+)
+def test_bracketed_attribution_is_not_a_quote(inner: str) -> None:
+    """E-030: a bracketed reference/attribution is never checked as a quotation; the quote next to it is."""
+    text = f'قال رسول الله ﷺ: "{H}" ({inner})'
+    got = [text[s.start : s.end] for s in extract_spans(text)]
+    assert got == [H]

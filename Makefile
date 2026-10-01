@@ -1,4 +1,4 @@
-.PHONY: bootstrap fetch index lint test gates smoke fixture serve eval eval-full islamiceval
+.PHONY: bootstrap fetch index lint test gates smoke fixture serve eval eval-full islamiceval islamiceval-1a
 PY=backend/.venv/bin/python
 bootstrap: ; bash scripts/bootstrap.sh
 fetch:     ; python3 corpus/fetch.py
@@ -12,3 +12,4 @@ serve:     ; bash scripts/serve.sh
 eval:      ; $(PY) eval/run_eval.py --repeats 3 --fail-on-unsafe
 eval-full: ; $(PY) eval/run_eval.py --index corpus/index --repeats 3 --false-alarm 500 --fail-on-unsafe
 islamiceval: ; $(PY) eval/islamiceval/run_1b.py
+islamiceval-1a: ; $(PY) eval/islamiceval/run_1a.py

@@ -24,7 +24,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from app.extract.surahs import surah_number
-from app.normalize import loose_tokens, tokenize
+from app.normalize import Token, loose_tokens, tokenize
 
 _AR = r"\u0600-\u06FF"
 _BRACKET_PAIRS = (("﴿", "﴾"), ("«", "»"), ("“", "”"), ('"', '"'), ("(", ")"), ("[", "]"), ("{", "}"))
@@ -186,7 +186,30 @@ def extract_spans(text: str, *, min_tokens_marked: int = 2, min_tokens_intro: in
     spans = merge_overlaps(spans)
     for sp in spans:
         sp.claimed_source = find_claimed_source(text, sp.start, sp.end)
+        if sp.kind == "unknown":
+            sp.kind = _kind_from_context(text, sp)
     return spans
+
+
+def _kind_from_context(text: str, sp: RuleSpan) -> str:
+    """Kind of a bracketed quote from its surroundings (E-029): an introducer right before the
+    opening bracket («قال تعالى: "…"», «قال رسول الله ﷺ: "…"»), else a claimed source (surah:ayah →
+    quran; a hadith book → hadith_matn), else «unknown». Only affects labels/messages for quotes
+    that are not found; a strict Quran hit always wins regardless (state I4)."""
+    before = text[max(0, sp.start - 120) : sp.start]
+    toks = tokenize(before)
+    loose = [t.loose for t in toks]
+    for _i, j, intro in _intro_positions(before, toks, loose):
+        if j >= len(toks):  # introducer is the last thing before the bracket
+            return _kind_from_introducer(" ".join(intro))
+    cs = sp.claimed_source or {}
+    parsed = cs.get("parsed", {}) if isinstance(cs, dict) else {}
+    if isinstance(parsed, dict):
+        if "surah" in parsed:
+            return "quran"
+        if parsed.get("books"):
+            return "hadith_matn"
+    return "unknown"
 
 
 def _bracketed(text: str, spans: list[RuleSpan], min_tokens: int) -> None:
@@ -200,12 +223,29 @@ def _bracketed(text: str, spans: list[RuleSpan], min_tokens: int) -> None:
             if b < 0:
                 break
             inner = text[a + 1 : b]
-            is_ref_only = _QURAN_REF.fullmatch(inner.strip()) is not None
             latin_words = len(re.findall(r"[A-Za-z]{2,}", inner))
-            if not is_ref_only and (_arabic_token_count(inner) >= min_tokens or latin_words >= 3):
+            if not _is_attribution(inner) and (_arabic_token_count(inner) >= min_tokens or latin_words >= 3):
                 kind = "quran" if open_ == "﴿" else "unknown"
                 spans.append(RuleSpan(a + 1, b, kind, True))
             i = b + 1
+
+
+def _is_attribution(inner: str) -> bool:
+    """Bracketed text that is a *reference*, not a quotation (E-030): «(البقرة: 255)», «(رواه مسلم)»,
+    «(متفق عليه)», «(سورة البقرة, آية 257)», «(عليه الصلاة والسلام)». Such brackets are never checked
+    as quotes — the user would otherwise see «رواه مسلم» reported as "not found"."""
+    inner = inner.strip()
+    if not inner or _QURAN_REF.fullmatch(inner) is not None:
+        return True
+    low = inner.lower()
+    if any(p in inner for p in _MUTTAFAQ) or _NARRATED.match(inner) is not None:
+        return True
+    if re.match(r"^(?:سورة\s+\S+|آية|الآية|الآيات)\b", inner) and re.search(r"\d", inner):
+        return True
+    loose = tuple(loose_tokens(inner))
+    if loose in _HONORIFICS or loose in {("صلي", "الله", "عليه", "وسلم"), ("رضي", "الله", "عنهم")}:
+        return True
+    return bool(re.fullmatch(r"[\d\s:/\-–،,]+", low))
 
 
 _HONORIFICS: tuple[tuple[str, ...], ...] = (  # loose-token sequences that may follow an introducer
@@ -220,51 +260,78 @@ _HONORIFICS: tuple[tuple[str, ...], ...] = (  # loose-token sequences that may f
     ("تعالي",),
     ("جل", "جلاله"),
 )
+# «ﷺ» is dropped by the normalizer, so «قال ﷺ» would collapse to the bare «قال» and fire on every
+# «قال فلان» in a text (E-028). Introducers whose loose form is a single generic verb are therefore
+# kept only in their explicit forms; «ﷺ» after «قال/قوله» is handled by the honorific swallowing
+# *after* a longer introducer, and by the dedicated check in ``_introduced``.
+_GENERIC_VERBS = frozenset({"قال", "قوله", "لقوله", "يقول"})
 _INTRO_LOOSE: tuple[tuple[str, ...], ...] = tuple(
-    sorted({tuple(loose_tokens(i)) for i in _INTRODUCERS}, key=len, reverse=True)
+    sorted(
+        {t for t in (tuple(loose_tokens(i)) for i in _INTRODUCERS) if not (len(t) == 1 and t[0] in _GENERIC_VERBS)},
+        key=len,
+        reverse=True,
+    )
 )
+_SAWS = "\ufdfa"  # ﷺ
 
 
-def _introduced(text: str, spans: list[RuleSpan], min_tokens: int) -> None:
-    """Introducers are matched on LOOSE TOKENS (so tashkeel, «صلَّى اللهُ عَلَيْهِ وسلَّمَ», ﷺ or an
-    honorific after the introducer never leak into the quote). Longest introducer first; a shorter one
-    overlapping an already matched longer one is skipped («قال الله تعالى» must not also fire as «قال الله»)."""
-    toks = tokenize(text)
-    loose = [t.loose for t in toks]
-    taken: list[tuple[int, int]] = []  # token ranges
-    for intro in _INTRO_LOOSE:
+def _intro_positions(text: str, toks: list[Token], loose: list[str]) -> list[tuple[int, int, tuple[str, ...]]]:
+    """Yield (first_token, token_after_introducer_and_honorifics, introducer) for every introducer
+    occurrence, longest introducer first, overlapping shorter matches skipped («قال الله تعالى» must
+    not also fire as «قال الله»). A bare generic verb («قال», «قوله») counts only when the ﷺ ligature —
+    invisible to the tokenizer — sits right after it in the raw text (E-028)."""
+    out: list[tuple[int, int, tuple[str, ...]]] = []
+    taken: list[tuple[int, int]] = []
+    saws = [(i,) for i in _GENERIC_VERBS]
+    for intro in [*_INTRO_LOOSE, *saws]:
         n = len(intro)
         for i in range(len(loose) - n + 1):
             if tuple(loose[i : i + n]) != intro:
                 continue
-            j = i + n
-            # swallow trailing honorifics («ﷺ» is dropped by the normalizer already)
-            progressed = True
-            while progressed:
-                progressed = False
-                for h in _HONORIFICS:
-                    if tuple(loose[j : j + len(h)]) == h:
-                        j += len(h)
-                        progressed = True
-                        break
+            if n == 1 and intro[0] in _GENERIC_VERBS:
+                nxt = toks[i + 1].start if i + 1 < len(toks) else len(text)
+                if _SAWS not in text[toks[i].end : nxt]:
+                    continue
+            j = _swallow_honorifics(loose, i + n)
             if any(a < j and i < b for a, b in taken):
                 continue
             taken.append((i, j))
-            if j >= len(toks):
-                continue
-            start = toks[j].start
-            if text[start] in {o for o, _ in _BRACKET_PAIRS}:
-                continue
-            # a bracket may open between the introducer and the next token («قال ﷺ: «…»»)
-            between = text[toks[j - 1].end : start]
-            if any(o in between for o, _ in _BRACKET_PAIRS):
-                continue  # the bracket rule already caught it
-            end_m = _SENTENCE_END.search(text, start)
-            end = end_m.start() if end_m else len(text)
-            if _arabic_token_count(text[start:end]) >= min_tokens:
-                while end > start and text[end - 1].isspace():
-                    end -= 1
-                spans.append(RuleSpan(start, end, _kind_from_introducer(" ".join(intro)), False))
+            out.append((i, j, intro))
+    return out
+
+
+def _swallow_honorifics(loose: list[str], j: int) -> int:
+    progressed = True
+    while progressed:
+        progressed = False
+        for h in _HONORIFICS:
+            if tuple(loose[j : j + len(h)]) == h:
+                j += len(h)
+                progressed = True
+                break
+    return j
+
+
+def _introduced(text: str, spans: list[RuleSpan], min_tokens: int) -> None:
+    """Introducers are matched on LOOSE TOKENS (so tashkeel, «صلَّى اللهُ عَلَيْهِ وسلَّمَ», ﷺ or an
+    honorific after the introducer never leak into the quote). The quote runs from the token after the
+    introducer to the sentence end, unless a bracket opens there (the bracket rule owns that case)."""
+    toks = tokenize(text)
+    loose = [t.loose for t in toks]
+    openers = {o for o, _ in _BRACKET_PAIRS}
+    for _i, j, intro in _intro_positions(text, toks, loose):
+        if j >= len(toks):
+            continue
+        start = toks[j].start
+        between = text[toks[j - 1].end : start]
+        if text[start] in openers or any(o in between for o in openers):
+            continue  # the bracket rule already caught it
+        end_m = _SENTENCE_END.search(text, start)
+        end = end_m.start() if end_m else len(text)
+        if _arabic_token_count(text[start:end]) >= min_tokens:
+            while end > start and text[end - 1].isspace():
+                end -= 1
+            spans.append(RuleSpan(start, end, _kind_from_introducer(" ".join(intro)), False))
 
 
 def _trailed(text: str, spans: list[RuleSpan], min_tokens: int) -> None:
