@@ -1,1 +1,47 @@
-work/
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+venv/
+.venv/
+env/
+
+# Node
+node_modules/
+dist/
+build/
+.vite/
+*.log
+.npm
+.yarn-cache/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Data (will be fetched by scripts)
+corpus/data/
+corpus/snapshot/
+*.sqlite
+*.db
+
+# Build artifacts
+*.tsbuildinfo
+coverage/
+.turbo/
