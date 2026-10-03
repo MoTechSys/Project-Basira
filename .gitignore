@@ -45,3 +45,8 @@ corpus/snapshot/
 *.tsbuildinfo
 coverage/
 .turbo/
+
+# Local snapshot caches
+corpus/snapshots/
+backend/.coverage
+backend/htmlcov/
