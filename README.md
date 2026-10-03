@@ -29,3 +29,23 @@ scripts/   — سكربتات التشغيل
 
 ## الحالة
 🚧 قيد التطوير — المسابقة 4-6 أكتوبر 2026
+
+## التشغيل السريع
+
+```bash
+# تجهيز البيئة
+cp .env.example .env
+./scripts/bootstrap.sh
+
+# التشغيل محلياً
+./scripts/serve.sh
+# API على http://localhost:8080
+```
+
+## الاختبار
+```bash
+cd backend && pytest -q
+```
+
+## المصادر المعتمدة
+انظر `SOURCES.md` للقائمة الكاملة مع هاشات SHA-256.
