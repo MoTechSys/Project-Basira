@@ -1,54 +1,53 @@
 # حالة المشروع — بصيرة
 
-> آخر تحديث: 2026-10-04 المساء (نهاية اليوم الأول)
+> آخر تحديث: 2026-10-05 المساء (نهاية اليوم الثاني)
 > المشرف: MoTechSys
 
-## ما أُنجز اليوم
+## اليوم الثاني — ما أُنجز
 
-### الواجهة الخلفية (backend-agent)
-- [x] طبقة الـ schemas (Pydantic v2) — 4 حالات، أربع أنواع اقتباسات
-- [x] الـ Config/Settings وتحميل البيئة
-- [x] المطبّع العربي + اختباراته
-- [x] محرك الحالات مع ثوابت I1-I9 (religious safety invariants)
-- [x] موفّرو LLM والرؤية (mock + openai-compat)
-- [x] المخزن (store) والفهرس الكسول
-- [x] طبقة الاستخراج (extract)
-- [x] طبقة الاسترجاع الهجين (retrieve: BM25 + fuzzy)
-- [x] طبقة المطابقة الحتمية (match: exact + harakat + window + diff)
-- [x] المنسّق (pipeline) + المدقّق اللاحق (verify)
-- [x] نقطة الدخول FastAPI + /check + /health
+### الواجهة الأمامية (frontend-agent) ✅
+- [x] هيكل Vite + React 19 + TypeScript 6
+- [x] نظام تصميم: tokens.css, Logo/Icon, i18n ar/en
+- [x] Components: StatusBadge, QuoteCard, ResultsView, SourcesFooter, DiffView, AnnotatedText
+- [x] Check.tsx كاملة مع كل حالات (loading/empty/error/success)
+- [x] موقع كامل: Home, Shell, Settings, LensDemo, Starfield, router
+- [x] PWA: manifest, sw.js (cache-first/network-first)
+- [x] خطوط Noto Naskh محلياً (لا CDN)
 
-### الذخيرة النصية (corpus-agent)
-- [x] manifest.json بـ SHA-256 لكل مصدر
-- [x] أسماء السور (114)
-- [x] fetch.py لجلب المصادر الأصلية
-- [x] build_index.py لبناء الفهرس
-- [x] snapshot.py للتحقق من الـ hashes قبل التحميل
-- [x] build_fixture.py لبيانات اختبارية حتمية
+### الواجهة الخلفية — تعزيز الأمان
+- [x] guard.py (حد الحجم، bidi، control chars)
+- [x] english_gate.py (كشف السكربت، تمييز translation_assisted)
+- [x] byok.py (مفاتيح لكل طلب، لا تسجيل، لا حفظ)
+- [x] devgate.py (مسارات dev خلف BASIRA_DEV_TOKEN)
+- [x] mcp_server.py (stdio MCP)
+- [x] openapi_examples.json لـ /docs
 
-### الاختبارات (qa-agent)
-- [x] test_normalize, test_state, test_providers
-- [x] test_pipeline, test_verify, test_api, test_snapshot
-- التغطية الحالية: ~70% للـ backend الأساسي
+### الـ Eval
+- [x] PLAN.md + metrics.py + materialize.py + false_alarm.py
+- [x] cases.yaml (60 حالة عربية) + english_cases.yaml (40 حالة)
+- [x] islamiceval adapter للـ harness الرسمي
+- [x] gen_cases.py لتوسيع الحالات
 
-### DevOps (devops-agent)
-- [x] Dockerfile متعدد المراحل بتصلّب أمني
-- [x] docker-compose.yml
-- [x] CI (GitHub Actions) للـ backend + frontend
-- [x] scripts/bootstrap.sh + scripts/serve.sh
+### DevOps
+- [x] scripts: smoke, bench_models, mcp_demo, gen_examples, gen_trust, check_site_lexicon
 
-## المتبقي ليوم غد (الخامس من أكتوبر)
-- [ ] الواجهة الأمامية (React + Vite + TS) — frontend-agent
-- [ ] وحدات حماية إضافية: guard, english_gate, byok
-- [ ] خادم MCP اختياري
-- [ ] eval harness + مصفوفة قياس الدقة والاسترجاع
-- [ ] الترجمات (messages/ar.json + en.json)
-- [ ] فحص SOURCES.md النهائي
-- [ ] شاشة التسليم / README جاهز للعرض
+### الاختبارات الجديدة
+- [x] test_guard, test_english_gate, test_byok, test_api_dev
+- [x] test_mcp, test_rules, test_precision, test_safety_gates
+- [x] test_scholar_lens, test_translations
+- [x] frontend/e2e/check.spec.ts (Playwright)
 
-## الالتزامات غير القابلة للتفاوض
-1. لا إفتاء ولا تخريج ولا توليد نص شرعي
-2. المطابقة حتمية بعد التطبيع فقط
-3. فشل مغلق (fail-closed) عند أي عدم تطابق hash
-4. الـ 4-state إلزامي لكل خرج
+## اليوم الأخير (6 أكتوبر) — المتبقي
+- [ ] تثبيت SOURCES.md النهائي + تجديد hashes
+- [ ] جلسة اختبارات حرجة (false alarms + adversarial)
+- [ ] README العرض (demo screenshots, 5-min pitch script)
+- [ ] تحسينات UX بسيطة بناءً على اختبار داخلي
+- [ ] CHANGELOG + v0.1.0 tag
+- [ ] تجهيز حزمة التسليم (deploy preview + تسجيل)
+
+## المقاييس الحالية
+- Backend LoC: ~11.5k Python
+- Frontend LoC: ~4.4k TypeScript
+- اختبارات: 100+ (أغلبها passing في CI محلي)
+- تغطية backend: ~82%
 
