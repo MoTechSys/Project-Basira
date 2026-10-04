@@ -1,0 +1,490 @@
+{
+ "found": {
+  "request": {
+   "text": "قال تعالى: ﴿إن الله مع الصابرين﴾",
+   "ui_lang": "ar"
+  },
+  "response": {
+   "request_id": "9c591616-d911-41bc-baaf-1b4674183a7e",
+   "disclaimer_key": "footer",
+   "transparency_key": "transparency_notice",
+   "corpus": {
+    "tanzil": "1.1",
+    "ohd_commit": "1515f6cb",
+    "hadeethenc": "1.7.0"
+   },
+   "extraction_degraded": false,
+   "extraction_provider": "mock",
+   "flags": {
+    "chain_message": false,
+    "refusal": false,
+    "pii_suspected": false
+   },
+   "quotes": [
+    {
+     "id": "q1",
+     "span": {
+      "start": 12,
+      "end": 31
+     },
+     "quoted_text": "إن الله مع الصابرين",
+     "kind": "quran",
+     "language": "ar",
+     "source_modality": "text",
+     "claimed_source": null,
+     "claimed_source_mismatch": false,
+     "status": "found",
+     "review_reason": null,
+     "score": 1.0,
+     "message_key": "found_multi",
+     "notice_keys": [
+      "quran_fragment"
+     ],
+     "matches": [
+      {
+       "corpus": "tanzil",
+       "ref": {
+        "surah": 2,
+        "ayah": 153
+       },
+       "ref_label_ar": "سورة البقرة، الآية 153",
+       "ref_label_en": "Surah Al-Baqarah (2:153)",
+       "collection_tier": "quran",
+       "source_text": "يَٰٓأَيُّهَا ٱلَّذِينَ ءَامَنُوا۟ ٱسْتَعِينُوا۟ بِٱلصَّبْرِ وَٱلصَّلَوٰةِ إِنَّ ٱللَّهَ مَعَ ٱلصَّٰبِرِينَ",
+       "source_text_range": null,
+       "source_url": "https://quranpedia.net/surah/1/2/153",
+       "links": [
+        {
+         "name": "quranpedia.net",
+         "url": "https://quranpedia.net/surah/1/2/153"
+        }
+       ],
+       "diff": [],
+       "diff_kinds": [],
+       "score": 1.0,
+       "grade": null,
+       "continues_to": null
+      }
+     ],
+     "total_positions": 2,
+     "external_search_links": [],
+     "segments": [
+      {
+       "type": "Ayah",
+       "start": 12,
+       "end": 31
+      }
+     ],
+     "repeated_spans": []
+    }
+   ],
+   "validator_rejections": 0,
+   "timings_ms": {
+    "extract": 5,
+    "retrieve": 0,
+    "match": 1,
+    "total": 8
+   },
+   "ocr_text": null,
+   "determinism_hash": "5785aa4af67b8d21cdafa04ca833bdf2cfd8d07f4a254f24e15d4bd8b842e78b"
+  }
+ },
+ "partial_match": {
+  "request": {
+   "text": "قال ﷺ: «طلب العلم فريضة على كل مسلم ومسلمة»",
+   "ui_lang": "ar"
+  },
+  "response": {
+   "request_id": "c3d829a1-f61a-4d21-abc0-782656dd5a27",
+   "disclaimer_key": "footer",
+   "transparency_key": "transparency_notice",
+   "corpus": {
+    "tanzil": "1.1",
+    "ohd_commit": "1515f6cb",
+    "hadeethenc": "1.7.0"
+   },
+   "extraction_degraded": false,
+   "extraction_provider": "mock",
+   "flags": {
+    "chain_message": false,
+    "refusal": false,
+    "pii_suspected": false
+   },
+   "quotes": [
+    {
+     "id": "q1",
+     "span": {
+      "start": 8,
+      "end": 42
+     },
+     "quoted_text": "طلب العلم فريضة على كل مسلم ومسلمة",
+     "kind": "hadith_matn",
+     "language": "ar",
+     "source_modality": "text",
+     "claimed_source": null,
+     "claimed_source_mismatch": false,
+     "status": "partial_match",
+     "review_reason": null,
+     "score": 0.8571,
+     "message_key": "partial_match",
+     "notice_keys": [
+      "hadith_variant",
+      "ohd_numbering",
+      "ohd_display_note",
+      "other_nine_referral",
+      "no_grade"
+     ],
+     "matches": [
+      {
+       "corpus": "ohd",
+       "ref": {
+        "book": "sunan_ibn-maja",
+        "num": 220,
+        "numbering": "ohd"
+       },
+       "ref_label_ar": "سنن ابن ماجه، رقم 220 (ترقيم مجموعة Open-Hadith-Data)",
+       "ref_label_en": "Sunan Ibn Majah, no. 220 (Open-Hadith-Data numbering)",
+       "collection_tier": "other_nine",
+       "source_text": " حَدَّثَنَا  هِشَامُ بْنُ عَمَّارٍ  حَدَّثَنَا  حَفْصُ بْنُ سُلَيْمَانَ  حَدَّثَنَا  كَثِيرُ بْنُ شِنْظِيرٍ  عَنْ  مُحَمَّدِ بْنِ سِيرِينَ  عَنْ  أَنَسِ بْنِ مَالِكٍ  قَالَ  قَالَ رَسُولُ اللَّهِ  صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ  طَلَبُ الْعِلْمِ فَرِيضَةٌ عَلَى كُلِّ مُسْلِمٍ وَوَاضِعُ الْعِلْمِ عِنْدَ غَيْرِ أَهْلِهِ كَمُقَلِّدِ الْخَنَازِيرِ  الْجَوْهَرَ وَاللُّؤْلُؤَ وَالذَّهَبَ ",
+       "source_text_range": [
+        232,
+        278
+       ],
+       "source_url": "https://github.com/mhashim6/Open-Hadith-Data/blob/1515f6cb/Sunan_Ibn-Maja/sunan_ibn-maja_ahadith_mushakkala_mufassala.utf8.csv",
+       "links": [
+        {
+         "name": "Open-Hadith-Data",
+         "url": "https://github.com/mhashim6/Open-Hadith-Data/blob/1515f6cb/Sunan_Ibn-Maja/sunan_ibn-maja_ahadith_mushakkala_mufassala.utf8.csv"
+        }
+       ],
+       "diff": [
+        {
+         "op": "equal",
+         "quote_range": [
+          0,
+          6
+         ],
+         "source_range": [
+          0,
+          6
+         ],
+         "quote_chars": [
+          0,
+          27
+         ],
+         "source_chars": [
+          232,
+          278
+         ],
+         "quote_letters": [],
+         "source_letters": []
+        },
+        {
+         "op": "delete",
+         "quote_range": [
+          6,
+          7
+         ],
+         "source_range": [
+          6,
+          6
+         ],
+         "quote_chars": [
+          28,
+          34
+         ],
+         "source_chars": [
+          278,
+          278
+         ],
+         "quote_letters": [],
+         "source_letters": []
+        }
+       ],
+       "diff_kinds": [
+        "word_added_in_quote"
+       ],
+       "score": 0.8571,
+       "grade": null,
+       "continues_to": null
+      }
+     ],
+     "total_positions": 1,
+     "external_search_links": [
+      {
+       "name": "ابحث في الدرر السنية",
+       "url": "https://dorar.net/hadith/search?q=%D8%B7%D9%84%D8%A8%20%D8%A7%D9%84%D8%B9%D9%84%D9%85%20%D9%81%D8%B1%D9%8A%D8%B6%D8%A9%20%D8%B9%D9%84%D9%89%20%D9%83%D9%84%20%D9%85%D8%B3%D9%84%D9%85%20%D9%88%D9%85%D8%B3%D9%84%D9%85%D8%A9"
+      },
+      {
+       "name": "ابحث في المكتبة الشاملة",
+       "url": "https://shamela.ws/search?q=%D8%B7%D9%84%D8%A8%20%D8%A7%D9%84%D8%B9%D9%84%D9%85%20%D9%81%D8%B1%D9%8A%D8%B6%D8%A9%20%D8%B9%D9%84%D9%89%20%D9%83%D9%84%20%D9%85%D8%B3%D9%84%D9%85%20%D9%88%D9%85%D8%B3%D9%84%D9%85%D8%A9"
+      }
+     ],
+     "segments": [
+      {
+       "type": "matn",
+       "start": 8,
+       "end": 42
+      }
+     ],
+     "repeated_spans": []
+    }
+   ],
+   "validator_rejections": 0,
+   "timings_ms": {
+    "extract": 1,
+    "retrieve": 15,
+    "match": 0,
+    "total": 19
+   },
+   "ocr_text": null,
+   "determinism_hash": "6862dda6e83fca6d796cecdf527cc04c08e2ed5916617b87deab3332c05eaa6f"
+  }
+ },
+ "needs_review": {
+  "request": {
+   "text": "قال تعالى: ﴿إن الله علي كل شيء قدير﴾",
+   "ui_lang": "ar"
+  },
+  "response": {
+   "request_id": "4e205547-c076-45b8-887b-a013d518e5b1",
+   "disclaimer_key": "footer",
+   "transparency_key": "transparency_notice",
+   "corpus": {
+    "tanzil": "1.1",
+    "ohd_commit": "1515f6cb",
+    "hadeethenc": "1.7.0"
+   },
+   "extraction_degraded": false,
+   "extraction_provider": "mock",
+   "flags": {
+    "chain_message": false,
+    "refusal": false,
+    "pii_suspected": false
+   },
+   "quotes": [
+    {
+     "id": "q1",
+     "span": {
+      "start": 12,
+      "end": 35
+     },
+     "quoted_text": "إن الله علي كل شيء قدير",
+     "kind": "quran",
+     "language": "ar",
+     "source_modality": "text",
+     "claimed_source": null,
+     "claimed_source_mismatch": false,
+     "status": "needs_review",
+     "review_reason": "orthographic_difference",
+     "score": 1.0,
+     "message_key": "needs_review_quran",
+     "notice_keys": [
+      "many_positions"
+     ],
+     "matches": [
+      {
+       "corpus": "tanzil",
+       "ref": {
+        "surah": 2,
+        "ayah": 20
+       },
+       "ref_label_ar": "سورة البقرة، الآية 20",
+       "ref_label_en": "Surah Al-Baqarah (2:20)",
+       "collection_tier": "quran",
+       "source_text": "يَكَادُ ٱلْبَرْقُ يَخْطَفُ أَبْصَٰرَهُمْ كُلَّمَآ أَضَآءَ لَهُم مَّشَوْا۟ فِيهِ وَإِذَآ أَظْلَمَ عَلَيْهِمْ قَامُوا۟ وَلَوْ شَآءَ ٱللَّهُ لَذَهَبَ بِسَمْعِهِمْ وَأَبْصَٰرِهِمْ إِنَّ ٱللَّهَ عَلَىٰ كُلِّ شَىْءٍ قَدِيرٌ",
+       "source_text_range": [
+        180,
+        220
+       ],
+       "source_url": "https://quranpedia.net/surah/1/2/20",
+       "links": [
+        {
+         "name": "quranpedia.net",
+         "url": "https://quranpedia.net/surah/1/2/20"
+        }
+       ],
+       "diff": [
+        {
+         "op": "equal",
+         "quote_range": [
+          0,
+          2
+         ],
+         "source_range": [
+          0,
+          2
+         ],
+         "quote_chars": [
+          0,
+          7
+         ],
+         "source_chars": [
+          180,
+          192
+         ],
+         "quote_letters": [],
+         "source_letters": []
+        },
+        {
+         "op": "replace",
+         "quote_range": [
+          2,
+          3
+         ],
+         "source_range": [
+          2,
+          3
+         ],
+         "quote_chars": [
+          8,
+          11
+         ],
+         "source_chars": [
+          194,
+          199
+         ],
+         "quote_letters": [
+          [
+           10,
+           11
+          ]
+         ],
+         "source_letters": [
+          [
+           198,
+           199
+          ]
+         ]
+        },
+        {
+         "op": "equal",
+         "quote_range": [
+          3,
+          6
+         ],
+         "source_range": [
+          3,
+          6
+         ],
+         "quote_chars": [
+          12,
+          23
+         ],
+         "source_chars": [
+          201,
+          220
+         ],
+         "quote_letters": [],
+         "source_letters": []
+        }
+       ],
+       "diff_kinds": [
+        "word_replaced"
+       ],
+       "score": 1.0,
+       "grade": null,
+       "continues_to": null
+      }
+     ],
+     "total_positions": 11,
+     "external_search_links": [
+      {
+       "name": "ابحث في موسوعة القرآن",
+       "url": "https://quranpedia.net/search?q=%D8%A5%D9%86%20%D8%A7%D9%84%D9%84%D9%87%20%D8%B9%D9%84%D9%8A%20%D9%83%D9%84%20%D8%B4%D9%8A%D8%A1%20%D9%82%D8%AF%D9%8A%D8%B1"
+      }
+     ],
+     "segments": [
+      {
+       "type": "Ayah",
+       "start": 12,
+       "end": 35
+      }
+     ],
+     "repeated_spans": []
+    }
+   ],
+   "validator_rejections": 0,
+   "timings_ms": {
+    "extract": 1,
+    "retrieve": 0,
+    "match": 1,
+    "total": 4
+   },
+   "ocr_text": null,
+   "determinism_hash": "2277b24db80d3f37e20eda3a40bf23b9c8701f6404f093fa622dd8a23732bbab"
+  }
+ },
+ "not_found": {
+  "request": {
+   "text": "قال ﷺ: «الدين المعاملة»",
+   "ui_lang": "ar"
+  },
+  "response": {
+   "request_id": "e9c5aaa6-d6ba-46fe-a318-d6671fc648ac",
+   "disclaimer_key": "footer",
+   "transparency_key": "transparency_notice",
+   "corpus": {
+    "tanzil": "1.1",
+    "ohd_commit": "1515f6cb",
+    "hadeethenc": "1.7.0"
+   },
+   "extraction_degraded": false,
+   "extraction_provider": "mock",
+   "flags": {
+    "chain_message": false,
+    "refusal": false,
+    "pii_suspected": false
+   },
+   "quotes": [
+    {
+     "id": "q1",
+     "span": {
+      "start": 8,
+      "end": 22
+     },
+     "quoted_text": "الدين المعاملة",
+     "kind": "hadith_matn",
+     "language": "ar",
+     "source_modality": "text",
+     "claimed_source": null,
+     "claimed_source_mismatch": false,
+     "status": "not_found",
+     "review_reason": null,
+     "score": 0.0,
+     "message_key": "not_found",
+     "notice_keys": [],
+     "matches": [],
+     "total_positions": 0,
+     "external_search_links": [
+      {
+       "name": "ابحث في الدرر السنية",
+       "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D8%AF%D9%8A%D9%86%20%D8%A7%D9%84%D9%85%D8%B9%D8%A7%D9%85%D9%84%D8%A9"
+      },
+      {
+       "name": "ابحث في المكتبة الشاملة",
+       "url": "https://shamela.ws/search?q=%D8%A7%D9%84%D8%AF%D9%8A%D9%86%20%D8%A7%D9%84%D9%85%D8%B9%D8%A7%D9%85%D9%84%D8%A9"
+      }
+     ],
+     "segments": [
+      {
+       "type": "matn",
+       "start": 8,
+       "end": 22
+      }
+     ],
+     "repeated_spans": []
+    }
+   ],
+   "validator_rejections": 0,
+   "timings_ms": {
+    "extract": 1,
+    "retrieve": 4,
+    "match": 0,
+    "total": 6
+   },
+   "ocr_text": null,
+   "determinism_hash": "a4d5b77d78e2b341d0ecd2c6082a94a8f8ae42bf98e48b76652d6b9adaeff943"
+  }
+ }
+}
