@@ -1,0 +1,652 @@
+{
+ "rules": {
+  "f1": 0.6295632085979572,
+  "f1_q": 0.7609971478815309,
+  "f1_h": 0.6513921376402598,
+  "secs": 9.0971839427948,
+  "per_q": [
+   {
+    "id": "A-Q01",
+    "f1": 0.4371,
+    "gold_spans": 1,
+    "pred_spans": 1
+   },
+   {
+    "id": "A-Q02",
+    "f1": 0.6839,
+    "gold_spans": 10,
+    "pred_spans": 16
+   },
+   {
+    "id": "A-Q03",
+    "f1": 1.0,
+    "gold_spans": 3,
+    "pred_spans": 3
+   },
+   {
+    "id": "A-Q04",
+    "f1": 0.5433,
+    "gold_spans": 2,
+    "pred_spans": 2
+   },
+   {
+    "id": "A-Q05",
+    "f1": 0.5274,
+    "gold_spans": 3,
+    "pred_spans": 6
+   },
+   {
+    "id": "A-Q06",
+    "f1": 0.9561,
+    "gold_spans": 3,
+    "pred_spans": 3
+   },
+   {
+    "id": "A-Q07",
+    "f1": 0.2639,
+    "gold_spans": 1,
+    "pred_spans": 3
+   },
+   {
+    "id": "A-Q08",
+    "f1": 0.9905,
+    "gold_spans": 9,
+    "pred_spans": 8
+   },
+   {
+    "id": "A-Q09",
+    "f1": 0.5941,
+    "gold_spans": 12,
+    "pred_spans": 11
+   },
+   {
+    "id": "A-Q10",
+    "f1": 1.0,
+    "gold_spans": 4,
+    "pred_spans": 4
+   },
+   {
+    "id": "A-Q11",
+    "f1": 0.9997,
+    "gold_spans": 13,
+    "pred_spans": 13
+   },
+   {
+    "id": "A-Q12",
+    "f1": 1.0,
+    "gold_spans": 15,
+    "pred_spans": 15
+   },
+   {
+    "id": "A-Q13",
+    "f1": 1.0,
+    "gold_spans": 3,
+    "pred_spans": 3
+   },
+   {
+    "id": "A-Q14",
+    "f1": 0.6118,
+    "gold_spans": 5,
+    "pred_spans": 10
+   },
+   {
+    "id": "A-Q15",
+    "f1": 0.0,
+    "gold_spans": 0,
+    "pred_spans": 1,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q16",
+    "f1": 1.0,
+    "gold_spans": 2,
+    "pred_spans": 2
+   },
+   {
+    "id": "A-Q17",
+    "f1": 0.7002,
+    "gold_spans": 7,
+    "pred_spans": 24
+   },
+   {
+    "id": "A-Q18",
+    "f1": 1.0,
+    "gold_spans": 0,
+    "pred_spans": 0,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q19",
+    "f1": 0.9142,
+    "gold_spans": 5,
+    "pred_spans": 7
+   },
+   {
+    "id": "A-Q20",
+    "f1": 0.8061,
+    "gold_spans": 4,
+    "pred_spans": 11
+   },
+   {
+    "id": "A-Q21",
+    "f1": 0.9738,
+    "gold_spans": 1,
+    "pred_spans": 1
+   },
+   {
+    "id": "A-Q22",
+    "f1": 0.2262,
+    "gold_spans": 1,
+    "pred_spans": 0
+   },
+   {
+    "id": "A-Q23",
+    "f1": 1.0,
+    "gold_spans": 0,
+    "pred_spans": 0,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q24",
+    "f1": 1.0,
+    "gold_spans": 0,
+    "pred_spans": 0,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q25",
+    "f1": 0.6577,
+    "gold_spans": 3,
+    "pred_spans": 9
+   },
+   {
+    "id": "A-Q26",
+    "f1": 0.0,
+    "gold_spans": 0,
+    "pred_spans": 1,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q27",
+    "f1": 0.0,
+    "gold_spans": 0,
+    "pred_spans": 1,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q28",
+    "f1": 0.0,
+    "gold_spans": 0,
+    "pred_spans": 1,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q29",
+    "f1": 0.0,
+    "gold_spans": 0,
+    "pred_spans": 1,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q30",
+    "f1": 0.7806,
+    "gold_spans": 15,
+    "pred_spans": 21
+   },
+   {
+    "id": "A-Q31",
+    "f1": 1.0,
+    "gold_spans": 0,
+    "pred_spans": 0,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q32",
+    "f1": 1.0,
+    "gold_spans": 0,
+    "pred_spans": 0,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q33",
+    "f1": 0.4081,
+    "gold_spans": 2,
+    "pred_spans": 4
+   },
+   {
+    "id": "A-Q34",
+    "f1": 0.9195,
+    "gold_spans": 3,
+    "pred_spans": 6
+   },
+   {
+    "id": "A-Q35",
+    "f1": 0.8919,
+    "gold_spans": 5,
+    "pred_spans": 5
+   },
+   {
+    "id": "A-Q36",
+    "f1": 0.6834,
+    "gold_spans": 10,
+    "pred_spans": 10
+   },
+   {
+    "id": "A-Q37",
+    "f1": 1.0,
+    "gold_spans": 5,
+    "pred_spans": 5
+   },
+   {
+    "id": "A-Q38",
+    "f1": 0.9219,
+    "gold_spans": 7,
+    "pred_spans": 14
+   },
+   {
+    "id": "A-Q39",
+    "f1": 0.724,
+    "gold_spans": 15,
+    "pred_spans": 16
+   },
+   {
+    "id": "A-Q40",
+    "f1": 0.4623,
+    "gold_spans": 7,
+    "pred_spans": 4
+   },
+   {
+    "id": "A-Q41",
+    "f1": 0.6581,
+    "gold_spans": 2,
+    "pred_spans": 5
+   },
+   {
+    "id": "A-Q42",
+    "f1": 0.0,
+    "gold_spans": 0,
+    "pred_spans": 1,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q43",
+    "f1": 1.0,
+    "gold_spans": 0,
+    "pred_spans": 0,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q44",
+    "f1": 0.0327,
+    "gold_spans": 12,
+    "pred_spans": 1
+   },
+   {
+    "id": "A-Q45",
+    "f1": 0.5518,
+    "gold_spans": 2,
+    "pred_spans": 2
+   },
+   {
+    "id": "A-Q46",
+    "f1": 1.0,
+    "gold_spans": 0,
+    "pred_spans": 0,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q47",
+    "f1": 0.5581,
+    "gold_spans": 2,
+    "pred_spans": 3
+   },
+   {
+    "id": "A-Q48",
+    "f1": 0.0,
+    "gold_spans": 0,
+    "pred_spans": 1,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q49",
+    "f1": 0.0,
+    "gold_spans": 0,
+    "pred_spans": 1,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q50",
+    "f1": 0.0,
+    "gold_spans": 0,
+    "pred_spans": 1,
+    "no_annotation": true
+   }
+  ],
+  "provider": "mock"
+ },
+ "rules+llm": {
+  "f1": 0.6747564630097093,
+  "f1_q": 0.7651070883911616,
+  "f1_h": 0.7159926731692576,
+  "secs": 357.1919333934784,
+  "per_q": [
+   {
+    "id": "A-Q01",
+    "f1": 0.8053,
+    "gold_spans": 1,
+    "pred_spans": 2
+   },
+   {
+    "id": "A-Q02",
+    "f1": 0.8052,
+    "gold_spans": 10,
+    "pred_spans": 7
+   },
+   {
+    "id": "A-Q03",
+    "f1": 1.0,
+    "gold_spans": 3,
+    "pred_spans": 3
+   },
+   {
+    "id": "A-Q04",
+    "f1": 0.5433,
+    "gold_spans": 2,
+    "pred_spans": 2
+   },
+   {
+    "id": "A-Q05",
+    "f1": 0.8871,
+    "gold_spans": 3,
+    "pred_spans": 2
+   },
+   {
+    "id": "A-Q06",
+    "f1": 0.9561,
+    "gold_spans": 3,
+    "pred_spans": 3
+   },
+   {
+    "id": "A-Q07",
+    "f1": 0.4959,
+    "gold_spans": 1,
+    "pred_spans": 0
+   },
+   {
+    "id": "A-Q08",
+    "f1": 0.9905,
+    "gold_spans": 9,
+    "pred_spans": 8
+   },
+   {
+    "id": "A-Q09",
+    "f1": 0.8673,
+    "gold_spans": 12,
+    "pred_spans": 10
+   },
+   {
+    "id": "A-Q10",
+    "f1": 1.0,
+    "gold_spans": 4,
+    "pred_spans": 4
+   },
+   {
+    "id": "A-Q11",
+    "f1": 0.9783,
+    "gold_spans": 13,
+    "pred_spans": 12
+   },
+   {
+    "id": "A-Q12",
+    "f1": 1.0,
+    "gold_spans": 15,
+    "pred_spans": 15
+   },
+   {
+    "id": "A-Q13",
+    "f1": 1.0,
+    "gold_spans": 3,
+    "pred_spans": 3
+   },
+   {
+    "id": "A-Q14",
+    "f1": 0.7152,
+    "gold_spans": 5,
+    "pred_spans": 7
+   },
+   {
+    "id": "A-Q15",
+    "f1": 0.0,
+    "gold_spans": 0,
+    "pred_spans": 1,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q16",
+    "f1": 1.0,
+    "gold_spans": 2,
+    "pred_spans": 2
+   },
+   {
+    "id": "A-Q17",
+    "f1": 1.0,
+    "gold_spans": 7,
+    "pred_spans": 7
+   },
+   {
+    "id": "A-Q18",
+    "f1": 1.0,
+    "gold_spans": 0,
+    "pred_spans": 0,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q19",
+    "f1": 0.9142,
+    "gold_spans": 5,
+    "pred_spans": 7
+   },
+   {
+    "id": "A-Q20",
+    "f1": 0.8061,
+    "gold_spans": 4,
+    "pred_spans": 11
+   },
+   {
+    "id": "A-Q21",
+    "f1": 0.9738,
+    "gold_spans": 1,
+    "pred_spans": 1
+   },
+   {
+    "id": "A-Q22",
+    "f1": 0.2262,
+    "gold_spans": 1,
+    "pred_spans": 0
+   },
+   {
+    "id": "A-Q23",
+    "f1": 1.0,
+    "gold_spans": 0,
+    "pred_spans": 0,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q24",
+    "f1": 1.0,
+    "gold_spans": 0,
+    "pred_spans": 0,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q25",
+    "f1": 0.6577,
+    "gold_spans": 3,
+    "pred_spans": 9
+   },
+   {
+    "id": "A-Q26",
+    "f1": 0.0,
+    "gold_spans": 0,
+    "pred_spans": 1,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q27",
+    "f1": 0.0,
+    "gold_spans": 0,
+    "pred_spans": 1,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q28",
+    "f1": 0.0,
+    "gold_spans": 0,
+    "pred_spans": 1,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q29",
+    "f1": 0.0,
+    "gold_spans": 0,
+    "pred_spans": 1,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q30",
+    "f1": 0.7239,
+    "gold_spans": 15,
+    "pred_spans": 13
+   },
+   {
+    "id": "A-Q31",
+    "f1": 1.0,
+    "gold_spans": 0,
+    "pred_spans": 0,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q32",
+    "f1": 1.0,
+    "gold_spans": 0,
+    "pred_spans": 0,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q33",
+    "f1": 0.5879,
+    "gold_spans": 2,
+    "pred_spans": 2
+   },
+   {
+    "id": "A-Q34",
+    "f1": 0.9195,
+    "gold_spans": 3,
+    "pred_spans": 6
+   },
+   {
+    "id": "A-Q35",
+    "f1": 0.8919,
+    "gold_spans": 5,
+    "pred_spans": 5
+   },
+   {
+    "id": "A-Q36",
+    "f1": 0.6834,
+    "gold_spans": 10,
+    "pred_spans": 10
+   },
+   {
+    "id": "A-Q37",
+    "f1": 1.0,
+    "gold_spans": 5,
+    "pred_spans": 5
+   },
+   {
+    "id": "A-Q38",
+    "f1": 0.9219,
+    "gold_spans": 7,
+    "pred_spans": 14
+   },
+   {
+    "id": "A-Q39",
+    "f1": 0.7461,
+    "gold_spans": 15,
+    "pred_spans": 14
+   },
+   {
+    "id": "A-Q40",
+    "f1": 0.4623,
+    "gold_spans": 7,
+    "pred_spans": 4
+   },
+   {
+    "id": "A-Q41",
+    "f1": 0.6581,
+    "gold_spans": 2,
+    "pred_spans": 5
+   },
+   {
+    "id": "A-Q42",
+    "f1": 0.0,
+    "gold_spans": 0,
+    "pred_spans": 1,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q43",
+    "f1": 1.0,
+    "gold_spans": 0,
+    "pred_spans": 0,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q44",
+    "f1": 0.0327,
+    "gold_spans": 12,
+    "pred_spans": 1
+   },
+   {
+    "id": "A-Q45",
+    "f1": 0.5518,
+    "gold_spans": 2,
+    "pred_spans": 2
+   },
+   {
+    "id": "A-Q46",
+    "f1": 1.0,
+    "gold_spans": 0,
+    "pred_spans": 0,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q47",
+    "f1": 0.9362,
+    "gold_spans": 2,
+    "pred_spans": 1
+   },
+   {
+    "id": "A-Q48",
+    "f1": 0.0,
+    "gold_spans": 0,
+    "pred_spans": 1,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q49",
+    "f1": 0.0,
+    "gold_spans": 0,
+    "pred_spans": 1,
+    "no_annotation": true
+   },
+   {
+    "id": "A-Q50",
+    "f1": 0.0,
+    "gold_spans": 0,
+    "pred_spans": 1,
+    "no_annotation": true
+   }
+  ],
+  "provider": "openai-compatible:gpt-5.4"
+ }
+}
