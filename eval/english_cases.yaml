@@ -1,0 +1,156 @@
+# eval/english_cases.yaml — 30 English-gate cases. Run: backend/.venv/bin/python eval/run_english.py
+#
+# Same spirit as eval/cases.yaml: one input text, one declared expectation, judged mechanically.
+#   expect: {kind: quran|hadith, ref: "2:256" | "<hadeethenc id>", accept: [other refs carrying the same
+#            sentence — an ayah repeated verbatim elsewhere, or the same hadith under two HadeethEnc ids]}
+#   expect: none  → an ordinary English sentence; every candidate must stay below the low-score ceiling.
+# Categories: EQ = Quran, wording from one of the two indexed translations (verbatim or clipped)
+#             EP = Quran, a *popular* English wording NOT in our index (Yusuf Ali / Hilali-Khan / Sahih Intl)
+#             EH = hadith (HadeethEnc English)      EN = not a quotation (incl. hard negatives with
+#             religious vocabulary). `wording` records where the phrasing comes from; nothing is generated.
+- id: EQ-001
+  category: EQ
+  text: "There is no compulsion in religion"
+  expect: {kind: quran, ref: "2:256"}
+  wording: english_rwwad (clipped)
+- id: EP-002
+  category: EP
+  text: "Let there be no compulsion in religion: Truth stands out clear from Error"
+  expect: {kind: quran, ref: "2:256"}
+  wording: Yusuf Ali (not indexed)
+- id: EQ-003
+  category: EQ
+  text: "Indeed, with hardship comes ease"
+  expect: {kind: quran, ref: "94:6", accept: ["94:5"]}
+  wording: english_rwwad; 94:5 repeats the sentence with «For»
+- id: EP-004
+  category: EP
+  text: "So verily, with the hardship, there is relief"
+  expect: {kind: quran, ref: "94:6", accept: ["94:5"]}
+  wording: Hilali-Khan (not indexed)
+- id: EQ-005
+  category: EQ
+  text: "whoever kills a soul unless for a soul or for corruption done in the land - it is as if he had slain mankind entirely"
+  expect: {kind: quran, ref: "5:32"}
+  wording: english_saheeh (brackets removed)
+- id: EP-006
+  category: EP
+  text: "if anyone killed a person it would be as if he killed all mankind, and if anyone saved a life it would be as if he saved the life of all mankind"
+  expect: {kind: quran, ref: "5:32"}
+  wording: Yusuf Ali (not indexed)
+- id: EQ-007
+  category: EQ
+  text: "And kill them wherever you find them"
+  expect: {kind: quran, ref: "2:191"}
+  wording: english_rwwad (clipped)
+- id: EQ-008
+  category: EQ
+  text: "We have not sent you except as a mercy to the worlds"
+  expect: {kind: quran, ref: "21:107"}
+  wording: english_rwwad (bracket removed)
+- id: EP-009
+  category: EP
+  text: "Allah does not burden a soul beyond that it can bear"
+  expect: {kind: quran, ref: "2:286"}
+  wording: Sahih International, popular short form (not indexed)
+- id: EP-010
+  category: EP
+  text: "Verily, in the remembrance of Allah do hearts find rest"
+  expect: {kind: quran, ref: "13:28"}
+  wording: Hilali-Khan (not indexed)
+- id: EQ-011
+  category: EQ
+  text: "So remember Me; I will remember you"
+  expect: {kind: quran, ref: "2:152"}
+  wording: english_saheeh (clipped)
+- id: EQ-012
+  category: EQ
+  text: "Every soul will taste death"
+  expect: {kind: quran, ref: "3:185", accept: ["21:35", "29:57"]}
+  wording: english_saheeh; the sentence opens three ayat verbatim
+- id: EQ-013
+  category: EQ
+  text: "do not despair of the mercy of Allah. Indeed, Allah forgives all sins"
+  expect: {kind: quran, ref: "39:53"}
+  wording: english_saheeh (clipped, diacritics dropped)
+- id: EH-014
+  category: EH
+  text: "None of you truly believes until he loves for his brother what he loves for himself"
+  expect: {kind: hadith, ref: "4717", accept: ["66520"]}
+  wording: HadeethEnc title (+ «truly», popular)
+- id: EH-015
+  category: EH
+  text: "Actions are judged by intentions"
+  expect: {kind: hadith, ref: "4560", accept: ["66511"]}
+  wording: popular short form (HadeethEnc says «the reward of deeds depends on the intentions»)
+- id: EH-016
+  category: EH
+  text: "Religion is sincerity"
+  expect: {kind: hadith, ref: "4309", accept: ["66516"]}
+  wording: HadeethEnc title
+- id: EH-017
+  category: EH
+  text: "The lawful is clear and the unlawful is clear"
+  expect: {kind: hadith, ref: "4314", accept: ["66515"]}
+  wording: HadeethEnc title without «Verily,»
+- id: EH-018
+  category: EH
+  text: "Be in this world as if you were a stranger or a traveler"
+  expect: {kind: hadith, ref: "4704"}
+  wording: popular (HadeethEnc has «as if you are … or a wayfarer»)
+- id: EH-019
+  category: EH
+  text: "Whoever believes in Allah and the Last Day should say what is good or keep silent"
+  expect: {kind: hadith, ref: "5437"}
+  wording: HadeethEnc title
+- id: EH-020
+  category: EH
+  text: "Fear Allah wherever you are, and follow a bad deed with a good deed"
+  expect: {kind: hadith, ref: "4302"}
+  wording: HadeethEnc title (clipped)
+- id: EH-021
+  category: EH
+  text: "Do not get angry"
+  expect: {kind: hadith, ref: "4709"}
+  wording: HadeethEnc title (4 tokens — shortest case)
+- id: EH-022
+  category: EH
+  text: "Allah does not look at your appearance and wealth, but He looks at your hearts and deeds"
+  expect: {kind: hadith, ref: "4555"}
+  wording: HadeethEnc title
+- id: EH-023
+  category: EH
+  text: "Modesty is part of faith"
+  expect: {kind: hadith, ref: "5478"}
+  wording: HadeethEnc title
+- id: EN-024
+  category: EN
+  text: "The weather is nice today and I am going to the market to buy vegetables"
+  expect: none
+- id: EN-025
+  category: EN
+  text: "Please remember to submit the quarterly report before Friday afternoon"
+  expect: none
+- id: EN-026
+  category: EN
+  text: "The function returns a sorted list of integers and raises ValueError on empty input"
+  expect: none
+- id: EN-027
+  category: EN
+  text: "Our team won the match last night after a dramatic penalty shootout"
+  expect: none
+- id: EN-028
+  category: EN
+  text: "Patience and prayer are good habits for anyone who wants a calmer life"
+  expect: none
+  wording: hard negative — vocabulary overlaps 2:45 / 2:153
+- id: EN-029
+  category: EN
+  text: "The mosque committee will meet on Tuesday to discuss the parking situation"
+  expect: none
+  wording: hard negative — religious vocabulary, no quotation
+- id: EN-030
+  category: EN
+  text: "I believe that kindness to parents is important in every culture"
+  expect: none
+  wording: hard negative — vocabulary overlaps 17:23
