@@ -30,7 +30,9 @@ RUN python corpus/fetch.py && python corpus/build_index.py \
 
 # ---------- 4) runtime ----------
 FROM python:3.12-slim
-ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 \
+# Shown in /health so a deployment can be tied to a commit: --build-arg BUILD_SHA=$(git rev-parse --short HEAD)
+ARG BUILD_SHA=dev
+ENV BUILD_SHA=${BUILD_SHA} PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 \
     BASIRA_INDEX_DIR=/app/corpus/index BASIRA_MANIFEST=/app/corpus/manifest.json \
     BASIRA_MESSAGES_DIR=/app/messages BASIRA_STATIC_DIR=/app/frontend/dist \
     BASIRA_SNAPSHOT_WRITE=0 LLM_PROVIDER=mock VISION_PROVIDER=mock PORT=8000 \

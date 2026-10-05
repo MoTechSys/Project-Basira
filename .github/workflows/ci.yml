@@ -62,10 +62,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
-      - run: docker build -t basira:ci .
+      - run: docker build --build-arg BUILD_SHA=${GITHUB_SHA::7} -t basira:ci .
       - name: smoke
         run: |
           docker run -d --name basira-ci -p 8000:8000 basira:ci
           for i in $(seq 1 60); do curl -sf localhost:8000/health && break; sleep 1; done
           curl -sf localhost:8000/health | grep -q '"boot":"snapshot"'
+          curl -sf localhost:8000/health | grep -q "\"build_sha\":\"${GITHUB_SHA::7}\""
           curl -sf localhost:8000/v1/check -H 'Content-Type: application/json' -d '{"text":"قال تعالى: ﴿قل هو الله أحد﴾"}' | grep -q '"status":"found"'
