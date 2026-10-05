@@ -4,49 +4,72 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "basira-backend"
-version = "0.1.0"
-description = "Basira — Islamic citation verification service"
-requires-python = ">=3.11"
-authors = [{name = "MoTechSys", email = "moain.learn@gmail.com"}]
-license = {text = "Apache-2.0"}
-
+version = "0.2.0"
+description = "Basira — deterministic verification of Quran and Hadith quotations (HTTP API + MCP server)"
+requires-python = ">=3.12"
+license = { text = "Apache-2.0" }
+authors = [{ name = "MoTechSys", email = "moain.learn@gmail.com" }]
+classifiers = [
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Framework :: FastAPI",
+  "License :: OSI Approved :: Apache Software License",
+  "Natural Language :: Arabic",
+]
 dependencies = [
-    "fastapi>=0.110",
-    "uvicorn[standard]>=0.27",
-    "pydantic>=2.6",
-    "httpx>=0.27",
-    "python-multipart>=0.0.9",
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "pydantic>=2.7",
+  "rapidfuzz>=3.9",
+  "numpy>=2.0",
+  "openpyxl>=3.1",
+  "httpx>=0.27",
+  "python-multipart>=0.0.9",
 ]
 
 [project.optional-dependencies]
-dev = [
-    "pytest>=8.0",
-    "pytest-asyncio>=0.23",
-    "pytest-cov>=4.1",
-    "httpx>=0.27",
-    "ruff>=0.3",
-    "mypy>=1.9",
-]
+dev = ["pytest>=8", "pytest-asyncio>=0.23", "hypothesis>=6", "ruff>=0.5", "mypy>=1.10"]
+# Optional MCP server mounted at /mcp; imported only when BASIRA_MCP=1 (docs/INTEGRATIONS.md).
+mcp = ["mcp>=2.2,<3"]
 
+[project.urls]
+Homepage = "https://github.com/MoTechSys/Project-Basira"
+Documentation = "https://github.com/MoTechSys/Project-Basira/tree/main/docs"
+Issues = "https://github.com/MoTechSys/Project-Basira/issues"
+
+# The Docker image installs dependencies from this file alone and runs `app/` from source.
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["app*"]
 
 [tool.ruff]
-line-length = 100
-target-version = "py311"
+line-length = 110
+target-version = "py312"
+src = ["app", "tests"]
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM"]
-ignore = ["E501"]
+select = ["E", "F", "I", "B", "UP", "N", "W", "RUF", "SIM", "C4", "PL"]
+# Arabic text in strings/comments trips the ambiguous-unicode rules by design (RUF001-003).
+# N806: single-letter upper-case names mirror the maths in store.py (G, GS, …).
+ignore = ["PLR0913", "PLR0915", "PLR0917", "PLR2004", "RUF001", "RUF002", "RUF003", "E501", "N806"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["PLR", "S101"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.12"
 strict = true
-warn_return_any = true
-warn_unused_configs = true
+warn_unreachable = true
+files = ["app"]
+
+[[tool.mypy.overrides]]
+module = ["rapidfuzz.*", "openpyxl.*"]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-python_files = ["test_*.py"]
 asyncio_mode = "auto"
+addopts = "-q"
