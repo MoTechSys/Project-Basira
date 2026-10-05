@@ -2,7 +2,7 @@
  * Never caches /v1/* or /health: verification results are always computed live (and never stored).
  * Strategy: navigation → network-first with cached shell fallback (offline page still opens);
  * hashed assets / fonts / brand → cache-first. Bump VERSION to invalidate. */
-const VERSION = "basira-shell-v1";
+const VERSION = "basira-shell-v2"; // v2: identity v4 (E-056) — brand/ and fonts/ files changed under the same names
 const SHELL = ["/", "/manifest.webmanifest", "/fonts/ReadexPro.woff2", "/brand/favicon/favicon.svg", "/brand/pwa/icon-192.png"];
 
 self.addEventListener("install", (e) => {

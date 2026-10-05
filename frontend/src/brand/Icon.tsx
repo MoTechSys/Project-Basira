@@ -1,4 +1,7 @@
-/* Auto-generated from brand/dist/icons — Basira icon set (24×24, stroke 1.75, currentColor) */
+/* Auto-generated from brand/dist/icons — Basira icon set (24×24, stroke 1.75, currentColor).
+ * Exception (E-056): the four state-* icons are the dāra system from docs/design/brand/glyph.py —
+ * one ring, the inner shape alone tells the state (WCAG 1.4.1, colour is never the only carrier):
+ *   found = filled rhombus (the collation dot) · partial = hollow rhombus · review = bar · not_found = empty ring. */
 import * as React from 'react';
 
 export type BasiraIconName =
@@ -81,10 +84,10 @@ const PATHS: Record<BasiraIconName, React.ReactNode> = {
   'shield-verify': (<><path d="m12 3 7 3v5c0 5-3.2 8.3-7 10-3.8-1.7-7-5-7-10V6z"/><path d="m9 12 2 2 4-4.5"/></>),
   'source-link': (<><path d="M14 4h6v6m0-6-8 8m7 1v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"/></>),
   'spinner': (<><path strokeWidth="2.25" d="M12 3a9 9 0 0 1 9 9"/></>),
-  'state-found': (<><path d="m12 2.5 2.84 2.65 3.88.13.13 3.88L21.5 12l-2.65 2.84-.13 3.88-3.88.13L12 21.5l-2.84-2.65-3.88-.13-.13-3.88L2.5 12l2.65-2.84.13-3.88 3.88-.13Z"/><path d="m8.5 12.2 2.4 2.4 4.6-5"/></>),
-  'state-notfound': (<><path d="m12 2.5 2.84 2.65 3.88.13.13 3.88L21.5 12l-2.65 2.84-.13 3.88-3.88.13L12 21.5l-2.84-2.65-3.88-.13-.13-3.88L2.5 12l2.65-2.84.13-3.88 3.88-.13ZM8.5 12h7"/></>),
-  'state-partial': (<><path d="m12 2.5 2.84 2.65 3.88.13.13 3.88L21.5 12l-2.65 2.84-.13 3.88-3.88.13L12 21.5l-2.84-2.65-3.88-.13-.13-3.88L2.5 12l2.65-2.84.13-3.88 3.88-.13Z"/><path d="M8.3 10.6c1.2-1.1 2.5-1.1 3.7 0s2.5 1.1 3.7 0m-7.4 3.2c1.2-1.1 2.5-1.1 3.7 0s2.5 1.1 3.7 0"/></>),
-  'state-review': (<><path d="m12 2.5 2.84 2.65 3.88.13.13 3.88L21.5 12l-2.65 2.84-.13 3.88-3.88.13L12 21.5l-2.84-2.65-3.88-.13-.13-3.88L2.5 12l2.65-2.84.13-3.88 3.88-.13Z"/><path d="M9.8 9.6a2.3 2.3 0 1 1 3.2 2.1c-.7.4-1 .9-1 1.6m0 3z"/></>),
+  'state-found': (<><circle cx="12" cy="12" r="8" strokeWidth="2.6"/><path fill="currentColor" stroke="none" d="M12 8 16 12 12 16 8 12Z"/></>),
+  'state-notfound': (<><circle cx="12" cy="12" r="8" strokeWidth="2.6"/></>),
+  'state-partial': (<><circle cx="12" cy="12" r="8" strokeWidth="2.6"/><path strokeWidth="1.6" d="M12 8.4 15.6 12 12 15.6 8.4 12Z"/></>),
+  'state-review': (<><circle cx="12" cy="12" r="8" strokeWidth="2.6"/><rect width="9" height="3" x="7.5" y="10.5" rx="1.5" fill="currentColor" stroke="none"/></>),
   'theme': (<><path d="M12 3a9 9 0 1 0 9 9c0-.5 0-.9-.1-1.4a6 6 0 0 1-7.5-7.5A9 9 0 0 0 12 3"/></>),
   'upload-image': (<><path d="M19 13.5V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h7.5"/><circle cx="8" cy="9.5" r="1.5"/><path d="m3 17 5-5 4 4 2-2 5 5M18 3v6m-2.5-3.5L18 3l2.5 2.5"/></>),
   'warning': (<><path d="M12 3 2.5 20h19zm0 7v4m0 3z"/></>),
