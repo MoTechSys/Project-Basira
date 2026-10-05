@@ -25,8 +25,10 @@ git log -1 --format='  commit: %h %an — %s' | cut -c1-160
 export BUILD_SHA=$(git rev-parse --short HEAD)
 start=$(date +%s)
 if docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build > /root/build.log 2>&1; then
-  sleep 8
-  code=$(curl -s -m 10 -o /dev/null -w '%{http_code}' "${HEALTH_URL:-https://basirapp.site/health}")
+  for _ in $(seq 1 30); do                          # wait up to ~60 s for the new container to answer
+    code=$(curl -s -m 5 -o /dev/null -w '%{http_code}' "${HEALTH_URL:-https://basirapp.site/health}")
+    [ "$code" = 200 ] && break; sleep 2
+  done
   live=$(curl -s -m 10 "${HEALTH_URL:-https://basirapp.site/health}" | grep -o '"build_sha":"[^"]*"')
   echo "  ✅ DEPLOYED $BUILD_SHA in $(( $(date +%s) - start ))s · health $code · $live"
   docker image prune -f >/dev/null
