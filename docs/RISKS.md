@@ -52,3 +52,12 @@
 
 ### R-009: Lighthouse score < 90
 - **التخفيف:** قياس في CI + تحسين الأصول
+
+---
+
+## مراجعة ليلة التسليم — 2026-10-06
+
+- **R-002** (sources go offline): خففنا بـ snapshot محلي قبل العرض ✅
+- **R-005** (adversarial fabricated hadith): اختبرنا 3 حالات جديدة ✅
+- **R-008** (BYOK leak): مراجعة كود + اختبار test_byok.py يؤكد عدم التسجيل ✅
+- **R-009** (CSP breakage في frontend): اختبار يدوي في chromium + firefox نظيف ✅
