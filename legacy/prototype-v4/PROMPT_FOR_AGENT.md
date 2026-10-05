@@ -1,17 +1,17 @@
 # برومبت للوكيل — دمج Basira v4
 
-أنت تعمل على مستودع `MoTechSys/Project-Basira` (main عند `b801da5` أو بعده). المطلوب دمج حزمة **v4** الجاهزة والمختبرة، ثم التحقق والنشر على الخادم الحي.
+أنت تعمل على مستودع `MoTechSys/Project-Basira00` (main عند `b801da5` أو بعده). المطلوب دمج حزمة **v4** الجاهزة والمختبرة، ثم التحقق والنشر على الخادم الحي.
 
 ## 1) اسحب الحزمة
 ```bash
-git clone https://github.com/MoTechSys/Project-Basira3.git /tmp/basira3
+git clone https://github.com/MoTechSys/Project-Basira00.git /tmp/basira3
 ls /tmp/basira3/basira-v4    # README.md  STRATEGY_AR.md  PROMPT_FOR_AGENT.md  apply.sh  patch/  files/  shots/
 ```
 اقرأ `/tmp/basira3/basira-v4/README.md` أولاً، ففيه التحليل البصري (قبل/بعد) وكل قرار.
 
 ## 2) طبّق
 ```bash
-cd <Project-Basira>
+cd <Project-Basira00>
 bash /tmp/basira3/basira-v4/apply.sh
 ```
 السكربت ينشئ فرع `v4-ui` من `origin/main`، ويطبّق 4 patches بـ `git am --3way`. وإن تعارضت الـ patches، ينسخ الملفات الكاملة من `files/`.

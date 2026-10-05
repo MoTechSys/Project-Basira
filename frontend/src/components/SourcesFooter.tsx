@@ -80,7 +80,7 @@ export function SourcesFooter({ lang, corpus }: { lang: Lang; corpus: Record<str
               <Icon name="api" size={16} />
               {ui(lang, "api_link")}
             </a>
-            <a href="https://github.com/MoTechSys/Basira.ai" target="_blank" rel="noopener noreferrer">
+            <a href="https://github.com/MoTechSys/Project-Basira" target="_blank" rel="noopener noreferrer">
               <Icon name="github" size={16} />
               {ui(lang, "github_link")}
             </a>

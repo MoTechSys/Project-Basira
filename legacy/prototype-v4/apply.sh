@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Apply Basira v4 onto Project-Basira main (base b801da5). Run from the Project-Basira repo root.
+# Apply Basira v4 onto Project-Basira00 main (base b801da5). Run from the Project-Basira00 repo root.
 #   bash /path/to/basira-v4/apply.sh
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

@@ -44,7 +44,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parent
 MANIFEST = ROOT / "manifest.json"
 DATA = ROOT / "data"
-USER_AGENT = "Basira-corpus-fetch/1.0 (+https://github.com/MoTechSys/Basira.ai)"
+USER_AGENT = "Basira-corpus-fetch/1.0 (+https://github.com/MoTechSys/Project-Basira)"
 TIMEOUT_S = 120
 
 

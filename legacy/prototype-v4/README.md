@@ -1,6 +1,6 @@
 # Basira v4 — حزمة الواجهة «الأشعة» + الفحص على مرحلتين
 
-**قاعدة التطبيق:** `MoTechSys/Project-Basira` main عند `b801da5`. التطبيق: `bash basira-v4/apply.sh` من جذر Project-Basira.
+**قاعدة التطبيق:** `MoTechSys/Project-Basira00` main عند `b801da5`. التطبيق: `bash basira-v4/apply.sh` من جذر Project-Basira00.
 محتويات المجلد: `patch/` (4 patches بصيغة git am، مُختبرة على b801da5) · `files/` (نسخ كاملة لكل ملف تغيّر، احتياطاً) · `shots/` (قبل/بعد) · `STRATEGY_AR.md` (الوثيقة الاستراتيجية أ–و) · `PROMPT_FOR_AGENT.md`.
 
 ## 1) التحليل البصري للموقع الحي (قبل)
