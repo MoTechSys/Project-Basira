@@ -35,10 +35,15 @@ in `DECISIONS.md`, and the per-version list of changes in `../CHANGELOG.md`.
 | Dependencies | pip-audit 0 · npm audit 0 | CI |
 | Image | snapshot boot 0.78 s · RSS 314 MB · `/health` reports the commit | CI `docker` job |
 
-## 3. Open items
+## 3. Live
+
+https://basirapp.site — deployed from `main` of MoTechSys/Project-Basira by `deploy/vps/autodeploy.sh`
+(60 s timer). `/health` reports the deployed commit in `build_sha`. Model providers stay `mock` until a
+key is entered in `/settings` (DEPLOYMENT §3).
+
+## 4. Open items
 
 | Item | Why it is open | Next step |
 |---|---|---|
-| Public deployment | Needs a host, a public domain and the load-balancer address (`docs/DEPLOYMENT.md` §0) | Deploy the image; run the three checks in DEPLOYMENT §3 |
 | Scholarly review of the four-state wording | Must be signed by a qualified reviewer; it cannot be written by the developer | Collect the signed note and add it as `docs/SCHOLAR_REVIEW.md` (SAFETY §7) |
 | IslamicEval 1B vocalised spans | 30 vocalised spans are `needs_review` under the harakat policy (D-013) while the gold ignores marks | Policy is deliberate; revisit only with a new D- decision |

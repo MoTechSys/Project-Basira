@@ -1,0 +1,18 @@
+basirapp.site {
+	encode zstd gzip
+
+	# Operator-only: changing/removing the server's model key (E-051). Public reads stay open.
+	@modelcfg_write {
+		path /v1/models/config
+		method PUT DELETE POST PATCH
+	}
+	basic_auth @modelcfg_write {
+		admin <BCRYPT_HASH>
+	}
+
+	reverse_proxy basira:8000
+}
+
+www.basirapp.site {
+	redir https://basirapp.site{uri} permanent
+}

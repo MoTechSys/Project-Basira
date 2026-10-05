@@ -1,0 +1,22 @@
+services:
+  basira:
+    ports: !reset []
+    expose: ["8000"]
+    environment:
+      BASIRA_CORS_ORIGINS: https://basirapp.site,https://www.basirapp.site
+      BASIRA_TRUSTED_PROXIES: 172.16.0.0/12
+      FORWARDED_ALLOW_IPS: 172.16.0.0/12
+      BUILD_SHA: ${BUILD_SHA:-prod}
+    mem_limit: 2g
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports: ["80:80", "443:443", "443:443/udp"]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on: [basira]
+volumes:
+  caddy-data:
+  caddy-config:

@@ -1,0 +1,1 @@
+/var/log/basira-deploy.log { weekly rotate 8 compress missingok notifempty }

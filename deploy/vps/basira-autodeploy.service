@@ -1,0 +1,7 @@
+[Unit]
+Description=Basira auto-deploy (check GitHub, rebuild on new commit)
+After=docker.service network-online.target
+[Service]
+Type=oneshot
+ExecStart=/opt/basira/autodeploy.sh
+TimeoutStartSec=1800

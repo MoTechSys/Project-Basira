@@ -1,0 +1,3 @@
+# Auto-deploy settings. Edit and save — takes effect on the next check (≤ 1 min).
+REPO=https://github.com/MoTechSys/Project-Basira.git
+BRANCH=main

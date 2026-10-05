@@ -7,6 +7,8 @@ matches it **byte-exactly** against licensed source corpora, and returns one of 
 text and a letter-level diff — including vowel marks (حركات). It never grades a hadith, never rewrites your text,
 never generates religious text, and stores nothing.
 
+**Live:** https://basirapp.site — deployed automatically from `main` ([`deploy/vps/`](deploy/vps/README.md)).
+
 > Track 4 entry · *AI in Service of Islamic Content Challenge 2026* · Arabic-first, bilingual (AR/EN), RTL.
 
 [![CI](https://github.com/MoTechSys/Project-Basira/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/MoTechSys/Project-Basira/actions/workflows/ci.yml)

@@ -66,6 +66,9 @@ snapshot is prebuilt.
 
 ## 4. Platform notes
 
+* **Reference deployment** — https://basirapp.site runs on one VPS with Docker Compose and Caddy, and
+  redeploys itself from `main` of this repository within a minute of each push. The exact files and install
+  steps are in [`deploy/vps/`](../deploy/vps/README.md).
 * **Any Docker host / VM** — the recipe above. Put TLS at the proxy; the app emits HSTS when it sees
   `X-Forwarded-Proto: https`.
 * **Cloudflare / managed container platforms** — the image is stateless except `/data`. Mount a small persistent
