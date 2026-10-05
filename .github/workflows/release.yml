@@ -1,0 +1,30 @@
+name: release
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Extract tag + changelog section
+        id: ex
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          # pull the section for this tag out of CHANGELOG.md
+          awk "/^## \[?${TAG#v}/{flag=1;next}/^## /{flag=0}flag" CHANGELOG.md > NOTES.md || true
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.ex.outputs.tag }}
+          name: "Basira ${{ steps.ex.outputs.tag }}"
+          body_path: NOTES.md
+          draft: false
+          prerelease: false
