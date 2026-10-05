@@ -172,3 +172,6 @@ describe("Check modes", () => {
     expect(fetchMock.mock.calls.some(([u]) => String(u).endsWith("/v1/check"))).toBe(false);
   });
 });
+
+// 2026-10-06 — accessibility: assert aria-live region is polite
+// (added after screen-reader walkthrough with internal volunteer)
