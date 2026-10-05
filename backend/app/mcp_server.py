@@ -98,7 +98,7 @@ def build_mcp_app(app: FastAPI, settings: Settings) -> Starlette:
         title="Basira — deterministic Quran/Hadith quotation checker",
         version=__version__,
         instructions=grounding_rules("en")["text"],
-        website_url="https://github.com/alabasi2025/Project-Basira",
+        website_url="https://github.com/MoTechSys/Basira.ai",
     )
 
     @server.tool(

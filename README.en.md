@@ -1,7 +1,7 @@
 # Basira (بصيرة) — Citation Verification for Islamic Content
 
 > Submission to **IslamicAIch 2026 — Track 4 (Knowledge & Verification Tools)**
-> Team: MoTechSys + 5 AI agents (backend, frontend, corpus, qa, devops)
+> Author: MoTechSys (developed with AI assistance)
 
 ## What it does
 Given free-form Arabic (or English) text, Basira extracts quoted Qur'anic and

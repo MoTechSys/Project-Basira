@@ -19,7 +19,7 @@ const NAV: { route: Exclude<Route, "notfound">; key: SiteKey }[] = [
   { route: "settings", key: "nav_settings" },
 ];
 
-export const GITHUB = "https://github.com/MoTechSys/Project-Basira";
+export const GITHUB = "https://github.com/MoTechSys/Basira.ai";
 
 export function A({ to, className, children, ...rest }: { to: string; className?: string; children: React.ReactNode } & Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "href">) {
   return (

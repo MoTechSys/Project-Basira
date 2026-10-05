@@ -58,9 +58,8 @@ cd backend && pytest -q
 4. **العرض الحي** — إدخال نص مختلط (آية صحيحة + حديث منسوب خاطئ) ومشاهدة التصنيف الفوري.
 5. **الطريق قدماً** — إضافة لغات، MCP integrations، لوحة للمتابعة.
 
-## الفريق
-- MoTechSys — القائد والمعماري
-- basira-backend-agent, basira-frontend-agent, basira-corpus-agent, basira-qa-agent, basira-devops-agent
+## المؤلف
+- MoTechSys (طُوّر بمساعدة أدوات الذكاء الاصطناعي)
 
 ## الترخيص
 Apache-2.0 — انظر `LICENSE`.
