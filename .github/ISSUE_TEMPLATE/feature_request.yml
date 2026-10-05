@@ -1,0 +1,25 @@
+name: ✨ Feature Request
+description: اقتراح ميزة جديدة
+labels: [enhancement, needs-triage]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: المشكلة التي تحلّها الميزة
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: الحل المقترح
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: تأكيد السلامة الشرعية
+      options:
+        - label: الميزة لا تتضمّن توليد نص قرآني/حديثي
+          required: true
+        - label: الميزة لا تُصدر فتوى أو حُكماً فقهياً
+          required: true

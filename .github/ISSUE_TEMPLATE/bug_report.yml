@@ -1,0 +1,27 @@
+name: 🐛 Bug Report
+description: الإبلاغ عن خطأ أو سلوك غير متوقّع في بصيرة
+labels: [bug, needs-triage]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: الوصف
+      description: ماذا حدث؟ ماذا توقّعت أن يحدث؟
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: خطوات إعادة الإنتاج
+      description: اذكر الخطوات مرقّمة
+      placeholder: |
+        1. افتح الصفحة ...
+        2. ألصق النص ...
+        3. اضغط ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: إصدار بصيرة
+      placeholder: v0.1.0
