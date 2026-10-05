@@ -1,13 +1,13 @@
 # Contributing
 
-Basira is owned and directed by one person; AI engineering agents work under that direction (see `AI_USAGE.md`).
-These rules apply to humans and agents alike.
+Basira is maintained by one person. AI-assisted development is disclosed in `AI_USAGE.md`.
+These rules apply to every change, however it was produced.
 
 ## Ground rules
 
 1. **Three red lines** (`SAFETY.md` §1): no generated religious text · no judgment vocabulary · no storage.
    Anything that touches them needs an ADR in `docs/adr/` **before** code.
-2. **Decisions are not re-litigated.** `docs/DECISIONS.md` is the log of owner (D-) and engineering (E-) decisions.
+2. **Decisions are not re-litigated.** `docs/DECISIONS.md` is the log of product (D-) and engineering (E-) decisions.
    If you disagree, add a dated note proposing a change; do not silently diverge.
 3. **Every user-facing string lives in `messages/{ar,en}.json` or `frontend/src/site/strings.ts`** and passes
    `scripts/check_site_lexicon.py`. Never hard-code prose in components. AR and EN key sets must be identical (tested).
@@ -25,7 +25,7 @@ cd frontend && npm run typecheck && npm run lint && npm test -- --run && npm run
 ```
 
 * Branch from `main`; Conventional Commits (`feat(scope): …`, `fix: …`, `docs: …`, `test: …`, `chore: …`).
-* Agents open a PR with **pasted terminal output** of every gate; the integrating engineer **re-runs** them,
+* A pull request includes the **pasted terminal output** of every gate; the maintainer **re-runs** them
   then merges `--no-ff` with the measured numbers in the merge message (D-001).
 * Stacked branches are rebased with `git rebase --onto origin/main origin/<base> <branch>`.
 

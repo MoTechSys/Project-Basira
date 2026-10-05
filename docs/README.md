@@ -2,7 +2,8 @@
 
 | File | Purpose | Update when |
 |---|---|---|
-| `DECISIONS.md` | Dated owner (`D-`) and engineering (`E-`) decisions with reason and location | any non-trivial choice |
+| `STATE.md` | What is shipped, how it was verified, open items | every release |
+| `DECISIONS.md` | Dated product (`D-`) and engineering (`E-`) decisions with reason and location | any non-trivial choice |
 | `ARCHITECTURE.md` | System context, pipeline stages, developer gate, data, security posture | structure changes |
 | `DEPLOYMENT.md` | Pre-flight checklist, Docker, env vars that matter, first-boot steps, rollback | ops changes |
 | `API.md` | REST contract, examples, determinism header, receipt, guard | endpoint changes |

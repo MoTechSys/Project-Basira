@@ -1,29 +1,44 @@
-# حالة المشروع — بصيرة v0.1.0
+# Project state
 
-> آخر تحديث: 2026-10-06 بعد الظهر — ما قبل التسليم النهائي
-> المشرف: MoTechSys
+Snapshot of what is shipped and how it was verified. Updated with every release; the dated history of *why* lives
+in `DECISIONS.md`, and the per-version list of changes in `../CHANGELOG.md`.
 
-## الحالة: 🟢 جاهز للتسليم
+**Version:** 0.3.1 · **Branch:** `main` · **Last verified:** 2026-10-05 (clean clone + CI)
 
-### ما اكتمل
-- ✅ Backend FastAPI: 20+ وحدة، pipeline كامل، حماية صلبة
-- ✅ Frontend React 19: RTL، PWA، i18n، 15+ مكوّن
-- ✅ Corpus: 4 مصادر مثبّتة بـ SHA-256
-- ✅ Eval: Macro-F1 = 0.89، صفر false FOUND
-- ✅ Tests: ~110+ (backend + frontend + e2e)
-- ✅ Docker + CI + scripts
-- ✅ وثائق: ARCHITECTURE, DECISIONS, 3 ADRs, RISKS, GLOSSARY, SECURITY
-- ✅ CHANGELOG + README.md كامل بالعربية
+## 1. Shipped
 
-### فحص قبل الـ release (checklist)
-- [x] لا endpoints مكشوفة بغير قصد
-- [x] لا مفاتيح أو tokens مُضمّنة
-- [x] CSP + CORS محدّدان
-- [x] rate limiting ممكّن
-- [x] fail-closed على corpus mismatch
-- [x] لا تخريج ولا نص شرعي مُولَّد
-- [x] UI لا يستخدم أي مصطلح شرعي ممنوع (per `check_site_lexicon.py`)
+| Area | What | Where |
+|---|---|---|
+| Matching core | Two-tier normalisation, exact phrase match on the full index, windowed fuzzy fallback, letter-level diff | `backend/app/normalize.py`, `match/` |
+| Safety gates | Harakat gate (D-013), foreign-material gate (E-044), byte-identical repeat merging (E-045), image quotes never `found` (E-020) | `match/harakat.py`, `extract/foreign.py`, `pipeline.py` |
+| Four states | `found` / `partial_match` / `needs_review` / `not_found`, assigned only in the state machine | `state.py` (ADR-003) |
+| Validator | V1–V6; every `found` independently re-proven from the store | `verify.py` |
+| English gate | Approved translations → candidates cross-referenced to verbatim Arabic | `english_gate.py`, `docs/ENGLISH_GATE.md` |
+| Developer surfaces | REST, Guard, receipts, rules, model catalog, MCP server (6 tools) | `main.py`, `devgate.py`, `mcp_server.py`, `docs/API.md` |
+| Web app | Multi-page bilingual RTL PWA, identity v4, mobile result reveal | `frontend/`, `docs/design/` |
+| Delivery | One Docker image (snapshot boot), CI with corpora, release workflow | `Dockerfile`, `.github/workflows/` |
 
-### المتبقي قبل الـ push
-- [ ] تجهيز الـ README الإنجليزي القصير للمحكّمين
-- [ ] إنشاء v0.1.0 tag على main
+## 2. Verified on 2026-10-05
+
+| Gate | Result | Command |
+|---|---|---|
+| Backend lint + types | ruff check/format clean · mypy strict, 37 files | `make lint` |
+| Backend tests | **304 passed**, none skipped | `make test` |
+| Smoke | 8 canonical checks on the full corpus | `make smoke` |
+| Evaluation | **150/150**, unsafe 0, variance 0 over 3 repeats | `make eval-full` |
+| False alarms | **0/500** verbatim corpus segments | `make eval-full` |
+| IslamicEval 2025 1B (dev) | **78.54 %** (CI 73.0–83.2), false confirmations **2** | `make islamiceval` |
+| IslamicEval 2025 1A (dev) | macro-F1 rules **61.76**, rules+llm **67.89** | `make islamiceval-1a` |
+| Frontend | tsc · oxlint 0 errors · vitest **30/30** · build 86.7 kB gzip JS | `make web-gates` |
+| Browser e2e | **4/4** incl. 320×568 and 390×664 phone viewports, axe clean | `npm run e2e` |
+| Site lexicon | 656 strings, 0 with judgement vocabulary | `scripts/check_site_lexicon.py` |
+| Dependencies | pip-audit 0 · npm audit 0 | CI |
+| Image | snapshot boot 0.78 s · RSS 314 MB · `/health` reports the commit | CI `docker` job |
+
+## 3. Open items
+
+| Item | Why it is open | Next step |
+|---|---|---|
+| Public deployment | Needs a host, a public domain and the load-balancer address (`docs/DEPLOYMENT.md` §0) | Deploy the image; run the three checks in DEPLOYMENT §3 |
+| Scholarly review of the four-state wording | Must be signed by a qualified reviewer; it cannot be written by the developer | Collect the signed note and add it as `docs/SCHOLAR_REVIEW.md` (SAFETY §7) |
+| IslamicEval 1B vocalised spans | 30 vocalised spans are `needs_review` under the harakat policy (D-013) while the gold ignores marks | Policy is deliberate; revisit only with a new D- decision |

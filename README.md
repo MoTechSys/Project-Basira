@@ -9,7 +9,7 @@ never generates religious text, and stores nothing.
 
 > Track 4 entry · *AI in Service of Islamic Content Challenge 2026* · Arabic-first, bilingual (AR/EN), RTL.
 
-[![CI](https://img.shields.io/badge/ci-304%20tests%20%C2%B7%20lint%20%C2%B7%20eval%20150%2F150-2EF2C2?labelColor=12183F)](.github/workflows/ci.yml)
+[![CI](https://github.com/MoTechSys/Project-Basira/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/MoTechSys/Project-Basira/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-6150EA)](LICENSE)
 [![Determinism](https://img.shields.io/badge/false%20alarms-0%2F500-2EF2C2?labelColor=12183F)](eval/REPORT.md)
 
@@ -53,15 +53,16 @@ Full invariants I1–I17 and validator passes V1–V6: [`SAFETY.md`](SAFETY.md).
 
 ## Measured, not claimed
 
-| Gate | Result (2026-10-03, full corpus) |
+| Gate | Result (2026-10-05, full corpus, clean clone) |
 |---|---|
 | Evaluation cases | **150/150**, 3 repeats, variance 0 |
 | False alarms on 500 verbatim corpus segments | **0/500** |
 | Unsafe verdicts / forbidden vocabulary | 0 / 0 |
-| Backend tests | **304** · ruff + mypy clean (strict) |
-| Frontend | tsc · oxlint 0 errors · vitest 26/26 · bundle **86.7 kB gzip** |
+| IslamicEval 2025 subtask 1B (public dev) | **78.54 %**, false confirmations **2** of 100 wrong spans ([report](eval/islamiceval/REPORT_1B.md)) |
+| Backend tests | **304** passed, none skipped · ruff + mypy strict clean |
+| Frontend | tsc · oxlint 0 errors · vitest **30/30** · e2e **4/4** (incl. two phone viewports, axe) · **86.7 kB** gzip JS |
 | Dependency audit | pip-audit 0 · npm audit 0 |
-| Boot (snapshot) | ≈ 2 s · ≈ 300 MB RSS · 71 987 records |
+| Boot (snapshot) | **0.78 s** · **314 MB** RSS · 71 987 records |
 
 Every response carries a `determinism_hash` = sha256(corpus fingerprint + normalized input + ordered verdicts).
 Same input on the same corpus build ⇒ same hash. A judge can re-run and compare. See [`eval/REPORT.md`](eval/REPORT.md)
@@ -135,14 +136,15 @@ docs/           ARCHITECTURE · API · SAFETY-adjacent docs · DECISIONS (E-001�
 
 | Need | Read |
 |---|---|
-| Why things are the way they are | [`docs/DECISIONS.md`](docs/DECISIONS.md) (owner + engineering decisions, dated) · [`docs/adr/`](docs/adr/) |
+| Rules for contributors (human or AI-assisted) | [`AGENTS.md`](AGENTS.md) |
+| Why things are the way they are | [`docs/DECISIONS.md`](docs/DECISIONS.md) (product + engineering decisions, dated) · [`docs/adr/`](docs/adr/) |
 | API / MCP / Guard contracts | [`docs/API.md`](docs/API.md) · [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md) · [`docs/GUARD.md`](docs/GUARD.md) |
 | Safety invariants, security model | [`SAFETY.md`](SAFETY.md) · [`SECURITY.md`](SECURITY.md) · [`docs/RISKS.md`](docs/RISKS.md) |
 | Release history | [`CHANGELOG.md`](CHANGELOG.md) |
 
 ## Contributing
 
-Conventional Commits · every change passes `make lint && make test && make smoke` · owner decisions are never
+Conventional Commits · every change passes `make lint && make test && make smoke` · product decisions are never
 re-litigated (see `docs/DECISIONS.md`) · see [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## License

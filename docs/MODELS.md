@@ -3,7 +3,7 @@
 **Where this is used:** `/settings` (server-side model config, E-051) and `GET /v1/models`. The catalog lives in `backend/app/byok.py`
 and these numbers are the only source for what the UI shows. Nothing here is a vendor claim.
 
-**How measured.** Owner's Genspark proxy key, `https://www.genspark.ai/api/llm_proxy/v1`, temperature 0,
+**How measured.** An OpenAI-compatible proxy endpoint, `https://www.genspark.ai/api/llm_proxy/v1`, temperature 0,
 `response_format=json_object`, Basira's real `EXTRACT_SYSTEM` prompt (`backend/app/providers/openai_compat.py`).
 Six extraction inputs (4 marked Arabic quotes incl. a foreign token inside an ayah, 1 unmarked saying,
 1 plain text, 1 English quote), 6 parallel calls per model. "exact" = returned exactly the gold span list;

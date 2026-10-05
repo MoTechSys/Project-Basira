@@ -40,7 +40,7 @@ pytest 304 · ruff + mypy strict · eval-full 150/150 · unsafe 0 · false alarm
 - Decision-id collisions across parallel branches (E-047/E-050) renumbered at merge.
 
 ### Changed
-- Repository hygiene: all non-product material moved under `out/`; every stale branch deleted (UI v4 draft kept as tag `archive/v4-ui`); README rewritten.
+- Repository hygiene: non-product material separated from the product; stale branches deleted; README rewritten.
 
 ### Verified (on `main`, full corpus)
 pytest **304** · ruff + mypy strict · smoke OK · eval **150/150** · unsafe 0 · false alarms **0/500** · variance 0 ·
@@ -60,7 +60,7 @@ tsc · oxlint 0 · vitest 26/26 · bundle **86.7 kB gzip** · pip-audit 0 · npm
 - English introducers («The Prophet said:», «Allah says:») are captured and reported as `needs_review_non_arabic` with referral links instead of being ignored.
 
 ### Added
-- **E-030 deterministic whole-text Quran scan** (`extract/scan.py`): ayat quoted with no marker («اللهم ربنا آتنا…») are detected by pure index lookup (4-gram seed, greedy extension). 0 false alarms on prose probes. Toggle `QURAN_SCAN`, `QURAN_SCAN_MIN_TOKENS`.
+- **Deterministic whole-text Quran detection**: ayat quoted with no marker («اللهم ربنا آتنا…») are detected by pure index lookup (4-gram seed, greedy extension); since 0.3.0 this is `extract/anchor.py` (E-041). 0 false alarms on prose probes. Toggle `QURAN_SCAN`, `QURAN_SCAN_MIN_TOKENS`.
 - **E-031 binary snapshot** (`snapshot.py`): mmap'd numpy + pickled records. **Boot 25 s → 1.9 s, RSS 1,001 MB → 250 MB**, output byte-identical (test). Auto-invalidated by `records.jsonl` sha.
 - **E-032 `determinism_hash`** on every response; `/health` exposes `index_sha256`, `boot` mode and `boot_seconds`.
 - 35 new tests (`test_scholar_lens.py`, `test_snapshot.py`) → **132 total**; ruff + mypy clean.
