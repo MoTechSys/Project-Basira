@@ -2519,3 +2519,20 @@
     tokens:
     - 33
     - 40
+
+# 2026-10-06 — adversarial additions (post final-day testing)
+- id: adv-001
+  input: "حديث: من قال كذا دخل الجنة بإذن ربه بغير حساب."
+  expected_status: NOT_FOUND
+  note: "فبركة شهيرة تنتشر على مواقع التواصل"
+
+- id: adv-002
+  input: "﷽ قال رسول الله ﷺ: اطلبوا العلم ولو في الصين"
+  expected_status: NEEDS_REVIEW
+  note: "لفظ مشهور لكن ليس في الصحيحين — موضوعه خلافي عند الحفّاظ"
+
+- id: adv-003
+  input: "قال تعالى: وفي أنفسكم أفلا تبصرون"
+  expected_status: FOUND
+  surah: 51
+  ayah: 21
