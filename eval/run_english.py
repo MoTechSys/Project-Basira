@@ -1,8 +1,6 @@
-"""eval/run_english.py — measure the English gate on eval/english_cases.yaml (recall@k, negatives, latency).
-
-ملاحظة: يُشغَّل عبر Makefile (target: eval) أو مباشرة من سطر الأوامر.
-جميع المسارات نسبية لجذر المستودع.
-"""
+# يُشغَّل عبر Makefile (target: eval) أو مباشرة من سطر الأوامر.
+# جميع المسارات نسبية لجذر المستودع.
+#!/usr/bin/env python3
 """eval/run_english.py — measure the English gate on eval/english_cases.yaml (recall@k, negatives, latency).
 
     backend/.venv/bin/python eval/run_english.py                      # full index, k=5, 3 repeats

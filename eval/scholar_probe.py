@@ -1,8 +1,6 @@
-"""Run eval/scholar_lens_cases.yaml against a live server (default http://localhost:8000). Exit 1 on any failure.
-
-ملاحظة: يُشغَّل عبر Makefile (target: eval) أو مباشرة من سطر الأوامر.
-جميع المسارات نسبية لجذر المستودع.
-"""
+# يُشغَّل عبر Makefile (target: eval) أو مباشرة من سطر الأوامر.
+# جميع المسارات نسبية لجذر المستودع.
+#!/usr/bin/env python3
 """Run eval/scholar_lens_cases.yaml against a live server (default http://localhost:8000). Exit 1 on any failure."""
 
 from __future__ import annotations
