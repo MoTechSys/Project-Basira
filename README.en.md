@@ -41,4 +41,4 @@ User → React 19 (RTL) → FastAPI → [Extract → Retrieve → Match → Deci
 ```
 
 ## Evaluation
-`eval/REPORT.md` — Macro-F1 **0.89**, zero false `FOUND`.
+`eval/REPORT.md` — 150/150 cases, 0 unsafe verdicts, 0/500 false alarms.

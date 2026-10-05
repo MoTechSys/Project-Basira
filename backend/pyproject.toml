@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "basira-backend"
-version = "0.2.0"
+version = "0.3.1"
 description = "Basira — deterministic verification of Quran and Hadith quotations (HTTP API + MCP server)"
 requires-python = ">=3.12"
 license = { text = "Apache-2.0" }

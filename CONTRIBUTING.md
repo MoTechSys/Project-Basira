@@ -1,70 +1,50 @@
-# المساهمة في «بصيرة»
+# Contributing
 
-شكراً لاهتمامك! اقرأ هذا قبل فتح PR.
+Basira is owned and directed by one person; AI engineering agents work under that direction (see `AI_USAGE.md`).
+These rules apply to humans and agents alike.
 
-## المبادئ الصارمة
+## Ground rules
 
-1. **لا كود يولّد نصاً شرعياً من ذاكرة النموذج.**
-2. **كل نص مرجعي يُعرض = من المدوّنة بمعرّفه.**
-3. **المطابقة حتمية (deterministic) حرف بحرف.**
-4. **لا تخزين لبيانات المستخدم.**
+1. **Three red lines** (`SAFETY.md` §1): no generated religious text · no judgment vocabulary · no storage.
+   Anything that touches them needs an ADR in `docs/adr/` **before** code.
+2. **Decisions are not re-litigated.** `docs/DECISIONS.md` is the log of owner (D-) and engineering (E-) decisions.
+   If you disagree, add a dated note proposing a change; do not silently diverge.
+3. **Every user-facing string lives in `messages/{ar,en}.json` or `frontend/src/site/strings.ts`** and passes
+   `scripts/check_site_lexicon.py`. Never hard-code prose in components. AR and EN key sets must be identical (tested).
+4. **No religious text in tests, examples or fixtures that is not drawn verbatim from the corpus/fixture.**
+5. **Numbers are measured.** A number in docs or UI must cite the command/file that produced it.
 
-مخالفة أي واحدة = PR مرفوض.
+## Workflow
 
-## سير العمل
+```bash
+bash scripts/bootstrap.sh          # once per machine
+make gates && make smoke           # before you start, and before every commit
+# …work…
+make lint && make test && make smoke && make eval-full && git checkout eval/REPORT.md
+cd frontend && npm run typecheck && npm run lint && npm test -- --run && npm run build
+```
 
-1. افتح issue للمناقشة قبل البدء بميزة كبيرة.
-2. أنشئ فرعاً من `main` باسم `feat/...` أو `fix/...`.
-3. اكتب اختبارات قبل أو مع الكود (TDD مفضّل).
-4. تأكد أن `make test` يمر بـ 100%.
-5. تأكد أن `make lint` نظيف.
-6. افتح PR بوصف واضح وربطه بالـ issue.
+* Branch from `main`; Conventional Commits (`feat(scope): …`, `fix: …`, `docs: …`, `test: …`, `chore: …`).
+* Agents open a PR with **pasted terminal output** of every gate; the integrating engineer **re-runs** them,
+  then merges `--no-ff` with the measured numbers in the merge message (D-001).
+* Stacked branches are rebased with `git rebase --onto origin/main origin/<base> <branch>`.
 
-## معايير الكود
+## Definition of Done
 
-### Python (Backend)
-- Python 3.11+
-- `ruff` + `mypy --strict`
-- `pytest` للاختبارات
-- Type hints إلزامية
+lint ✓ · mypy ✓ · pytest ✓ · smoke ✓ · eval 150/150 · FA 0/500 · frontend tsc/oxlint/vitest/build ✓ ·
+lexicon 0 · docs updated (STATE, DECISIONS, and API/ARCHITECTURE where relevant) · merged to `main` ·
+post-merge verification run on `main`.
 
-### TypeScript (Frontend)
-- `tsc --strict`
-- `eslint` + `prettier`
-- `vitest` للـ unit
-- `playwright` للـ e2e
+## Code style
 
-## الالتزام بالثوابت الشرعية
+* Python 3.12+: ruff (all rules enabled in `backend/pyproject.toml`), mypy strict, dataclasses with `slots`,
+  no `Any` leaking from public functions, every module has a docstring explaining *why* it exists.
+* TypeScript: strict, no `any`, no router/framework dependencies beyond React, components are small and
+  tested with Testing Library.
+* Comments explain intent and cite the decision id (`# B12`, `# E-051`). Code that enforces a safety invariant
+  cites it (`# I7`).
 
-عند لمس أي كود في `backend/app/match/` أو `backend/app/verify/`:
-- أضف اختباراً adversarial جديداً.
-- وثّق أي تغيير في `SAFETY.md`.
-- أشر إلى الـ invariant المتأثر (I1, I2, ...).
+## Reporting a safety or security issue
 
-## أسلوب رسائل الـ Commits
-
-نتبع Conventional Commits:
-- `feat:` ميزة جديدة
-- `fix:` إصلاح خطأ
-- `docs:` توثيق
-- `refactor:` إعادة هيكلة بلا تغيير سلوك
-- `test:` إضافة/تعديل اختبارات
-- `chore:` صيانة (dependencies, config)
-
-## الاستعانة بالذكاء الاصطناعي (AI Assistance Disclosure)
-
-تماشياً مع روح IslamicAIch 2026، نُفصح أن هذا المشروع استعان بأدوات ذكاء
-اصطناعي (coding assistants) في المراحل التالية:
-
-- **التصميم والـ scaffolding**: مراجعة البنية، اقتراح أسماء، توليد templates
-- **الوثائق**: مراجعة لغوية، ترجمة، تنسيق Markdown
-- **الاختبارات**: توليد test cases ابتدائية (مع مراجعة بشرية لكل حالة)
-- **الكود**: مراجعة PRs، suggestions، refactoring
-
-### ما **لم** يُستعن فيه بالـ AI (مسؤولية بشرية 100%):
-- أي قرار شرعي (أسماء المصادر المعتمدة، آليات التحقق، قوائم الأحاديث)
-- اختيار المصادر (Tanzil، OHD، HadeethEnc) ومراجعة SHA-256 الخاص بها
-- محتوى SOURCES.md وSAFETY.md
-- التصميم المعماري الأساسي (ADRs)
-
-كل commit مراجَع بواسطة المؤلف (MoTechSys) قبل الدمج.
+See `SECURITY.md`. For a wrong verdict on a specific quotation, open an issue with the `determinism_hash` from the
+response — it lets us reproduce the exact run.

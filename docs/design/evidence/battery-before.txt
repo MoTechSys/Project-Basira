@@ -1,0 +1,68 @@
+PASS | T01 no horizontal overflow | Galaxy S8 360x740 | scrollWidth>vw=false
+PASS | T02 check button visible without scrolling | Galaxy S8 360x740 | bottom=654 vh=740
+FAIL | T03 result summary in view after check | Galaxy S8 360x740 | summaryTop=711 vh=740 scrollY=0
+FAIL | T04 annotated text in view after check | Galaxy S8 360x740 | annotatedTop=1093 vh=740
+FAIL | T05 focus moved to results (screen readers) | Galaxy S8 360x740 | activeElement=BODY
+PASS | T06 highlight tap target ≥24px | Galaxy S8 360x740 | min h=42
+PASS | T07 tap highlight opens sheet | Galaxy S8 360x740 | dialogs=1 sheetH=651/740
+PASS | T08 focus inside sheet | Galaxy S8 360x740 | active=sheet
+PASS | T09 close button in view | Galaxy S8 360x740 | top=111
+PASS | T10 sheet content fits or scrolls inside | Galaxy S8 360x740 | scrollH=2273 clientH=584
+PASS | T11 Escape closes sheet | Galaxy S8 360x740 | dialogs=0
+PASS | T12 body scroll restored | Galaxy S8 360x740 | overflow=''
+PASS | T01 no horizontal overflow | iPhone SE 320x568 | scrollWidth>vw=false
+FAIL | T02 check button visible without scrolling | iPhone SE 320x568 | bottom=671 vh=568
+FAIL | T03 result summary in view after check | iPhone SE 320x568 | summaryTop=625 vh=568 scrollY=103
+FAIL | T04 annotated text in view after check | iPhone SE 320x568 | annotatedTop=1007 vh=568
+FAIL | T05 focus moved to results (screen readers) | iPhone SE 320x568 | activeElement=BODY
+PASS | T06 highlight tap target ≥24px | iPhone SE 320x568 | min h=42
+PASS | T07 tap highlight opens sheet | iPhone SE 320x568 | dialogs=1 sheetH=500/568
+PASS | T08 focus inside sheet | iPhone SE 320x568 | active=sheet
+PASS | T09 close button in view | iPhone SE 320x568 | top=90
+PASS | T10 sheet content fits or scrolls inside | iPhone SE 320x568 | scrollH=2301 clientH=433
+PASS | T11 Escape closes sheet | iPhone SE 320x568 | dialogs=0
+PASS | T12 body scroll restored | iPhone SE 320x568 | overflow=''
+PASS | T01 no horizontal overflow | iPhone 13 390x664 | scrollWidth>vw=false
+PASS | T02 check button visible without scrolling | iPhone 13 390x664 | bottom=654 vh=664
+FAIL | T03 result summary in view after check | iPhone 13 390x664 | summaryTop=711 vh=664 scrollY=0
+FAIL | T04 annotated text in view after check | iPhone 13 390x664 | annotatedTop=997 vh=664
+FAIL | T05 focus moved to results (screen readers) | iPhone 13 390x664 | activeElement=BODY
+PASS | T06 highlight tap target ≥24px | iPhone 13 390x664 | min h=42
+PASS | T07 tap highlight opens sheet | iPhone 13 390x664 | dialogs=1 sheetH=584/664
+PASS | T08 focus inside sheet | iPhone 13 390x664 | active=sheet
+PASS | T09 close button in view | iPhone 13 390x664 | top=102
+PASS | T10 sheet content fits or scrolls inside | iPhone 13 390x664 | scrollH=2172 clientH=517
+PASS | T11 Escape closes sheet | iPhone 13 390x664 | dialogs=0
+PASS | T12 body scroll restored | iPhone 13 390x664 | overflow=''
+PASS | T01 no horizontal overflow | Pixel 7 412x839 | scrollWidth>vw=false
+PASS | T02 check button visible without scrolling | Pixel 7 412x839 | bottom=655 vh=839
+PASS | T03 result summary in view after check | Pixel 7 412x839 | summaryTop=712 vh=839 scrollY=0
+FAIL | T04 annotated text in view after check | Pixel 7 412x839 | annotatedTop=997 vh=839
+FAIL | T05 focus moved to results (screen readers) | Pixel 7 412x839 | activeElement=BODY
+PASS | T06 highlight tap target ≥24px | Pixel 7 412x839 | min h=42
+PASS | T07 tap highlight opens sheet | Pixel 7 412x839 | dialogs=1 sheetH=738/839
+PASS | T08 focus inside sheet | Pixel 7 412x839 | active=sheet
+PASS | T09 close button in view | Pixel 7 412x839 | top=123
+PASS | T10 sheet content fits or scrolls inside | Pixel 7 412x839 | scrollH=2144 clientH=671
+PASS | T11 Escape closes sheet | Pixel 7 412x839 | dialogs=0
+PASS | T12 body scroll restored | Pixel 7 412x839 | overflow=''
+PASS | T01 no horizontal overflow | Laptop 1440x900 | scrollWidth>vw=false
+PASS | T02 check button visible without scrolling | Laptop 1440x900 | bottom=638 vh=900
+PASS | T03 result summary in view after check | Laptop 1440x900 | summaryTop=703 vh=900 scrollY=0
+FAIL | T04 annotated text in view after check | Laptop 1440x900 | annotatedTop=876 vh=900
+FAIL | T05 focus moved to results (screen readers) | Laptop 1440x900 | activeElement=BODY
+PASS | T06 highlight tap target ≥24px | Laptop 1440x900 | min h=42
+PASS | T01 no horizontal overflow | Laptop 1280x720 | scrollWidth>vw=false
+PASS | T02 check button visible without scrolling | Laptop 1280x720 | bottom=638 vh=720
+FAIL | T03 result summary in view after check | Laptop 1280x720 | summaryTop=703 vh=720 scrollY=0
+FAIL | T04 annotated text in view after check | Laptop 1280x720 | annotatedTop=876 vh=720
+FAIL | T05 focus moved to results (screen readers) | Laptop 1280x720 | activeElement=BODY
+PASS | T06 highlight tap target ≥24px | Laptop 1280x720 | min h=42
+PASS | T13 empty input → button disabled | iPhone 13 | disabled=true
+PASS | T14 loading state visible on button | iPhone 13 | label="جارٍ الفحص…"
+FAIL | T15 loading announced (aria-busy) | iPhone 13 | aria-busy elements=0
+PASS | T16 error shown | iPhone 13 | alerts=1
+PASS | T17 error in view on phone | iPhone 13 | alertTop=703 vh=844
+FAIL | T18 old result cleared on error | iPhone 13 | old highlights still shown=4
+
+TOTAL 66 · PASS 47 · FAIL 19
