@@ -14,7 +14,7 @@ Per case we judge PASS/FAIL against the declared expectation (see ``judge``). Ag
 * **forbidden-lexicon hits** — any string we emit that trips ``messages.scan_forbidden`` (target 0).
 
 Confidence intervals: Wilson score interval at 95 % for proportions with n ≥ 30; smaller groups are
-reported as counts only and labelled «indicative» (audit T19). Variance across the 3 repeats is
+reported as counts only and labelled «indicative». Variance across the 3 repeats is
 labelled «extraction variance only» because the matching core is deterministic.
 """
 

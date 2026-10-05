@@ -1,21 +1,21 @@
 {
  "rules": {
-  "f1": 0.6295632085979572,
-  "f1_q": 0.7609971478815309,
-  "f1_h": 0.6513921376402598,
-  "secs": 9.0971839427948,
+  "f1": 0.6176231890901515,
+  "f1_q": 0.7959364435525362,
+  "f1_h": 0.5904171013829398,
+  "secs": 10.792825698852539,
   "per_q": [
    {
     "id": "A-Q01",
-    "f1": 0.4371,
+    "f1": 0.4399,
     "gold_spans": 1,
     "pred_spans": 1
    },
    {
     "id": "A-Q02",
-    "f1": 0.6839,
+    "f1": 0.6595,
     "gold_spans": 10,
-    "pred_spans": 16
+    "pred_spans": 18
    },
    {
     "id": "A-Q03",
@@ -31,9 +31,9 @@
    },
    {
     "id": "A-Q05",
-    "f1": 0.5274,
+    "f1": 0.5807,
     "gold_spans": 3,
-    "pred_spans": 6
+    "pred_spans": 7
    },
    {
     "id": "A-Q06",
@@ -49,33 +49,33 @@
    },
    {
     "id": "A-Q08",
-    "f1": 0.9905,
+    "f1": 0.8616,
     "gold_spans": 9,
-    "pred_spans": 8
+    "pred_spans": 7
    },
    {
     "id": "A-Q09",
-    "f1": 0.5941,
+    "f1": 0.4557,
     "gold_spans": 12,
-    "pred_spans": 11
+    "pred_spans": 7
    },
    {
     "id": "A-Q10",
-    "f1": 1.0,
+    "f1": 0.9799,
     "gold_spans": 4,
-    "pred_spans": 4
+    "pred_spans": 5
    },
    {
     "id": "A-Q11",
-    "f1": 0.9997,
+    "f1": 0.5466,
     "gold_spans": 13,
-    "pred_spans": 13
+    "pred_spans": 3
    },
    {
     "id": "A-Q12",
-    "f1": 1.0,
+    "f1": 0.9702,
     "gold_spans": 15,
-    "pred_spans": 15
+    "pred_spans": 16
    },
    {
     "id": "A-Q13",
@@ -85,9 +85,9 @@
    },
    {
     "id": "A-Q14",
-    "f1": 0.6118,
+    "f1": 0.5856,
     "gold_spans": 5,
-    "pred_spans": 10
+    "pred_spans": 13
    },
    {
     "id": "A-Q15",
@@ -104,9 +104,9 @@
    },
    {
     "id": "A-Q17",
-    "f1": 0.7002,
+    "f1": 0.6363,
     "gold_spans": 7,
-    "pred_spans": 24
+    "pred_spans": 19
    },
    {
     "id": "A-Q18",
@@ -117,19 +117,19 @@
    },
    {
     "id": "A-Q19",
-    "f1": 0.9142,
+    "f1": 0.9163,
     "gold_spans": 5,
     "pred_spans": 7
    },
    {
     "id": "A-Q20",
-    "f1": 0.8061,
+    "f1": 0.7852,
     "gold_spans": 4,
-    "pred_spans": 11
+    "pred_spans": 12
    },
    {
     "id": "A-Q21",
-    "f1": 0.9738,
+    "f1": 1.0,
     "gold_spans": 1,
     "pred_spans": 1
    },
@@ -155,9 +155,9 @@
    },
    {
     "id": "A-Q25",
-    "f1": 0.6577,
+    "f1": 0.5578,
     "gold_spans": 3,
-    "pred_spans": 9
+    "pred_spans": 3
    },
    {
     "id": "A-Q26",
@@ -189,9 +189,9 @@
    },
    {
     "id": "A-Q30",
-    "f1": 0.7806,
+    "f1": 0.7811,
     "gold_spans": 15,
-    "pred_spans": 21
+    "pred_spans": 26
    },
    {
     "id": "A-Q31",
@@ -227,39 +227,39 @@
    },
    {
     "id": "A-Q36",
-    "f1": 0.6834,
+    "f1": 0.5751,
     "gold_spans": 10,
-    "pred_spans": 10
+    "pred_spans": 8
    },
    {
     "id": "A-Q37",
-    "f1": 1.0,
+    "f1": 0.8667,
     "gold_spans": 5,
-    "pred_spans": 5
+    "pred_spans": 4
    },
    {
     "id": "A-Q38",
-    "f1": 0.9219,
+    "f1": 0.9303,
     "gold_spans": 7,
-    "pred_spans": 14
+    "pred_spans": 12
    },
    {
     "id": "A-Q39",
-    "f1": 0.724,
+    "f1": 0.6287,
     "gold_spans": 15,
-    "pred_spans": 16
+    "pred_spans": 19
    },
    {
     "id": "A-Q40",
-    "f1": 0.4623,
+    "f1": 0.4627,
     "gold_spans": 7,
     "pred_spans": 4
    },
    {
     "id": "A-Q41",
-    "f1": 0.6581,
+    "f1": 0.6622,
     "gold_spans": 2,
-    "pred_spans": 5
+    "pred_spans": 4
    },
    {
     "id": "A-Q42",
@@ -277,13 +277,13 @@
    },
    {
     "id": "A-Q44",
-    "f1": 0.0327,
+    "f1": 0.1962,
     "gold_spans": 12,
-    "pred_spans": 1
+    "pred_spans": 4
    },
    {
     "id": "A-Q45",
-    "f1": 0.5518,
+    "f1": 1.0,
     "gold_spans": 2,
     "pred_spans": 2
    },
@@ -296,9 +296,9 @@
    },
    {
     "id": "A-Q47",
-    "f1": 0.5581,
+    "f1": 0.5938,
     "gold_spans": 2,
-    "pred_spans": 3
+    "pred_spans": 4
    },
    {
     "id": "A-Q48",
@@ -325,28 +325,28 @@
   "provider": "mock"
  },
  "rules+llm": {
-  "f1": 0.6747564630097093,
-  "f1_q": 0.7651070883911616,
-  "f1_h": 0.7159926731692576,
-  "secs": 357.1919333934784,
+  "f1": 0.6788587364369857,
+  "f1_q": 0.8286686524234081,
+  "f1_h": 0.666983248947542,
+  "secs": 224.06573128700256,
   "per_q": [
    {
     "id": "A-Q01",
-    "f1": 0.8053,
+    "f1": 0.8256,
     "gold_spans": 1,
     "pred_spans": 2
    },
    {
     "id": "A-Q02",
-    "f1": 0.8052,
+    "f1": 0.7679,
     "gold_spans": 10,
-    "pred_spans": 7
+    "pred_spans": 9
    },
    {
     "id": "A-Q03",
-    "f1": 1.0,
+    "f1": 0.9569,
     "gold_spans": 3,
-    "pred_spans": 3
+    "pred_spans": 4
    },
    {
     "id": "A-Q04",
@@ -356,9 +356,9 @@
    },
    {
     "id": "A-Q05",
-    "f1": 0.8871,
+    "f1": 0.9677,
     "gold_spans": 3,
-    "pred_spans": 2
+    "pred_spans": 3
    },
    {
     "id": "A-Q06",
@@ -374,33 +374,33 @@
    },
    {
     "id": "A-Q08",
-    "f1": 0.9905,
+    "f1": 0.8616,
     "gold_spans": 9,
-    "pred_spans": 8
+    "pred_spans": 7
    },
    {
     "id": "A-Q09",
-    "f1": 0.8673,
+    "f1": 0.6703,
     "gold_spans": 12,
-    "pred_spans": 10
+    "pred_spans": 6
    },
    {
     "id": "A-Q10",
-    "f1": 1.0,
+    "f1": 0.9799,
     "gold_spans": 4,
-    "pred_spans": 4
+    "pred_spans": 5
    },
    {
     "id": "A-Q11",
-    "f1": 0.9783,
+    "f1": 0.5434,
     "gold_spans": 13,
-    "pred_spans": 12
+    "pred_spans": 3
    },
    {
     "id": "A-Q12",
-    "f1": 1.0,
+    "f1": 0.9702,
     "gold_spans": 15,
-    "pred_spans": 15
+    "pred_spans": 16
    },
    {
     "id": "A-Q13",
@@ -410,9 +410,9 @@
    },
    {
     "id": "A-Q14",
-    "f1": 0.7152,
+    "f1": 0.5944,
     "gold_spans": 5,
-    "pred_spans": 7
+    "pred_spans": 12
    },
    {
     "id": "A-Q15",
@@ -429,9 +429,9 @@
    },
    {
     "id": "A-Q17",
-    "f1": 1.0,
+    "f1": 0.7963,
     "gold_spans": 7,
-    "pred_spans": 7
+    "pred_spans": 11
    },
    {
     "id": "A-Q18",
@@ -442,27 +442,27 @@
    },
    {
     "id": "A-Q19",
-    "f1": 0.9142,
+    "f1": 0.9163,
     "gold_spans": 5,
     "pred_spans": 7
    },
    {
     "id": "A-Q20",
-    "f1": 0.8061,
+    "f1": 0.7852,
     "gold_spans": 4,
-    "pred_spans": 11
+    "pred_spans": 12
    },
    {
     "id": "A-Q21",
-    "f1": 0.9738,
+    "f1": 1.0,
     "gold_spans": 1,
     "pred_spans": 1
    },
    {
     "id": "A-Q22",
-    "f1": 0.2262,
+    "f1": 0.9692,
     "gold_spans": 1,
-    "pred_spans": 0
+    "pred_spans": 1
    },
    {
     "id": "A-Q23",
@@ -480,9 +480,9 @@
    },
    {
     "id": "A-Q25",
-    "f1": 0.6577,
+    "f1": 0.5578,
     "gold_spans": 3,
-    "pred_spans": 9
+    "pred_spans": 3
    },
    {
     "id": "A-Q26",
@@ -509,14 +509,14 @@
     "id": "A-Q29",
     "f1": 0.0,
     "gold_spans": 0,
-    "pred_spans": 1,
+    "pred_spans": 2,
     "no_annotation": true
    },
    {
     "id": "A-Q30",
-    "f1": 0.7239,
+    "f1": 0.8196,
     "gold_spans": 15,
-    "pred_spans": 13
+    "pred_spans": 25
    },
    {
     "id": "A-Q31",
@@ -552,39 +552,39 @@
    },
    {
     "id": "A-Q36",
-    "f1": 0.6834,
+    "f1": 0.5751,
     "gold_spans": 10,
-    "pred_spans": 10
+    "pred_spans": 8
    },
    {
     "id": "A-Q37",
-    "f1": 1.0,
+    "f1": 0.8491,
     "gold_spans": 5,
     "pred_spans": 5
    },
    {
     "id": "A-Q38",
-    "f1": 0.9219,
+    "f1": 0.9303,
     "gold_spans": 7,
-    "pred_spans": 14
+    "pred_spans": 12
    },
    {
     "id": "A-Q39",
-    "f1": 0.7461,
+    "f1": 0.6439,
     "gold_spans": 15,
-    "pred_spans": 14
+    "pred_spans": 17
    },
    {
     "id": "A-Q40",
-    "f1": 0.4623,
+    "f1": 0.4627,
     "gold_spans": 7,
     "pred_spans": 4
    },
    {
     "id": "A-Q41",
-    "f1": 0.6581,
+    "f1": 0.6622,
     "gold_spans": 2,
-    "pred_spans": 5
+    "pred_spans": 4
    },
    {
     "id": "A-Q42",
@@ -602,13 +602,13 @@
    },
    {
     "id": "A-Q44",
-    "f1": 0.0327,
+    "f1": 0.4438,
     "gold_spans": 12,
-    "pred_spans": 1
+    "pred_spans": 4
    },
    {
     "id": "A-Q45",
-    "f1": 0.5518,
+    "f1": 1.0,
     "gold_spans": 2,
     "pred_spans": 2
    },
@@ -621,9 +621,9 @@
    },
    {
     "id": "A-Q47",
-    "f1": 0.9362,
+    "f1": 0.9988,
     "gold_spans": 2,
-    "pred_spans": 1
+    "pred_spans": 2
    },
    {
     "id": "A-Q48",

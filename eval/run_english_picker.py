@@ -1,5 +1,3 @@
-# يُشغَّل عبر Makefile (target: eval) أو مباشرة من سطر الأوامر.
-# جميع المسارات نسبية لجذر المستودع.
 """eval/run_english_picker.py — the English gate END-TO-END: candidates → picker (rule / model) → selection.
 
 This is the «with model / without model» evidence for the English door (E-048). For every case in

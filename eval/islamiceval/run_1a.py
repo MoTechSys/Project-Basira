@@ -16,7 +16,7 @@ rules extractor ∪ LLM proposals (re-located verbatim, ADR-005) → matching �
 quote is labelled from the product's own evidence: `matches[0].corpus` (tanzil → Ayah, else Hadith)
 when there is any match; otherwise the extractor's kind (`quran` → Ayah, else Hadith). Two
 configurations are reported: `rules` (mock provider, fully deterministic) and `rules+llm`
-(gpt-5.4 via the platform proxy). The LLM only *proposes* substrings; it never writes text.
+(gpt-5.4 behind an OpenAI-compatible endpoint). The LLM only *proposes* substrings; it never writes text.
 
 Honest limits:
 1. DEV set (50 responses, 210 spans), not the hidden TEST set.
@@ -274,7 +274,7 @@ async def main_async(args: argparse.Namespace) -> int:
         "## Limits of significance",
         "",
         "1. DEV set (50 responses), not the hidden TEST set used for the leaderboard.",
-        "2. The `rules+llm` configuration depends on a hosted model (gpt-5.4 via the platform proxy); the model only "
+        "2. The `rules+llm` configuration depends on a hosted model (gpt-5.4 behind an OpenAI-compatible endpoint); the model only "
         "proposes substrings that are re-located verbatim — if the proxy is down, the product falls back to `rules` "
         "and so does this number.",
         "3. The rules-only number is fully deterministic and reproducible with `make islamiceval-1a`.",

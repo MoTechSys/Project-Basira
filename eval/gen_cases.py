@@ -5,7 +5,7 @@ Cases reference corpus records by ID + token window (never text). Record choice 
 (20261004) and restricted to records present in the test FIXTURE so the same file runs on the
 fixture (CI) and on the full corpus (release eval). Wrappers are engineer-written prose.
 
-Categories (BUILD_SPEC §6.1 as revised by the audit T2/T4/T20 + package scenarios):
+Categories (eval/PLAN.md):
   A  Quran verbatim (incl. 5 cross-ayah)                       → found
   B  Quran orthographic fold (strict-breaking)                  → needs_review / orthographic_difference
   C  Quran near-miss (1 edit in ≥6 tokens, 16)                      → needs_review / near_miss, never partial

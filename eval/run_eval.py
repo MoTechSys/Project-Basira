@@ -1,5 +1,3 @@
-# يُشغَّل عبر Makefile (target: eval) أو مباشرة من سطر الأوامر.
-# جميع المسارات نسبية لجذر المستودع.
 #!/usr/bin/env python3
 """eval/run_eval.py — run the 150 cases (and optionally the 500 false-alarm segments) in-process.
 

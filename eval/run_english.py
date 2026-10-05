@@ -1,5 +1,3 @@
-# يُشغَّل عبر Makefile (target: eval) أو مباشرة من سطر الأوامر.
-# جميع المسارات نسبية لجذر المستودع.
 #!/usr/bin/env python3
 """eval/run_english.py — measure the English gate on eval/english_cases.yaml (recall@k, negatives, latency).
 

@@ -39,21 +39,21 @@
   },
   {
    "key": "ie1b_acc",
-   "value": "89.07",
+   "value": "78.54",
    "n": "247",
-   "ci": "84.6–92.4",
+   "ci": "73.0–83.2",
    "source": "eval/islamiceval/REPORT_1B.md",
    "line": 9,
-   "row": "| **Basira (deterministic core)** | dev | **89.07** (95 % CI 84.6–92.4) | 90.56 | 85.07 | 247 (180 Ayah / 67 Hadith) |"
+   "row": "| **Basira (deterministic core)** | dev | **78.54** (95 % CI 73.0–83.2) | 76.11 | 85.07 | 247 (180 Ayah / 67 Hadith) |"
   },
   {
    "key": "ie1b_danger",
-   "value": "5",
+   "value": "2",
    "n": "100",
    "ci": null,
    "source": "eval/islamiceval/REPORT_1B.md",
    "line": 24,
-   "row": "**Dangerous direction** (gold Incorrect, Basira said Correct): **5** of 100 wrong spans. This is the number that matters for a citation checker; every case is listed below with the expert's correction so the reader can judge."
+   "row": "**Dangerous direction** (gold Incorrect, Basira said Correct): **2** of 100 wrong spans. This is the number that matters for a citation checker; every case is listed below with the expert's correction so the reader can judge."
   },
   {
    "key": "ie26_ayah",
@@ -75,12 +75,12 @@
   },
   {
    "key": "ie1a_f1",
-   "value": "67.48",
+   "value": "67.89",
    "n": null,
    "ci": null,
    "source": "eval/islamiceval/REPORT_1A.md",
    "line": 12,
-   "row": "| **Basira (rules+llm)** | dev | **67.48** | 76.51 | 71.60 | rules ∪ `openai-compatible:gpt-5.4` proposals re-located verbatim (ADR-005) |"
+   "row": "| **Basira (rules+llm)** | dev | **67.89** | 82.87 | 66.70 | rules ∪ `openai-compatible:gpt-5.4` proposals re-located verbatim (ADR-005) |"
   }
  ]
 }

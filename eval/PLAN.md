@@ -6,10 +6,10 @@ emitting a judgment on the text?
 ## Hypotheses (pre-registered)
 | id | hypothesis | metric | threshold | source of threshold |
 |---|---|---|---|---|
-| H1 | Verbatim Quran/Hadith quotes are confirmed | recall@found (cats A, E, I, J, L, M) | ≥ 0.85 | idea deck slide 10 |
-| H2 | A confirmed quote is really verbatim | precision@found (all cases) | ≥ 0.85 | idea deck slide 10 |
+| H1 | Verbatim Quran/Hadith quotes are confirmed | recall@found (cats A, E, I, J, L, M) | ≥ 0.85 | project hypothesis |
+| H2 | A confirmed quote is really verbatim | precision@found (all cases) | ≥ 0.85 | project hypothesis |
 | H3 | **No altered quote is ever `found`; no Quran quote is ever `partial_match`** | unsafe rate (cats B, C, F, G, D, H `never` lists) | **= 0** | SAFETY §1, ADR-003 I1/I2 |
-| H4 | Verbatim segments in neutral wrappers are confirmed | false-alarm rate (500 segments, seed 20261004) | < 0.02 | idea deck slide 10 |
+| H4 | Verbatim segments in neutral wrappers are confirmed | false-alarm rate (500 segments, seed 20261004) | < 0.02 | project hypothesis |
 | H5 | We never emit judgment vocabulary | forbidden-lexicon hits in our strings | = 0 | SAFETY §2, messages scanner |
 | H6 | Output is deterministic | cases whose 3 repeats differ (mock provider) | = 0 | ADR-002 |
 
@@ -21,7 +21,7 @@ emitting a judgment on the text?
 - **500 false-alarm segments**: 50 % ayah windows (4–10 tokens, common and Uthmani surface forms),
   50 % OHD matn windows (5–12 tokens), each in one of 4 neutral wrappers.
 - **3 repeats** per case; the matching core is deterministic, so differences can only come from the
-  extraction provider («extraction variance only», audit T19).
+  extraction provider («extraction variance only»).
 - Runs on the **fixture index** in CI (fast, same record format) and on the **full index** for the
   published report. Both numbers are reported with the index sha256.
 

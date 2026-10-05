@@ -103,12 +103,15 @@ def basira_status(pipe: Pipeline, text: str, kind: str) -> tuple[str, str | None
     q = pipe._prepare(text, sp)  # the product's own stages, deliberately
     if q is None:
         return "not_found", "too_short", "none", "", []
-    evidence, carriers, _ = pipe._gather_evidence(q)
-    d = decide(pipe._facts(q, "text"), evidence, pipe.th)
-    d = pipe._diacritic_gate(q, d, carriers)  # I11 — same stage the product runs
+    # Same stage order as Pipeline.check() — keep in sync with backend/app/pipeline.py.
+    evidence, carriers, _, rasm0_only = pipe._gather_evidence(q)
+    facts = pipe._facts(q, "text", text, evidence)
+    d = decide(facts, evidence, pipe.th)
+    d = pipe._foreign_gate(q, d)
+    d = pipe._harakat_gate(q, d, carriers)  # I11
+    pipe._claimed_ref_notice(d, facts)
+    pipe._quran_context_notices(d, q, carriers, rasm0_only)
     notices = list(d.notice_keys)
-    if d.status == "found" and d.corpus_scope == "quran" and pipe._is_fragment(q, carriers, d):
-        notices.append("quran_fragment")
     top = ""
     if d.winners:
         w = d.winners[0]
@@ -251,32 +254,37 @@ def main() -> int:
     lines += [row(d) for d in fn] or ["none"]
     lines += [
         "",
-        "## Case analysis (hand-written after inspecting every disagreement against the task's own reference files)",
+        "## Case analysis",
         "",
-        "**False confirmations (5).** All five are byte-faithful text that the expert nevertheless labelled wrong:",
-        "- `B-Q16_4`, `B-Q28_2`: verbatim *fragments* of 2:35 / 11:46 (the span stops before «الشجرة…» / drops the "
-        "opening «قال»). Guideline C1 counts an incomplete ayah as an error; Basira confirms the text and attaches the "
-        "`quran_fragment` notice (E-026) — the user sees the whole ayah beside their text and that it is a fragment. "
-        "We keep this behaviour: a faithful fragment is not a misquotation.",
-        "- `B-Q28_9` (11:41–43), `B-Q28_13` (21:76–77): complete runs of consecutive ayat, verbatim, with «،» between "
-        "ayat instead of verse numbers. Diffing the span against the expert's own correction (after removing the "
-        "«(41)» markers) gives zero token differences in both tiers. We believe the gold is in error here, and say so.",
+        "Counts in this section are computed from the run above; the named examples were checked by hand against "
+        "the task's own reference files.",
+        "",
+        f"**False confirmations ({len(fp)}).** Byte-faithful text that the expert nevertheless labelled wrong:",
+        "- `B-Q28_9` (11:41–43): a complete run of consecutive ayat, verbatim, with «،» between ayat instead of "
+        "verse numbers. Diffing the span against the expert's own correction (after removing the «(41)» markers) "
+        "gives zero token differences in both tiers. We believe the gold is in error here, and say so.",
         "- `B-Q32_6`: verbatim fragment of Bukhari 52 (OHD 50) beginning mid-sentence («صلحت صلح الجسد…»); the "
-        "correction only prepends «إذا». Same C1 completeness rule as above.",
+        "correction only prepends «إذا». Guideline C1 counts an incomplete text as an error; Basira confirms it.",
         "",
-        "**Missed confirmations (21).** Why Basira did not say Correct:",
-        "- *Hadith wording variants* (`partial_match` ×6, `near_miss` ×2): the span is a well-known riwaya whose exact "
-        "wording is not in our nine books / HadeethEnc (e.g. «من صلى عليّ واحدة» vs Muslim 577 «من صلى عليّ صلاة»). "
-        "Basira shows the closest text with the differing words highlighted and never confirms a variant.",
-        "- *Quran near-misses* (×11): single-word deviations the gold tolerated — «وسلام» for «والسلام» (19:33), «والذين» "
-        "for «ومن» (26:119), «جاؤوا» for «جاءوا» (24:11, a hamza-seat spelling), «عليكم» for «على ذلكم» (3:81), "
-        "«ياأيها» joined (12:88), «يشاؤون» for «يشاءون» (50:35). Basira highlights each; by its contract (ADR-003) a "
-        "letter difference in the Mushaf text is `needs_review`, not `found`.",
+        f"**Missed confirmations ({len(fn)}).** Why Basira did not say Correct:",
+        f"- *Vocalisation* (`diacritic_unverified` ×{fn_status['needs_review/diacritic_unverified']}, "
+        f"`diacritic_difference` ×{fn_status['needs_review/diacritic_difference']}): the span is vocalised and "
+        "its marks either contradict the Mushaf on a letter or cannot be aligned letter by letter. By policy D-013 "
+        "a written mark is part of the quotation, so Basira asks for review instead of confirming; the gold "
+        "ignores marks. This is the cost of the harakat gate (B01) and the main reason this number fell from the "
+        "pre-gate run.",
+        f"- *Hadith wording variants* (`partial_match` ×{fn_status['partial_match']}): a well-known riwaya whose "
+        "exact wording is not in our nine books / HadeethEnc (e.g. «من صلى عليّ واحدة» vs Muslim 577 «من صلى عليّ "
+        "صلاة»). Basira shows the closest text with the differing words highlighted and never confirms a variant.",
+        f"- *Near-misses* (`near_miss` ×{fn_status['needs_review/near_miss']}): single-word deviations the gold "
+        "tolerated — «وسلام» for «والسلام» (19:33), «والذين» for «ومن» (26:119), «جاؤوا» for «جاءوا» (24:11, a "
+        "hamza-seat spelling), «ياأيها» joined (12:88). By ADR-003 a letter difference in the Mushaf text is "
+        "`needs_review`, not `found`.",
         "- *Too short* (`B-Q33_5/7`, one word «وإنهما»): the product does not evaluate one-word Quran quotes (E-012).",
-        "- `B-Q35_2`: gold says CorrectAyah for «خيركم خيركم لأهله…», which is a hadith (Tirmidhi 3895); Basira finds "
+        "- `B-Q35_2`: gold says CorrectAyah for «خيركم خيركم لأهله…», which is a hadith (Tirmidhi); Basira finds "
         "it as a hadith → mapped Incorrect because the claimed kind disagrees. Gold label error.",
-        "- `B-Q47_4`: long Bukhari narration (3612) with several wording differences from OHD's text; fuzzy score below "
-        "the review threshold → `not_found`.",
+        "- `B-Q47_4`: long Bukhari narration (3612) with several wording differences from OHD's text; fuzzy score "
+        "below the review threshold → `not_found`.",
         "",
         "## Mapping and limits of significance",
         "",
@@ -289,9 +297,9 @@ def main() -> int:
         "3. Hadith reference differs: task = six books CSV; Basira = Open-Hadith-Data nine books + HadeethEnc. "
         "Disagreements on hadith can be reference coverage, not matching quality.",
         "4. Completeness: the guideline treats an incomplete ayah as an error; Basira confirms a verbatim fragment "
-        "and labels it as a fragment. These cases are the bulk of the false confirmations above.",
+        "and labels it as a fragment.",
         "5. No LLM involved — fully reproducible with `make islamiceval` once the data is cloned into "
-        "`.scratch/islamiceval/`.",
+        "`.scratch/islamiceval/`. The runner calls the same stages, in the same order, as `Pipeline.check()`.",
     ]
     (OUT / "REPORT_1B.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(

@@ -1,6 +1,6 @@
 """eval/false_alarm.py — 500 verbatim corpus segments in neutral wrappers; each MUST come back `found`.
 
-Definition (idea deck slide 10, audit §4): a *false alarm* is a verbatim quote that the checker
+Definition (hypothesis H4, eval/PLAN.md): a *false alarm* is a verbatim quote that the checker
 fails to confirm (anything other than ``found`` with the originating record among the matches; a
 ``found`` whose shown positions are a prefix of a longer list, or a Quran ``found`` for a hadith
 segment that is itself an ayah — invariant I4 — both count as confirmed).
