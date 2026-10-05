@@ -173,5 +173,57 @@ describe("Check modes", () => {
   });
 });
 
-// 2026-10-06 — accessibility: assert aria-live region is polite
-// (added after screen-reader walkthrough with internal volunteer)
+/** E-UX-01 / E-UX-03 — the result must reach the user, not just the DOM.
+ *  Regression: focus() used to run in a setTimeout before React committed the results, so the
+ *  results region was empty, focus silently failed and phones never scrolled to the report. */
+describe("Check page — reveal after check (E-UX-01, E-UX-03)", () => {
+  const TEXT = "قال تعالى: إن الله علي كل شيء قدير. وقال ﷺ: «إنما الأعمال بالنيات» رواه مسلم";
+  // Check reads its mode from the URL; an earlier test leaves ?mode=guard behind
+  beforeEach(() => history.replaceState(null, "", "/check"));
+
+  it("moves focus to the filled results region and scrolls it into view", async () => {
+    mockFetch();
+    const scrolled: Element[] = [];
+    const orig = Element.prototype.scrollIntoView;
+    Element.prototype.scrollIntoView = function (this: Element) {
+      scrolled.push(this);
+    };
+    try {
+      const user = userEvent.setup();
+      render(<Check lang="ar" />);
+      await user.click(screen.getByLabelText(UI.ar["input_label"]!));
+      await user.paste(TEXT);
+      await screen.findByText(UI.ar["status_ok"]!);
+      await user.click(screen.getByRole("button", { name: UI.ar["check"]! }));
+      await screen.findAllByRole("status");
+      const results = document.getElementById("results")!;
+      expect(results.childElementCount).toBeGreaterThan(0);
+      expect(document.activeElement).toBe(results);
+      expect(scrolled).toContain(results);
+      expect(results).toHaveAttribute("aria-busy", "false");
+    } finally {
+      Element.prototype.scrollIntoView = orig;
+    }
+  });
+
+  it("an error clears the previous report and receives focus", async () => {
+    const fetchMock = mockFetch();
+    const user = userEvent.setup();
+    render(<Check lang="ar" />);
+    await user.click(screen.getByLabelText(UI.ar["input_label"]!));
+    await user.paste(TEXT);
+    await screen.findByText(UI.ar["status_ok"]!);
+    await user.click(screen.getByRole("button", { name: UI.ar["check"]! }));
+    await screen.findAllByRole("status");
+    expect(document.querySelectorAll(".hl").length).toBeGreaterThan(0);
+    fetchMock.mockImplementation(async (input: RequestInfo | URL) =>
+      String(input).endsWith("/v1/check")
+        ? new Response(JSON.stringify({ error: { code: "busy", message_ar: "خطأ تجريبي", message_en: "test error" } }), { status: 503 })
+        : new Response("{}", { status: 200 }),
+    );
+    await user.click(screen.getByRole("button", { name: UI.ar["check"]! }));
+    const alert = await screen.findByRole("alert");
+    expect(document.querySelectorAll(".hl").length).toBe(0);
+    expect(document.activeElement).toBe(alert);
+  });
+});

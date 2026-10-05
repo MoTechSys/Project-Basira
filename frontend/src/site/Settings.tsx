@@ -125,11 +125,11 @@ export default function Settings({ lang }: { lang: Lang }) {
           <p id="sm" className="set-label">
             {t(lang, "set_model_label")}
           </p>
-          <ul className="set-list" role="radiogroup" aria-labelledby="sm">
+          <div className="set-list" role="radiogroup" aria-labelledby="sm">
             {visible.map((m) => {
               const sel = m.id === model;
               return (
-                <li key={m.id}>
+                <div key={m.id}>
                   <button
                     type="button"
                     role="radio"
@@ -159,10 +159,10 @@ export default function Settings({ lang }: { lang: Lang }) {
                       {sel && <span className="set-row__note">{lang === "ar" ? m.note_ar : m.note_en}</span>}
                     </span>
                   </button>
-                </li>
+                </div>
               );
             })}
-          </ul>
+          </div>
           {catalog.length > RECOMMENDED && (
             <button type="button" className="set-more" onClick={() => setAll((v) => !v)} aria-expanded={all}>
               <Icon name="chevron-down" size={16} />

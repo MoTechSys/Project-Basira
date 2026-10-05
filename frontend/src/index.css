@@ -559,6 +559,12 @@ kbd {
 main.container:has(.workspace) {
   inline-size: min(100% - 2 * var(--bs-sp-4), 1320px);
 }
+/* E-UX-01: targets the page scrolls to after a check. The offset keeps them clear of the sticky
+   .topbar (64–80px measured) so the summary line is never hidden under it. */
+.reveal-target {
+  scroll-margin-block-start: 96px;
+  outline: none;
+}
 .results {
   margin-block-start: var(--bs-sp-5);
   display: flex;
@@ -1175,21 +1181,4 @@ mark.d-source {
   display: flex;
   flex-direction: column;
   gap: var(--bs-sp-4);
-}
-
-/* 2026-10-06 polish — AA contrast for status chips in bright mode */
-.status-chip--needs-review { outline: 1px solid currentColor; outline-offset: -1px; }
-.status-chip--not-found { font-weight: 600; }
-
-/* 2026-10-06 — focus-visible rings for keyboard users (final a11y pass) */
-*:focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 2px;
-  border-radius: 2px;
-}
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
 }

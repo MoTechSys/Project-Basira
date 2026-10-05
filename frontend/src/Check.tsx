@@ -189,6 +189,26 @@ export default function Check({ lang }: { lang: Lang; onLang?: (l: Lang) => void
   const resultsRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  // Set when a check finishes; consumed by the effect below once React has painted the results.
+  const revealPending = useRef(false);
+  const errorRef = useRef<HTMLDivElement>(null);
+
+  /** Bring the results into view after a check (E-UX-01).
+   *  Why an effect and not `setTimeout(focus, 0)`: the timeout fired before React committed the
+   *  results, so `#results` was still empty (0px tall, measured) and `focus()` silently failed —
+   *  on phones the result rendered below the fold and nothing told the user it had arrived.
+   *  Runs after commit, so the node has its content. `preventScroll` + an explicit scroll lets the
+   *  sticky top bar be compensated by CSS `scroll-margin-top`; reduced-motion users get no animation. */
+  useEffect(() => {
+    if (!revealPending.current || (!result && !guardResult && !error)) return;
+    revealPending.current = false;
+    // an error has no results region content: reveal the alert banner instead
+    const el = result || guardResult ? resultsRef.current : errorRef.current;
+    if (!el) return;
+    el.focus({ preventScroll: true });
+    const reduce = typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    el.scrollIntoView?.({ block: "start", behavior: reduce ? "auto" : "smooth" });
+  }, [result, guardResult, error]);
 
   useEffect(() => {
     const u = new URL(location.href);
@@ -205,10 +225,12 @@ export default function Check({ lang }: { lang: Lang; onLang?: (l: Lang) => void
       abort.current = ac;
       setBusy(true);
       setError(null);
+      // E-UX-03: a new check invalidates the previous report — never show an error above stale results.
+      setResult(null);
       try {
         const r = await fn(ac.signal);
+        revealPending.current = true;
         setResult(r);
-        setTimeout(() => resultsRef.current?.focus(), 0);
       } catch (e) {
         if (e instanceof DOMException && e.name === "AbortError") return;
         if (e instanceof BasiraError) {
@@ -217,6 +239,7 @@ export default function Check({ lang }: { lang: Lang; onLang?: (l: Lang) => void
         } else {
           setError(ui(lang, "error_network"));
         }
+        revealPending.current = true;
       } finally {
         setBusy(false);
       }
@@ -237,8 +260,8 @@ export default function Check({ lang }: { lang: Lang; onLang?: (l: Lang) => void
       setResult(null);
       void guard(text, lang, ac.signal)
         .then((g) => {
+          revealPending.current = true;
           setGuardResult(g);
-          setTimeout(() => resultsRef.current?.focus(), 0);
         })
         .catch((err: unknown) => {
           if (err instanceof DOMException && err.name === "AbortError") return;
@@ -423,13 +446,13 @@ export default function Check({ lang }: { lang: Lang; onLang?: (l: Lang) => void
         )}
 
         {error && (
-          <div className="banner banner--error" role="alert" dir="auto">
+          <div ref={errorRef} tabIndex={-1} className="banner banner--error reveal-target" role="alert" dir="auto">
             <Icon name="warning" size={18} />
             <span>{error}</span>
           </div>
         )}
 
-        <div id="results" ref={resultsRef} tabIndex={-1} className="results" aria-live="polite">
+        <div id="results" ref={resultsRef} tabIndex={-1} className="results reveal-target" aria-live="polite" aria-busy={busy}>
           {guardResult && mode === "guard" && <GuardPanel g={guardResult} lang={lang} />}
           {result && (
             <>

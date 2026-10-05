@@ -2079,3 +2079,60 @@ body {
 .en-cands__head { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; font-size: 0.9rem; }
 .en-cands__head small { color: var(--lux-text-2); }
 .en-cands__tr { margin: 0.35rem 0; font-size: 0.95rem; }
+
+/* E-UX-02 — short phones (iPhone SE class, ≤ 700px tall viewport, measured 568px usable).
+   Before: the check button sat at y=671 on a 568px viewport, i.e. the primary action needed a scroll.
+   The page intro is secondary on this screen; the composer is the task. Tighten only what is
+   above the button — no font goes below 16px and no target below 44px. */
+@media (max-height: 700px) and (max-width: 959px) {
+  .page--check .page-head--tight {
+    padding-block: 1rem 0.75rem;
+  }
+  .page--check .page-head h1 {
+    font-size: 1.6rem;
+    margin-block-end: 0.25rem;
+  }
+  .page--check .page-head p {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  /* 4 lines at line-height 2 ≈ 120px: still shows a full short post; measured button bottom 583 → fits 568 */
+  .page--check .composer-lux__input {
+    min-block-size: 120px;
+  }
+}
+
+/* E-UX-04 — status strip on narrow phones (≤ 420px). Before: at 320px the four chips wrapped one per
+   line (4 × 48px = ~190px measured) and pushed the user's annotated text below the fold.
+   A 2×2 grid keeps every chip ≥ 40px tall (targets stay ≥ 24px, WCAG 2.5.8) in half the height. */
+@media (max-width: 420px) {
+  .strip {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .strip .chip {
+    inline-size: 100%;
+    justify-content: flex-start;
+    padding-inline: 10px;
+  }
+  .strip .chip span {
+    flex: 1;
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+    line-height: 1.3;
+  }
+}
+
+/* E-UX-05 — header at 320px (iPhone SE 1st gen / small Android). Before: brand 102px + 4 actions × 44px
+   + gaps = 338px in a 320px row → the menu button sat at x = −18px, half off-screen (measured).
+   Tighten the action gap only; every target keeps its 44px box (WCAG 2.5.8). */
+@media (max-width: 359px) {
+  .site-actions {
+    gap: 0;
+  }
+  .site-header .wrap,
+  .topbar__inner {
+    padding-inline: 12px;
+    gap: 4px;
+  }
+}

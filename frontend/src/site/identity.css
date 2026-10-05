@@ -1,0 +1,423 @@
+/* ============================================================================
+   Basira identity v4 — «ختم المعارضة» (the collation seal). Loaded LAST (after index.css, lux.css).
+   Decision: DECISIONS E-056 · Rationale + measurements: docs/design/README.md
+
+   Concept: a manuscript collated against its source. Three marks, all from the tradition:
+     • khatam  8-fold star of two squares (the rub' al-hizb ۞ of every mushaf) — never 6-fold
+     • dāra    the circle muhaddithun drew between hadiths, left empty, dotted once collated
+     • nuqta   Ibn Muqla's rhombic pen dot, in illumination gold
+   Surfaces: night band (header + page head) over manuscript paper; the user's text sits on a «sheet»
+   framed by the mushaf jadwal (double gold rule).
+
+   Why one file and not edits spread across index.css / lux.css: the identity can be reviewed, measured
+   and reverted as a unit; the layout and behaviour rules underneath are untouched.
+
+   Red lines kept (index.css header): corpus text byte-exact (no letter-spacing / transform / synthesis),
+   not_found neutral (never red), logical properties only, targets ≥ 44px, focus always visible.
+   Contrast: every text pair below was measured ≥ 4.5:1 (docs/design/brand/tokens.py → text failures: 0;
+   night pairs: gold-light 9.69, moon 11.31, mist 7.30). Gold #B8893A on paper is 3.09 → graphics only.
+   ============================================================================ */
+
+@font-face {
+  font-family: "Basira Naskh";
+  src: url("/fonts/Amiri-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF;
+}
+@font-face {
+  font-family: "Basira Kufi";
+  src: url("/fonts/ReemKufi.woff2") format("woff2");
+  font-weight: 400 700;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF;
+}
+
+/* ---------------------------------------------------------------- tokens */
+:root {
+  --night: #0b0f2e;
+  --on-night: #f6f2e9; /* text on the night band — constant in both themes (dark redefines --paper) */
+  --night-2: #141a45;
+  --paper: #f6f2e9;
+  --sheet: #fffdf8;
+  --sheet-2: #fbf8f0;
+  --rule: #e5decf;
+  --rule-2: #d6cdb9;
+  --gold: #b8893a; /* graphics only on light surfaces (3.09:1) */
+  --gold-l: #d9b66e; /* text allowed on night (9.69:1) */
+  --moon: #c4c8e0; /* body text on night (11.31:1) */
+  --mist: #9aa0c3; /* secondary text on night (7.30:1) */
+  --seal-ink: #12183f;
+  --seal-dot: #b8893a;
+  --font-naskh: "Basira Naskh", "Amiri", serif;
+  --font-kufi: "Basira Kufi", var(--bs-font-ui);
+  --khatam: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2296%22%20height%3D%2296%22%20viewBox%3D%220%200%2096%2096%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23D9B66E%22%20stroke-opacity%3D%220.16%22%20stroke-width%3D%221%22%3E%3Crect%20x%3D%2227.84%22%20y%3D%2227.84%22%20width%3D%2240.32%22%20height%3D%2240.32%22/%3E%3Cpath%20d%3D%22M48%2019.49L76.51%2048L48%2076.51L19.49%2048Z%22/%3E%3Crect%20x%3D%22-20.16%22%20y%3D%22-20.16%22%20width%3D%2240.32%22%20height%3D%2240.32%22/%3E%3Cpath%20d%3D%22M0%20-28.51L28.51%200L0%2028.51L-28.51%200Z%22/%3E%3Crect%20x%3D%22-20.16%22%20y%3D%2275.84%22%20width%3D%2240.32%22%20height%3D%2240.32%22/%3E%3Cpath%20d%3D%22M0%2067.49L28.51%2096L0%20124.51L-28.51%2096Z%22/%3E%3Crect%20x%3D%2275.84%22%20y%3D%22-20.16%22%20width%3D%2240.32%22%20height%3D%2240.32%22/%3E%3Cpath%20d%3D%22M96%20-28.51L124.51%200L96%2028.51L67.49%200Z%22/%3E%3Crect%20x%3D%2275.84%22%20y%3D%2275.84%22%20width%3D%2240.32%22%20height%3D%2240.32%22/%3E%3Cpath%20d%3D%22M96%2067.49L124.51%2096L96%20124.51L67.49%2096Z%22/%3E%3C/g%3E%3C/svg%3E");
+  --chain: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2232%22%20height%3D%2212%22%3E%3Cpath%20d%3D%22M0%206H11M21%206H32%22%20stroke%3D%22%23B8893A%22%20stroke-width%3D%221%22/%3E%3Cpath%20d%3D%22M16%201.5%2020.5%206%2016%2010.5%2011.5%206Z%22%20fill%3D%22none%22%20stroke%3D%22%23D9B66E%22%20stroke-width%3D%221%22/%3E%3Cpath%20d%3D%22M16%204.3%2017.7%206%2016%207.7%2014.3%206Z%22%20fill%3D%22%23D9B66E%22/%3E%3C/svg%3E");
+
+  /* app tokens re-pointed to the manuscript palette */
+  --lux-bg: var(--paper);
+  --lux-surface: var(--sheet);
+  --lux-line: var(--rule);
+  --lux-text-2: #4a5078;
+  --bs-bg: var(--paper);
+  --bs-bg-subtle: #efe9dc;
+  --bs-surface: var(--sheet);
+  --bs-surface-raised: var(--sheet-2);
+  --bs-border: var(--rule);
+  --bs-text: var(--seal-ink);
+  --bs-text-muted: #5d6283;
+  --bs-violet: #5b48e8;
+  --bs-primary: #4a37e7;
+  --bs-link: #4a37e7;
+  /* the four states (tokens.py: each colour ≥ 4.5:1 on its tint and on sheet) */
+  --bs-state-found: #0b6b52;
+  --bs-state-found-bg: #e1f0e6;
+  --bs-state-partial: #2e42b5;
+  --bs-state-partial-bg: #e6e9f7;
+  --bs-state-review: #8a4300;
+  --bs-state-review-bg: #fae9c8;
+  --bs-state-notfound: #4b5070;
+  --bs-state-notfound-bg: #eae6dc;
+  --s-found: var(--bs-state-found);
+  --s-partial: var(--bs-state-partial);
+  --s-review: var(--bs-state-review);
+  --s-notfound: var(--bs-state-notfound);
+  --bs-diff-quote: #fae9c8;
+  --bs-diff-source: #e1f0e6;
+}
+[data-theme="dark"] {
+  --paper: #0b0f2e;
+  --sheet: #121842;
+  --sheet-2: #161d4d;
+  --rule: rgb(217 182 110 / 0.16);
+  --rule-2: rgb(217 182 110 / 0.28);
+  --seal-ink: #f6f2e9;
+  --seal-dot: #d9b66e;
+  --lux-bg: #080b24;
+  --lux-text-2: var(--moon);
+  --bs-bg: #080b24;
+  --bs-bg-subtle: #0e1338;
+  --bs-text: #f6f2e9;
+  --bs-text-muted: var(--mist);
+  --bs-primary: #b3a9ff;
+  --bs-link: #b3a9ff;
+  --bs-state-found: #5fd3ad;
+  --bs-state-found-bg: rgb(95 211 173 / 0.14);
+  --bs-state-partial: #9fb0ff;
+  --bs-state-partial-bg: rgb(159 176 255 / 0.15);
+  --bs-state-review: #f0b866;
+  --bs-state-review-bg: rgb(240 184 102 / 0.15);
+  --bs-state-notfound: #b4b8d6;
+  --bs-state-notfound-bg: rgb(180 184 214 / 0.13);
+  --bs-diff-quote: rgb(240 184 102 / 0.28);
+  --bs-diff-source: rgb(95 211 173 / 0.24);
+}
+
+body {
+  background-color: var(--lux-bg);
+}
+/* paper grain: a 4px dot field at 3.5% — reads as paper, invisible to contrast */
+[data-theme="light"] body,
+:root:not([data-theme="dark"]) body {
+  background-image: radial-gradient(rgb(18 24 63 / 0.035) 0.6px, transparent 0.6px);
+  background-size: 4px 4px;
+}
+
+/* ---------------------------------------------------------------- night band (header) */
+.site-header,
+.site-header[data-scrolled] {
+  background: var(--night);
+  color: var(--on-night);
+  border-block-end: 0;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.site-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--khatam) 0 0 / 96px;
+  pointer-events: none;
+}
+.site-header { isolation: isolate; }
+.site-header[data-scrolled] {
+  box-shadow: 0 10px 30px -18px rgb(11 15 46 / 0.8);
+}
+.site-brand { color: var(--on-night); }
+.site-brand .seal { --seal-ink: #f6f2e9; --seal-dot: #d9b66e; }
+.site-brand__name strong {
+  font-family: var(--font-kufi);
+  font-weight: 600;
+  font-size: 1.45rem;
+  line-height: 1;
+}
+.site-brand__name > span { color: var(--mist); }
+.site-nav a { color: var(--mist); }
+.site-nav a:hover { color: var(--on-night); }
+.site-nav a[aria-current="page"] { color: var(--on-night); }
+/* active page = a gold nuqta under the link instead of an underline */
+.site-nav a[aria-current="page"]::after {
+  inset-inline: 0;
+  margin-inline: auto;
+  inline-size: 6px;
+  block-size: 6px;
+  inset-block-end: 2px;
+  border-radius: 0;
+  transform: rotate(45deg);
+  background: var(--gold-l);
+}
+.site-header .icon-btn {
+  color: var(--moon);
+  border-color: rgb(217 182 110 / 0.35);
+  background: transparent;
+}
+.site-header .icon-btn:hover { color: var(--on-night); border-color: var(--gold-l); }
+.site-header .btn-lux--sm { box-shadow: inset 0 0 0 1px rgb(217 182 110 / 0.5); }
+.engine-dot, .site-header .health { color: var(--moon); }
+.mobile-menu { background: var(--night); color: var(--on-night); }
+.mobile-menu a { color: var(--moon); }
+.mobile-menu a[aria-current="page"] { color: var(--gold-l); }
+
+/* ---------------------------------------------------------------- night band continues into page heads */
+.page-head,
+.hero-lux {
+  position: relative;
+  isolation: isolate;
+  background: var(--night);
+  color: var(--on-night);
+}
+.page-head::before,
+.hero-lux::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--khatam) 0 0 / 96px;
+  -webkit-mask: linear-gradient(180deg, #000 0%, rgb(0 0 0 / 0.45) 70%, transparent 100%);
+  mask: linear-gradient(180deg, #000 0%, rgb(0 0 0 / 0.45) 70%, transparent 100%);
+  pointer-events: none;
+}
+/* the illuminated chain (gold rhombi) that closes the band, as on a mushaf header */
+.page-head::after,
+.hero-lux::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 10px;
+  block-size: 12px;
+  background: var(--chain) center / 32px 12px repeat-x;
+  opacity: 0.8;
+  -webkit-mask: linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent);
+  mask: linear-gradient(90deg, transparent, #000 22%, #000 78%, transparent);
+  pointer-events: none;
+}
+.page-head h1,
+.hero-lux h1 {
+  font-family: var(--font-naskh);
+  font-weight: 700;
+  color: var(--on-night);
+  line-height: 1.45;
+}
+.page-head p,
+.hero-lux__sub { color: var(--moon); }
+.page-head--tight { padding-block-end: 2.75rem; }
+.hero-lux__bg { display: none; } /* the WebGL starfield is replaced by the khatam lattice */
+.kicker {
+  border-color: rgb(217 182 110 / 0.4);
+  background: transparent;
+  color: var(--gold-l);
+}
+.kicker__dot {
+  border-radius: 0;
+  transform: rotate(45deg);
+  background: var(--gold-l);
+  box-shadow: none;
+}
+.hero-lux .btn-ghost-lux { color: var(--on-night); border-color: rgb(217 182 110 / 0.45); background: transparent; }
+.motto__ai { color: #b3a9ff; }
+.motto__engine { color: #5fd3ad; }
+.motto__sep { background: linear-gradient(90deg, transparent, var(--gold-l), transparent); }
+
+/* section headings in Naskh (manuscript chapter heads) */
+.section__head h2 {
+  font-family: var(--font-naskh);
+  font-weight: 700;
+}
+.section__head h2 { line-height: 1.45; }
+
+/* ---------------------------------------------------------------- primary action */
+.btn-lux {
+  background: var(--night);
+  color: var(--on-night);
+  box-shadow: inset 0 0 0 1px rgb(217 182 110 / 0.4), inset 0 1px 0 rgb(255 255 255 / 0.08), 0 12px 28px -14px rgb(11 15 46 / 0.75);
+}
+.btn-lux:hover {
+  box-shadow: inset 0 0 0 1px var(--gold-l), inset 0 1px 0 rgb(255 255 255 / 0.08), 0 16px 36px -16px rgb(11 15 46 / 0.85);
+}
+.btn-lux::after { background: radial-gradient(120px circle at var(--mx, 50%) 50%, rgb(217 182 110 / 0.28), transparent 60%); }
+[data-theme="dark"] .btn-lux { background: var(--gold-l); color: var(--night); box-shadow: 0 12px 28px -14px rgb(0 0 0 / 0.7); }
+.btn-ghost-lux { border-color: var(--rule-2); background: var(--sheet); }
+
+/* ---------------------------------------------------------------- the workspace: tabs + composer */
+.page--check .ws { position: relative; z-index: 2; }
+/* the mode tabs sit ON the gold chain that closes the night band (half over, half under). The page
+   head reserves that space itself so the subtitle is never covered (measured: overlap at 390px before). */
+.page--check .page-head--tight { padding-block-end: 3.25rem; }
+.page--check .ws-modes { margin-block-start: -1.6rem; position: relative; z-index: 3; }
+.ws-modes {
+  background: var(--sheet);
+  border-color: var(--rule);
+  box-shadow: 0 14px 30px -22px rgb(11 15 46 / 0.55);
+}
+.ws-mode { color: var(--bs-text-muted); }
+.ws-mode[aria-selected="true"] {
+  background: var(--night);
+  color: var(--on-night);
+  box-shadow: inset 0 0 0 1px rgb(217 182 110 / 0.45);
+}
+[data-theme="dark"] .ws-mode[aria-selected="true"] { background: var(--gold-l); color: var(--night); }
+
+/* the jadwal — the double gold rule that frames a mushaf page */
+.composer-lux,
+.annotated-wrap,
+.drop {
+  position: relative;
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  box-shadow: 0 1px 0 #fff inset, 0 30px 60px -32px rgb(11 15 46 / 0.45);
+}
+.composer-lux::before,
+.annotated-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1px solid rgb(184 137 58 / 0.42);
+  border-radius: calc(var(--bs-radius-lg, 20px) - 6px);
+  box-shadow: inset 0 0 0 2px var(--sheet), inset 0 0 0 3px rgb(184 137 58 / 0.2);
+  pointer-events: none;
+}
+/* ruled lines in the composer, like a copyist's page (38px rhythm = line-height 2 × 1.1rem + rounding) */
+.composer-lux__input {
+  background-color: transparent;
+  background-image: repeating-linear-gradient(to bottom, transparent 0 37px, var(--rule) 37px 38px);
+  background-position: 0 calc(1rem - 2px);
+  background-attachment: local;
+  border-color: transparent;
+  line-height: 38px;
+}
+.composer-lux__input:focus-visible {
+  border-color: var(--bs-violet);
+}
+
+/* ---------------------------------------------------------------- examples: gold nuqta bullets */
+.ex-card { background: var(--sheet); border-color: var(--rule); }
+.ex-card > .bs-icon { color: var(--gold); }
+
+/* ---------------------------------------------------------------- results */
+.chip { border-color: var(--rule-2); background: var(--sheet); }
+.hl {
+  border-radius: 6px;
+  padding-inline: 3px;
+  box-shadow: inset 0 -2px 0 var(--hl);
+}
+.hl[aria-pressed="true"] {
+  box-shadow: inset 0 -2px 0 var(--hl), 0 0 0 2px var(--sheet), 0 0 0 4px var(--hl);
+}
+.quote { border-inline-start-width: 0; border-block-start: 3px solid var(--bs-state-notfound); }
+.quote[data-status="found"] { border-block-start-color: var(--bs-state-found); }
+.quote[data-status="partial_match"] { border-block-start-color: var(--bs-state-partial); }
+.quote[data-status="needs_review"] { border-block-start-color: var(--bs-state-review); }
+.quote__head { background: var(--sheet-2); border-color: var(--rule); }
+/* the collation folio: your leaf above, the source leaf below, joined by a dashed seam */
+.diff-pane { background: var(--sheet); border-color: var(--rule); }
+.diff-pane--source { background: var(--sheet-2); border-color: color-mix(in srgb, var(--bs-state-found) 35%, var(--rule)); }
+.match__ref strong,
+.match__ref h4 {
+  font-family: var(--font-naskh);
+  font-weight: 700;
+}
+.sheet { background: var(--sheet); border-block-start: 1px solid rgb(184 137 58 / 0.45); }
+.sheet__grip { background: var(--rule-2); }
+.sheet .quote { border-block-start-width: 0; }
+
+/* ---------------------------------------------------------------- footer on night */
+.site-footer {
+  position: relative;
+  isolation: isolate;
+  background: var(--night);
+  color: var(--moon);
+}
+.site-footer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--khatam) 0 0 / 96px;
+  -webkit-mask: linear-gradient(0deg, #000, transparent 80%);
+  mask: linear-gradient(0deg, #000, transparent 80%);
+  pointer-events: none;
+}
+.site-footer .seal { --seal-ink: #f6f2e9; --seal-dot: #d9b66e; }
+.site-footer a { color: var(--moon); }
+.site-footer a:hover { color: var(--gold-l); }
+.site-footer h2, .site-footer h3, .site-footer strong { color: var(--on-night); }
+
+/* lockup component */
+.seal-lockup { display: inline-flex; align-items: center; }
+.seal-lockup b { font-family: var(--font-kufi); font-weight: 600; line-height: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header::before, .page-head::before, .hero-lux::before { background-attachment: scroll; }
+}
+
+/* ---------------------------------------------------------------- state badge (StatusBadge) */
+/* the kit badge colours were the old palette (needs_review violet on a now-amber tint); re-point all four
+   to the state tokens so the badge, the highlight and the dāra glyph always share one colour. */
+.bs-badge[data-state] { background: var(--bs-state-notfound-bg); color: var(--bs-state-notfound); }
+.bs-badge[data-state="found"] { background: var(--bs-state-found-bg); color: var(--bs-state-found); }
+.bs-badge[data-state="partial_match"] { background: var(--bs-state-partial-bg); color: var(--bs-state-partial); }
+.bs-badge[data-state="needs_review"] { background: var(--bs-state-review-bg); color: var(--bs-state-review); }
+
+/* ---------------------------------------------------------------- accent: teal → illumination gold */
+/* v3 used verification teal #2EF2C2 as the accent (lens ring, kicker dot, engine pulse, focus rings).
+   v4 has one accent: gold. Re-pointing the token converts every teal accent at once; the literal
+   rgb(46 242 194) glows are overridden below where they appear. --bs-teal-700 (text on light) stays. */
+:root { --bs-teal: #d9b66e; --lux-glow: rgb(217 182 110 / 0.18); --lux-accent: #b8893a; }
+.lens-ring {
+  border-color: rgb(217 182 110 / 0.9);
+  background: radial-gradient(circle, transparent 58%, rgb(217 182 110 / 0.12) 70%, transparent 72%);
+  box-shadow: 0 0 0 6px rgb(11 15 46 / 0.06), 0 0 36px rgb(217 182 110 / 0.35);
+}
+.btn-lux:focus-visible, .set-input:focus-visible, .set-row:focus-visible { outline-color: var(--bs-primary); }
+/* the engine "ready" pulse keeps a status colour (found green), not decoration */
+.engine-dot[data-state="ok"]::before { background: #5fd3ad; box-shadow: 0 0 0 4px rgb(95 211 173 / 0.18), 0 0 12px rgb(95 211 173 / 0.55); }
+
+/* primary action ON the night band (hero CTA, header CTA): a solid gold seal-plate, so the one thing to
+   press is the brightest object on the dark surface. night on gold-light = 9.69:1 (tokens.cr). */
+.hero-lux .btn-lux,
+.site-header .btn-lux {
+  background: var(--gold-l);
+  color: var(--night);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.35), 0 12px 30px -12px rgb(217 182 110 / 0.55);
+}
+.hero-lux .btn-lux:hover,
+.site-header .btn-lux:hover { background: #e4c482; }
+
+/* ---------------------------------------------------------------- /settings (pre-existing a11y debt, measured by axe)
+   dark theme: the key field and model rows used --lux-surface-2 / --lux-text which are undefined → browser
+   defaults (white field, 2.24:1 placeholder; vendor 2.0:1). Bind them to the identity tokens. */
+.set-input, .set-row { background: var(--sheet); color: var(--bs-text); border-color: var(--rule-2); }
+.set-input::placeholder { color: var(--bs-text-muted); opacity: 1; }
+.set-vendor, .set-row__stats, .set-row__note, .set-help, .set-state { color: var(--bs-text-muted); }
+.set-more { color: var(--bs-link); }
+.set-row[data-selected] { border-color: var(--bs-primary); background: color-mix(in srgb, var(--bs-primary) 10%, var(--sheet)); }
+.set-radio, .set-row[data-selected] .set-radio::after { border-color: var(--bs-primary); }
+.set-row[data-selected] .set-radio::after { background: var(--bs-primary); }
+
+/* E-UX-02 kept under v4: on short phones (≤700px tall) the tabs-on-the-chain overlap needs less room;
+   measured before this rule: button bottom 582 on a 568px viewport (was 563 under v3); after: see battery-v4.txt. */
+@media (max-height: 700px) and (max-width: 959px) {
+  .page--check .page-head--tight { padding-block-end: 1.75rem; }
+  .page--check .page-head::after { inset-block-end: 6px; }
+  .page--check .ws-modes { margin-block-start: -1.4rem; }
+}

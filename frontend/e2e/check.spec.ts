@@ -4,7 +4,8 @@ import { expect, test } from "@playwright/test";
 const TYPO = "قال تعالى: إن الله علي كل شيء قدير. وقال ﷺ: «إنما الأعمال بالنيات» رواه مسلم";
 
 test("rtl shell, real check against the backend, axe clean", async ({ page }) => {
-  await page.goto("/");
+  // the composer lives on /check since the multi-page shell (f69e4df); "/" is the landing page
+  await page.goto("/check");
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
   await expect(page.locator("html")).toHaveAttribute("lang", "ar");
   await expect(page.getByText("جاهز")).toBeVisible({ timeout: 45_000 });
@@ -48,7 +49,7 @@ test("rtl shell, real check against the backend, axe clean", async ({ page }) =>
 
 test("mobile: highlight opens a bottom sheet; Escape closes and restores focus", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
+  await page.goto("/check");
   await expect(page.getByText("جاهز")).toBeVisible({ timeout: 45_000 });
   await page.locator("#text").fill(TYPO);
   await page.getByRole("button", { name: "افحص" }).click();
@@ -66,5 +67,25 @@ test("mobile: highlight opens a bottom sheet; Escape closes and restores focus",
   expect(axe.violations, JSON.stringify(axe.violations.map((v) => [v.id, v.nodes.length]), null, 1)).toEqual([]);
 });
 
-// 2026-10-06 — a11y gate: axe-core must find zero serious violations
-// (we already assert this in CI via @axe-core/playwright but keep local check)
+/** E-UX-01 / E-UX-02 / E-UX-04 — on real phone viewports the primary action is reachable without
+ *  scrolling, and after "افحص" the report is brought on screen (before: it rendered below the fold,
+ *  scrollY stayed 0 and focus stayed on <body> — measured on 6 viewports, 19/66 checks failed). */
+for (const vp of [
+  { name: "320x568 (iPhone SE)", width: 320, height: 568 },
+  { name: "390x664 (iPhone 13 visible)", width: 390, height: 664 },
+]) {
+  test(`mobile ${vp.name}: button above the fold, result revealed after check`, async ({ page }) => {
+    await page.setViewportSize({ width: vp.width, height: vp.height });
+    await page.goto("/check");
+    await expect(page.getByText("جاهز")).toBeVisible({ timeout: 45_000 });
+    await page.locator("#text").fill(TYPO);
+    const btn = page.getByRole("button", { name: "افحص" });
+    const bb = (await btn.boundingBox())!;
+    expect(bb.y + bb.height).toBeLessThanOrEqual(vp.height);
+    await btn.click();
+    await expect(page.locator(".hl").first()).toBeVisible({ timeout: 45_000 });
+    await expect(page.locator("#results")).toBeFocused();
+    await expect(page.locator(".summary")).toBeInViewport();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  });
+}
