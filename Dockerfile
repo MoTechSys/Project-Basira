@@ -4,9 +4,11 @@
 
 # ---------- 1) frontend ----------
 FROM node:22-alpine AS web
-WORKDIR /web
+# keep the repo layout: frontend/ imports ../messages/*.json (single source of UI strings)
+WORKDIR /src/frontend
 COPY frontend/package*.json ./
 RUN npm ci --no-audit --no-fund
+COPY messages/ /src/messages/
 COPY frontend/ ./
 # brand assets already live in frontend/public/brand (copied with frontend/ above)
 RUN npm run build
@@ -40,7 +42,7 @@ COPY --from=py /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12
 COPY --from=py /usr/local/bin/uvicorn /usr/local/bin/uvicorn
 COPY --from=index /app/corpus/index corpus/index
 COPY --from=index /app/corpus/manifest.json /app/corpus/surah_names.json corpus/
-COPY --from=web /web/dist frontend/dist
+COPY --from=web /src/frontend/dist frontend/dist
 COPY backend/app backend/app
 COPY messages messages
 COPY LICENSE SOURCES.md THIRD_PARTY_NOTICES.md AI_USAGE.md SAFETY.md ./

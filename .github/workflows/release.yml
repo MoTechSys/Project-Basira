@@ -1,30 +1,26 @@
+# Publishes a GitHub Release when a version tag (vX.Y.Z) is pushed.
+# The release notes are the matching section of CHANGELOG.md; the job fails if that section is missing.
 name: release
 on:
   push:
-    tags:
-      - "v*.*.*"
-
+    tags: ["v*.*.*"]
+permissions:
+  contents: write
 jobs:
   release:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Extract tag + changelog section
-        id: ex
+      - name: Extract the CHANGELOG section for this tag
         run: |
-          TAG="${GITHUB_REF_NAME}"
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
-          # pull the section for this tag out of CHANGELOG.md
-          awk "/^## \[?${TAG#v}/{flag=1;next}/^## /{flag=0}flag" CHANGELOG.md > NOTES.md || true
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+          VERSION="${GITHUB_REF_NAME#v}"
+          awk -v v="$VERSION" '
+            index($0, "## [" v "]") == 1 { on = 1; next }
+            on && /^## \[/              { exit }
+            on                          { print }
+          ' CHANGELOG.md > NOTES.md
+          test -s NOTES.md || { echo "CHANGELOG.md has no section for $VERSION"; exit 1; }
+      - uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.ex.outputs.tag }}
-          name: "Basira ${{ steps.ex.outputs.tag }}"
+          name: Basira ${{ github.ref_name }}
           body_path: NOTES.md
-          draft: false
-          prerelease: false

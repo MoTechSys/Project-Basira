@@ -1,52 +1,63 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-*.egg-info/
-.pytest_cache/
-.coverage
-htmlcov/
-.mypy_cache/
-.ruff_cache/
-venv/
-.venv/
-env/
+# --- Secrets & environment ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.dev.vars
 
-# Node
+# --- Dependencies ---
 node_modules/
+.pnpm-store/
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# --- Build output ---
 dist/
 build/
-.vite/
+.wrangler/
+.output/
+coverage/
+*.tsbuildinfo
+
+# --- Logs & runtime ---
+backend/.runtime/
+logs/
 *.log
-.npm
-.yarn-cache/
+npm-debug.log*
+*.sock
 
-# Environment
-.env
-.env.local
-.env.*.local
-
-# IDE
+# --- Editors / OS ---
 .vscode/
 .idea/
-*.swp
-*.swo
 .DS_Store
+Thumbs.db
 
-# Data (will be fetched by scripts)
+# --- Test artifacts ---
+playwright-report/
+test-results/
+.pytest_cache/
+
+# --- Local scratch (third-party datasets for eval/islamiceval, never committed) ---
+.scratch/
+
+# --- Corpus data & built indexes (downloaded at build time; only manifest.json is committed) ---
 corpus/data/
-corpus/snapshot/
-*.sqlite
-*.db
-
-# Build artifacts
-*.tsbuildinfo
-coverage/
-.turbo/
-
-# Local snapshot caches
-corpus/snapshots/
-backend/.coverage
-backend/htmlcov/
+corpus/index/
+*.MISMATCH
+.hypothesis/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+corpus/fixture/
+eval/results/
+frontend/node_modules/
+frontend/dist/
+frontend/test-results/
+frontend/playwright-report/
+frontend/e2e/*.png
+docs/manual-test/images/05_too_big.png
+frontend/.lighthouse/
+corpus/index/snapshot/
