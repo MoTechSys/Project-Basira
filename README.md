@@ -1,5 +1,10 @@
 # بصيرة (Basira)
 
+[![CI](https://img.shields.io/github/actions/workflow/status/MoTechSys/Project-Basira/ci.yml?branch=main&label=ci)](https://github.com/MoTechSys/Project-Basira/actions)
+[![License](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-0.1.0-green.svg)](CHANGELOG.md)
+[![IslamicAIch 2026](https://img.shields.io/badge/IslamicAIch-2026-orange.svg)](https://islamicaich.sa)
+
 > أداة تحقق لنصوص القرآن والحديث للمعرِّفين بالإسلام.
 
 مشاركة في **تحدي الذكاء الاصطناعي في خدمة المحتوى الإسلامي 2026** — المسار الرابع: أدوات المعرفة والتحقق.
