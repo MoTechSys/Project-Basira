@@ -1,17 +1,46 @@
-# بصيرة · Basira
+<div align="center">
 
-**Deterministic verification of Quran and Hadith quotations — before you publish.**
+# 🕌 بصيرة · Basira
 
-Paste a post, an article, a chatbot answer, or an image. Basira finds every quotation presented as Quran or Hadith,
-matches it **byte-exactly** against licensed source corpora, and returns one of four states with the verbatim source
-text and a letter-level diff — including vowel marks (حركات). It never grades a hadith, never rewrites your text,
-never generates religious text, and stores nothing.
+### **Deterministic verification of Quran & Hadith quotations — before you publish.**
 
-> Track 4 entry · *AI in Service of Islamic Content Challenge 2026* · Arabic-first, bilingual (AR/EN), RTL.
+<p align="center">
+  <em>Paste any text, image, or AI answer. Basira finds every Quran/Hadith quote,<br/>
+  matches it <strong>byte-exactly</strong> against licensed sources, and shows you<br/>
+  the diff — vowel marks and all. No judgment. No generation. No storage.</em>
+</p>
 
-[![CI](https://github.com/MoTechSys/Project-Basira/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/MoTechSys/Project-Basira/actions/workflows/ci.yml)
-[![License](https://img.shields.io/badge/license-Apache--2.0-6150EA)](LICENSE)
-[![Determinism](https://img.shields.io/badge/false%20alarms-0%2F500-2EF2C2?labelColor=12183F)](eval/REPORT.md)
+<p align="center">
+  <a href="https://basirapp.site"><img src="https://img.shields.io/badge/🌐_Try_Live-basirapp.site-2EF2C2?style=for-the-badge&labelColor=12183F" alt="Live Demo"/></a>
+  <a href="https://github.com/MoTechSys/Project-Basira/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/MoTechSys/Project-Basira/ci.yml?branch=main&style=for-the-badge&logo=github&label=CI&labelColor=12183F" alt="CI"/></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-6150EA?style=for-the-badge&labelColor=12183F" alt="License"/></a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/github/stars/MoTechSys/Project-Basira?style=flat-square&logo=github&color=FFD700&labelColor=12183F" alt="Stars"/>
+  <img src="https://img.shields.io/github/forks/MoTechSys/Project-Basira?style=flat-square&logo=github&color=6150EA&labelColor=12183F" alt="Forks"/>
+  <img src="https://img.shields.io/github/last-commit/MoTechSys/Project-Basira?style=flat-square&logo=git&color=2EF2C2&labelColor=12183F" alt="Last Commit"/>
+  <img src="https://img.shields.io/github/commit-activity/w/MoTechSys/Project-Basira?style=flat-square&color=FF6B9D&labelColor=12183F" alt="Commit Activity"/>
+  <img src="https://img.shields.io/github/languages/top/MoTechSys/Project-Basira?style=flat-square&color=3178C6&labelColor=12183F" alt="Top Language"/>
+  <img src="https://img.shields.io/badge/false_alarms-0%2F500-2EF2C2?style=flat-square&labelColor=12183F" alt="Zero false alarms"/>
+  <img src="https://img.shields.io/badge/eval-150%2F150-2EF2C2?style=flat-square&labelColor=12183F" alt="150/150 eval"/>
+  <img src="https://img.shields.io/badge/variance-0-2EF2C2?style=flat-square&labelColor=12183F" alt="Zero variance"/>
+</p>
+
+<p align="center">
+  <strong>Track 4 entry · <em>AI in Service of Islamic Content Challenge 2026 (IslamicAIch)</em></strong><br/>
+  <sub>Arabic-first · bilingual AR / EN · RTL · PWA · MCP server for AI assistants</sub>
+</p>
+
+<p align="center">
+  <a href="https://basirapp.site"><kbd>&nbsp;&nbsp;🚀&nbsp;Try&nbsp;it&nbsp;now&nbsp;&nbsp;</kbd></a>&nbsp;·&nbsp;
+  <a href="#quick-start"><kbd>&nbsp;&nbsp;⚡&nbsp;Quick&nbsp;Start&nbsp;&nbsp;</kbd></a>&nbsp;·&nbsp;
+  <a href="docs/API.md"><kbd>&nbsp;&nbsp;📘&nbsp;API&nbsp;Docs&nbsp;&nbsp;</kbd></a>&nbsp;·&nbsp;
+  <a href="SAFETY.md"><kbd>&nbsp;&nbsp;🛡️&nbsp;Safety&nbsp;Model&nbsp;&nbsp;</kbd></a>&nbsp;·&nbsp;
+  <a href="eval/REPORT.md"><kbd>&nbsp;&nbsp;📊&nbsp;Evaluation&nbsp;&nbsp;</kbd></a>
+</p>
+
+</div>
 
 ---
 
@@ -150,3 +179,22 @@ re-litigated (see `docs/DECISIONS.md`) · see [`CONTRIBUTING.md`](CONTRIBUTING.m
 ## License
 
 Apache-2.0 — see [`LICENSE`](LICENSE). Corpus data carry their own licences (above).
+
+---
+
+<div align="center">
+
+### 🌙 Built for the Ummah, measured for the judges.
+
+<sub>
+  <strong>IslamicAIch 2026 · Track 4</strong> &nbsp;·&nbsp;
+  <a href="https://basirapp.site">basirapp.site</a> &nbsp;·&nbsp;
+  <a href="https://github.com/MoTechSys/Project-Basira/issues">Issues</a> &nbsp;·&nbsp;
+  <a href="https://github.com/MoTechSys/Project-Basira/discussions">Discussions</a>
+</sub>
+
+<p align="center">
+  <sub>If Basira helps you ship safer Islamic content, consider a ⭐ — it's the only metric we don't measure ourselves.</sub>
+</p>
+
+</div>
