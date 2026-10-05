@@ -10,7 +10,7 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
-    allowedHosts: true, // sandbox preview hosts (dev only; prod is a static build)
+    allowedHosts: true, // dev server only: accept remote preview hostnames; production is a static build
     proxy: BACKEND_PROXY,
   },
   // `vite preview` serves the production bundle with the same proxy → Lighthouse measures real output

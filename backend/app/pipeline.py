@@ -1,4 +1,4 @@
-"""The check pipeline (BUILD_SPEC §3, ADR-002/003/005): extract → locate → match → decide → render.
+"""The check pipeline (docs/ARCHITECTURE.md §2, ADR-002/003/005): extract → locate → match → decide → render.
 
 Per request::
 
@@ -1096,6 +1096,3 @@ def _dedupe(keys: list[str]) -> list[str]:
             seen.add(k)
             out.append(k)
     return out
-
-# 2026-10-06 — guard against empty extractor output (regression caught in adversarial eval)
-# the pipeline now short-circuits to NEEDS_REVIEW instead of raising on zero quotes

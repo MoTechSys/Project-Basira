@@ -1,16 +1,4 @@
-"""Pydantic schemas للـ public API — بصيرة v0.1.
-
-يُنظّم هذا الملف البنى التالية:
-- Status (الأربع حالات I1-I9) + Kind (أنواع الاقتباسات)
-- CheckRequest / CheckResponse (العقد مع الواجهة)
-- Match / Quote / Grade / Diff (البنى الداخلية)
-- openapi_examples() لتغذية /docs
-
-المرجع:
-- ADR 0001 (four-state model)
-- ADR 0002 (deterministic matching)
-- ADR 0003 (BYOK provider keys)
-"""
+"""Pydantic models for the public API (contract: docs/API.md)."""
 
 from __future__ import annotations
 
@@ -21,34 +9,21 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-# ---------------------------------------------------------------------------
-# أمثلة OpenAPI — تُقرأ من ملف JSON خارجي (openapi_examples.json)
-# ---------------------------------------------------------------------------
 _EXAMPLES_FILE = Path(__file__).with_name("openapi_examples.json")
 
 
 @lru_cache(maxsize=1)
 def openapi_examples() -> dict[str, dict[str, Any]]:
-    """أزواج طلب/رد حقيقية للحالات الأربع، مُلتقطة من مجموعة اختبار كاملة.
-
-    تُستخدم في Swagger UI عبر CheckRequest.model_config و docs/API.md.
-    تعود بمعجم فارغ إذا الملف غير موجود — fallback آمن.
-    """
+    """Real `/v1/check` request/response pairs for the four states, captured from the full corpus
+    (mock provider) — see docs/API.md §Examples. `source_text` is the corpus record verbatim."""
     if not _EXAMPLES_FILE.exists():
         return {}
-    raw: dict[str, dict[str, Any]] = json.loads(_EXAMPLES_FILE.read_text(encoding="utf-8"))
-    return raw
+    data: dict[str, dict[str, Any]] = json.loads(_EXAMPLES_FILE.read_text(encoding="utf-8"))
+    return data
 
 
-# ---------------------------------------------------------------------------
-# الأنواع المحدودة (Literal types) — نستخدم Literal بدل Enum لأن Pydantic v2
-# يُولّد JSON Schema أنظف ويحافظ على سهولة التسلسل.
-# ---------------------------------------------------------------------------
 Status = Literal["found", "partial_match", "needs_review", "not_found"]
-
 Kind = Literal["quran", "hadith_matn", "isnad", "attributed_saying", "unknown"]
-
-# أسباب NEEDS_REVIEW — نُعلن قائمة مغلقة (لا نقبل أي سبب حر)
 ReviewReason = Literal[
     "near_miss",
     "orthographic_difference",
@@ -63,26 +38,16 @@ ReviewReason = Literal[
     "validator_unproven",
     "attribution_only",
 ]
-
 CorpusName = Literal["tanzil", "ohd", "hadeethenc"]
 
 
-# ---------------------------------------------------------------------------
-# خيارات الطلب
-# ---------------------------------------------------------------------------
 class CheckOptions(BaseModel):
-    """خيارات اختيارية للـ /v1/check."""
-
     max_candidates: int = Field(default=3, ge=1, le=5)
 
 
 class CheckRequest(BaseModel):
-    """جسم الطلب لـ POST /v1/check."""
-
     model_config = ConfigDict(
-        json_schema_extra={
-            "examples": [v["request"] for v in openapi_examples().values()]
-        }
+        json_schema_extra={"examples": [v["request"] for v in openapi_examples().values()]}
     )
 
     text: str = Field(min_length=1, max_length=5000)
@@ -91,32 +56,23 @@ class CheckRequest(BaseModel):
     options: CheckOptions = Field(default_factory=CheckOptions)
 
 
-# ---------------------------------------------------------------------------
-# البنى الفرعية
-# ---------------------------------------------------------------------------
 class Span(BaseModel):
-    """نطاق [start, end) داخل النص الأصلي بالأحرف (code points)."""
-
     start: int
     end: int
 
 
 class DiffOpModel(BaseModel):
-    """عملية diff واحدة بين الاقتباس والمصدر (char-level + letter-level)."""
-
     op: Literal["equal", "replace", "insert", "delete"]
     quote_range: list[int]
     source_range: list[int]
     quote_chars: list[int]
     source_chars: list[int]
-    # نطاقات letter-level داخل العملية (للتظليل اللوني وفروق الحركات)
+    # letter-level sub-ranges inside this op (char-by-char highlighting; diacritic conflicts)
     quote_letters: list[list[int]] = Field(default_factory=list)
     source_letters: list[list[int]] = Field(default_factory=list)
 
 
 class Grade(BaseModel):
-    """تخريج حديث من HadeethEnc فقط — لا نُنشئ تخريجاً جديداً أبداً (I4)."""
-
     text: str
     takhrij: str
     source: Literal["HadeethEnc"] = "HadeethEnc"

@@ -1,6 +1,6 @@
 """Word-level diff between a quote and a source window, projected onto original text.
 
-Uses ``difflib.SequenceMatcher`` on token lists (BUILD_SPEC §3.4-ج). Each op
+Uses ``difflib.SequenceMatcher`` on token lists (ARCHITECTURE §2 stage 4). Each op
 carries token ranges on both sides plus *character* ranges on the original
 strings, so the UI can highlight the user's text and the verbatim source text
 without ever re-rendering religious text.

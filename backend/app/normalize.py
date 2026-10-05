@@ -2,7 +2,7 @@
 
 Two tiers (ADR-002):
 
-* ``loose``  — BUILD_SPEC §3.1 exactly. Collapses أإآٱ→ا, ى→ي, ة→ه, ؤ→و, ئ→ي.
+* ``loose``  — retrieval tier (ADR-002). Collapses أإآٱ→ا, ى→ي, ة→ه, ؤ→و, ئ→ي.
                Used for *retrieval* and *fuzzy scoring* only.
 * ``strict`` — drops the same diacritics / Quranic marks / tatweel / direction
                marks and maps only ٱ→ا (wasla is a rasm notation, not a letter)

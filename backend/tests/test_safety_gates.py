@@ -1,4 +1,4 @@
-"""Safety gates B01–B03 (internal audit 2026-10-01, owner decision 2026-10-03).
+"""Safety gates B01–B03 (DECISIONS D-013, E-044, E-045).
 
 Written FAILING first against main@817c6fb — every case below was reproduced live on the full index:
 

@@ -1,4 +1,4 @@
-"""normalize.py — BUILD_SPEC §3.1 (loose) and ADR-002 (strict) behaviour."""
+"""normalize.py — ADR-002 loose and strict tiers behaviour."""
 
 from __future__ import annotations
 

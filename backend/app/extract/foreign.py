@@ -1,4 +1,4 @@
-"""Foreign material inside a quote (audit B02).
+"""Foreign material inside a quote (safety gate B02, DECISIONS E-044).
 
 ``normalize.tokenize`` turns every non-Arabic-letter character into a separator, so «قل هو HELLO الله
 أحد» produces exactly the tokens of 112:1 and used to come back `found`. The strict gate only ever

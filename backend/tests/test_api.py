@@ -1,4 +1,4 @@
-"""HTTP contract (BUILD_SPEC §4): envelopes, limits, health gate, sources, rate limit + bypass."""
+"""HTTP contract (docs/API.md): envelopes, limits, health gate, sources, rate limit + bypass."""
 
 from __future__ import annotations
 

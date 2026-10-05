@@ -61,7 +61,7 @@ def test_quran_never_partial_match(score: float) -> None:
 def test_quran_review_band_boundaries() -> None:
     assert decide(facts(), [q(0.602)], TH).status == "needs_review"
     assert decide(facts(), [q(0.598)], TH).status == "not_found"
-    # one-word change in a 4-word ayah = 0.75 → must be review, not not_found (audit T2, category C)
+    # one-word change in a 4-word ayah = 0.75 → must be review, not not_found (eval category C)
     d = decide(facts(n=4, marked=True), [q(0.75)], TH)
     assert d.status == "needs_review"
 

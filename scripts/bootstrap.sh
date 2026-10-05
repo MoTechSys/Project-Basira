@@ -21,4 +21,4 @@ echo "== 5/5 message templates lexicon self-check"
 from pathlib import Path; from app.messages import self_check_templates
 p=self_check_templates(Path('../messages')); assert not p, p; print('templates clean')" )
 echo
-echo "BOOTSTRAP OK — now read docs/STATE.md §2 for the next task."
+echo "BOOTSTRAP OK — run \`make serve\` and open http://localhost:8000 (see README §Quick start)."

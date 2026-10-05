@@ -1,4 +1,4 @@
-"""Windowed token-Levenshtein similarity over retrieval candidates (BUILD_SPEC §3.4-ب).
+"""Windowed token-Levenshtein similarity over retrieval candidates (ARCHITECTURE §2 stage 4).
 
 For each candidate doc, slide windows of length {round(0.8n), n, round(1.2n)}
 over its loose tokens and compute::

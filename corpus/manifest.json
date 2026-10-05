@@ -166,7 +166,7 @@
      "plain": "sunan_al-darimi_ahadith.utf8.csv",
      "display": "sunan_al-darimi_ahadith_mushakkala_mufassala.utf8.csv",
      "expected_rows": 3367,
-     "display_note": "BUILD_SPEC said \"_mufassala\" only; verified 2026-09-30 via GitHub API: actual name is _mushakkala_mufassala (2 columns)",
+     "display_note": "Verified 2026-09-30 via GitHub API: actual name is _mushakkala_mufassala (2 columns)",
      "sha256_plain": "de2ebe287de413450095f4e76ea60e111a1869ecb9e3e705528412ca0ab2ed3f",
      "sha256_display": "bb995abb07a513cf76743e9580787e80c7ce5bd08dd6108c13e01d936a048327"
     }

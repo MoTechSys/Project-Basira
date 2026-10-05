@@ -1,4 +1,4 @@
-"""Harakat (vocalisation) gate — QURAN ONLY (invariant I11, audit B01, owner policy 2026-10-03).
+"""Harakat (vocalisation) gate — QURAN ONLY (invariant I11, safety gate B01, DECISIONS D-013).
 
 Hadith vocalisation in any edition is editorial, not canonical, so it is never gated.
 

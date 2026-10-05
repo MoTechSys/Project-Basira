@@ -1,4 +1,4 @@
-"""Deterministic quote extractor (BUILD_SPEC §3.2 `rules.py`) — always runs.
+"""Deterministic quote extractor (ARCHITECTURE §2 stage 1) — always runs.
 
 Captures:
   * text between ﴿ ﴾, « », " ", “ ”, ( ) when it contains ≥ min tokens of Arabic;

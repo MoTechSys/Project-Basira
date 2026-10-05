@@ -1,4 +1,4 @@
-"""Basira HTTP API (BUILD_SPEC §4, ADR-001/004).
+"""Basira HTTP API (docs/API.md, ADR-001/004).
 
 * lifespan loads the Store + Retriever once; ``/health`` answers 503 ``loading`` until ready (E-011);
 * ``POST /v1/check`` — the only mutating-looking endpoint; stores NOTHING (ADR-004);
@@ -7,8 +7,8 @@
 * ``GET /v1/messages/{lang}`` — the UI strings (single source of truth, E-009);
 * developer gate (docs/API.md): ``GET /v1/rules``, ``POST /v1/guard``, ``X-Basira-Determinism-Hash``
   on ``/v1/check``, and the MCP server at ``/mcp`` when ``BASIRA_MCP=1`` (docs/INTEGRATIONS.md §3.1);
-* every error is ``{"error":{"code","message_ar","message_en"}}`` (audit §5);
-* in-memory fixed-window rate limit per client IP (30/min default) with ``X-Eval-Key`` bypass (T5).
+* every error is ``{"error":{"code","message_ar","message_en"}}`` (docs/API.md §Errors);
+* in-memory fixed-window rate limit per client IP (30/min default) with ``X-Eval-Key`` bypass for evaluation runs.
 
 No request body or user text is ever logged. Access logs are left to the ASGI server and
 contain only method/path/status.

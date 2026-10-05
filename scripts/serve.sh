@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Start the Basira backend. In a Genspark sandbox the platform LLM proxy keys are present, so the
-# REAL vision/LLM providers are used automatically; elsewhere it falls back to the offline mocks.
+# Start the Basira backend for local development.
+# If OPENAI_API_KEY and OPENAI_BASE_URL are set (any OpenAI-compatible endpoint), the real LLM and
+# vision providers are used; otherwise the deterministic offline mocks are used (ADR-005).
 set -euo pipefail
 cd "$(dirname "$0")/../backend"
 if [[ -n "${OPENAI_API_KEY:-}" && -n "${OPENAI_BASE_URL:-}" ]]; then

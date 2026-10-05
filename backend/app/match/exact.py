@@ -1,4 +1,4 @@
-"""Exact phrase matching over the FULL positional index (ADR-002 §2, audit T3).
+"""Exact phrase matching over the FULL positional index (ADR-002 §2: RRF top-k can drop the exact hit, so exact never goes through it).
 
 Given the loose tokens of a quote, find every global position where the tokens
 appear consecutively, inside one stream document (no crossing of surah / record

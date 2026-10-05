@@ -1,4 +1,3 @@
-"""Basira — Islamic citation verification."""
+"""Basira backend — deterministic verification of Quran and Hadith quotations."""
 
-__version__ = "0.1.0"
-__all__ = ["__version__"]
+__version__ = "0.2.0"

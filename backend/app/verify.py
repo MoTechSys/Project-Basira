@@ -1,4 +1,4 @@
-"""Post-validator (BUILD_SPEC §3.6, SAFETY §2.1) — runs on the COMPLETE response before it is sent.
+"""Post-validator (ARCHITECTURE §2 stage 7, SAFETY §2.1) — runs on the COMPLETE response before it is sent.
 
 Six checks. V1–V5 failures downgrade the affected quote to ``needs_review`` with
 ``review_reason="validator_reject"`` and empty its matches; a V6 failure downgrades to

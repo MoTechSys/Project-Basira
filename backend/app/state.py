@@ -1,4 +1,4 @@
-"""The four-state machine (ADR-003, BUILD_SPEC §3.5, SAFETY §1–2).
+"""The four-state machine (ADR-003, SAFETY §1–2).
 
 This module is the ONLY place where a quote is assigned a status. It is pure:
 it receives already-computed evidence (exact hits, fuzzy window hits) and the

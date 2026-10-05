@@ -1,7 +1,7 @@
 """Sparse retrieval channels (BM25 over loose words; TF over char 3-grams) + RRF fusion.
 
-Built once at startup from ``Store.rdocs_*`` (BUILD_SPEC §3.3, values marked
-«initial»). Both channels are CSR inverted indexes in numpy; scoring one query
+Built once at startup from ``Store.rdocs_*`` (ADR-002; parameters marked
+«initial» are re-measured in eval/REPORT.md). Both channels are CSR inverted indexes in numpy; scoring one query
 is a handful of vectorised gathers + ``np.add.at``.
 
 Vectors channel is intentionally absent (ADR-002 §7, ``RETRIEVAL_VECTORS=off``).
