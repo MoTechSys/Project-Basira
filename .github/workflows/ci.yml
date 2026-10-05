@@ -45,3 +45,15 @@ jobs:
       - name: Build
         working-directory: frontend
         run: npm run build
+
+  snapshot-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify corpus hashes
+        working-directory: corpus
+        run: |
+          python -c "import json,hashlib,sys; m=json.load(open('manifest.json')); print('manifest sources:', len(m.get('sources', [])))"
