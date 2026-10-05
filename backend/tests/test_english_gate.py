@@ -41,7 +41,7 @@ async def test_candidate_arabic_text_is_the_verbatim_record(pipeline: Pipeline) 
             rec = pipeline.store.lookup("tanzil", surah=int(c.ref["surah"]), ayah=int(c.ref["ayah"]))
             assert rec is not None and c.arabic_text == rec.display
         else:
-            assert c.arabic_text == ""  # owner Q2: HadeethEnc body is linked, never embedded
+            assert c.arabic_text == ""  # Q2: HadeethEnc body is linked, never embedded
     assert r.validator_rejections == 0
 
 

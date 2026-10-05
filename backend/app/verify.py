@@ -8,7 +8,7 @@ the closest record). Both increment ``validator_rejections``. Nothing is logged 
   V1  every ``matches[].source_text`` is byte-equal to the corpus record's display field
       for the same (corpus, ref) — no religious text may reach the user unless it is the
       verbatim corpus field; in ``HADEETHENC_MODE=link`` a HadeethEnc match must carry an
-      EMPTY body (text is linked, never embedded — owner Q2);
+      EMPTY body (text is linked, never embedded — decision Q2);
   V2  every ``ref`` exists in the store;
   V3  ``grade`` (if present) equals the HadeethEnc record's own ``grade``/``takhrij``/``link``
       and the match corpus is ``hadeethenc``;

@@ -28,7 +28,7 @@ from app.schemas import CheckRequest, CheckResponse
     ("user", "source", "n_conflicts"),
     [
         ("حُرِّمَ", "حَرَّمَ", 2),  # passive vs active: ح and ر vowels differ
-        ("الْمَيْتَةُ", "ٱلْمَيْتَةَ", 1),  # B01 (owner 2026-10-03): a written final vowel IS judged
+        ("الْمَيْتَةُ", "ٱلْمَيْتَةَ", 1),  # B01 (D-013): a written final vowel IS judged
         ("حرم", "حَرَّمَ", 0),  # no diacritics written → never a conflict
         ("اللَّهَ", "ٱللَّهَ", 0),  # identical vocalisation, wasla ignored
         ("شِيْءٍ", "شَىْءٍ", 1),  # kasra on ش where the Mushaf has fatha

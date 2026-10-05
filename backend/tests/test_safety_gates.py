@@ -8,7 +8,7 @@ Written FAILING first against main@817c6fb — every case below was reproduced l
   waqf 112:1 «…أَحَدْ» (pausal sukun on the last letter)      → stays `found` + note (the ONLY exception)
   B03  «﴿قل هو الله أحد﴾ … ﴿قل هو الله احد﴾»                 → second occurrence inherited the first verdict
 
-Harakat policy (owner 2026-10-03): any vowel the user WROTE that contradicts the Mushaf on the same
+Harakat policy (D-013): any vowel the user WROTE that contradicts the Mushaf on the same
 letter is a difference, wherever it sits in the word. Marks the user did not write are never a
 contradiction, but when the quote is vocalised at all, the letters whose marks are missing are shown.
 The single exception: a sukun on the last letter of the quote where the Mushaf has a vowel = pause.

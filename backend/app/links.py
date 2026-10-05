@@ -1,4 +1,4 @@
-"""Referral/source URL builders — every scheme verified live on 2026-10-01 (see docs/experiments E-014).
+"""Referral/source URL builders — every scheme verified live on 2026-10-01 (builders are unit-tested; the domains are listed in SOURCES.md).
 
 * Quran source: Tanzil is the corpus; the public ayah page is quranpedia (approved by the
   scientific package): ``https://quranpedia.net/surah/1/{surah}/{ayah}`` → 301 → ayah page (200).

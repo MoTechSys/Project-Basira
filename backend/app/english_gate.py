@@ -64,7 +64,7 @@ class EnglishGate:
         self.store = store
         self.index = index
         self.picker = picker
-        self.hadeethenc_link_only = hadeethenc_link_only  # owner Q2: HadeethEnc body is linked, not embedded
+        self.hadeethenc_link_only = hadeethenc_link_only  # Q2: HadeethEnc body is linked, not embedded
 
     @classmethod
     def from_path(
