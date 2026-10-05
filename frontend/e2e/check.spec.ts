@@ -65,3 +65,6 @@ test("mobile: highlight opens a bottom sheet; Escape closes and restores focus",
   const axe = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
   expect(axe.violations, JSON.stringify(axe.violations.map((v) => [v.id, v.nodes.length]), null, 1)).toEqual([]);
 });
+
+// 2026-10-06 — a11y gate: axe-core must find zero serious violations
+// (we already assert this in CI via @axe-core/playwright but keep local check)
