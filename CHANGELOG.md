@@ -8,10 +8,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versions are git
 ### Added
 - **D-015 rasm-uniqueness proof (I18/I19)**: bare-typed quotes («قل هو الله احد») are `found` with notice `rasm_completed` and the completed letters when the corpus spells the span one way; competing spellings («إن/أن الله على كل شيء قدير») → `needs_review/rasm_ambiguous` with alternatives + counts. Validator **V7** re-derives the proof. `QuoteResult.rasm` exposes it. 25 new tests.
 - **E-057 whole-ayah anchor**: a complete ayah typed with no marker is detected whatever its words' frequency.
+- **E-058 phrase-rarity anchor**: short famous texts typed with no marker («إنما الأعمال بالنيات», «لا ضرر ولا ضرار», «إن الله مع الصابرين») are detected; runs extend backwards over leading particles; isnad fragments never anchor. Composer hint: no marker, no hamza needed. 15 tests + 7 smoke cases «as people write».
 - Evaluation: category B expectations are now resolved *by construction* from the corpus (`eval/materialize.rasm_expectation`).
 
 ### Verified
-pytest 329 · ruff + mypy strict · eval-full **150/150 · unsafe 0 · 0/500** (fixture and full index) · IslamicEval 1B unchanged **78.54 %, false confirmations 2**.
+pytest 344 · ruff + mypy strict · eval-full **150/150 · unsafe 0 · 0/500** (fixture and full index) · IslamicEval 1B unchanged **78.54 %, false confirmations 2**.
 
 ## [0.3.1] — 2026-10-05 — publication release
 

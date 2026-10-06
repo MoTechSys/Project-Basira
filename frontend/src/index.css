@@ -1182,3 +1182,11 @@ mark.d-source {
   flex-direction: column;
   gap: var(--bs-sp-4);
 }
+
+/* E-058 — composer hint: the detector needs no marker, no hamza (supervisor feedback 2026-10-05) */
+.composer-lux__hint {
+  margin: 0.35rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--ink-muted, #5b5f7a);
+}

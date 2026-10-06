@@ -125,15 +125,57 @@ def _occurs(store: Store, ids: list[int]) -> np.ndarray:
     return cand
 
 
+# E-058 — phrase-rarity acceptance for short unmarked runs. A run of ≥ RARE_MIN_TOKENS tokens that occurs
+# verbatim at most RARE_MAX_OCC times in the whole corpus is a quotation, however common its words are
+# taken one by one: «إنما الأعمال بالنيات» occurs 7×, «إن الله مع الصابرين» 2×, «لا ضرر ولا ضرار» 9× — while
+# formulaic prose is three orders of magnitude more frequent («صلى الله عليه وسلم» 92 083×, «حدثنا عبد الله بن»
+# 3 248×, «لا إله إلا الله» 1 191×, «يا أيها الذين آمنوا» 250×, «بسم الله الرحمن الرحيم» 117×). Measured 2026-10-06 on the
+# full index; the band between the two populations is wide (27 ↔ 105). One content word is still required
+# so that a rare run made only of particles can never anchor. Guarded by eval-full false-alarm 0/500.
+RARE_MIN_TOKENS = 3
+RARE_MAX_OCC = 60
+# isnad vocabulary: a rare run made of chain words («نافع عن ابن عمر») is a narrator list, not a matn. Such
+# runs stay with the main rule (6 content tokens) so B05 wording decides what to say about them.
+_ISNAD = frozenset(
+    [
+        "عن",
+        "وعن",
+        "بن",
+        "ابن",
+        "ابي",
+        "أبي",
+        "ابو",
+        "أبو",
+        "حدثنا",
+        "حدثني",
+        "اخبرنا",
+        "أخبرنا",
+        "اخبرني",
+        "أخبرني",
+        "قال",
+        "قالت",
+        "سمعت",
+        "ان",
+        "أن",
+        "إن",
+        "انه",
+        "أنه",
+    ]
+)
+
+
 def detect(store: Store, text: str, *, seed: int = 4, max_cand: int = 4000) -> list[AnchorSpan]:
     toks: list[Token] = tokenize(text)
     ids = [store.token_id(t.loose) for t in toks]
     n = len(toks)
     out: list[AnchorSpan] = []
     i = 0
-    while i + seed <= n:
-        win = ids[i : i + seed]
-        if any(x < 0 for x in win) or all(toks[i + k].loose in _STOP for k in range(seed)):
+    min_seed = min(seed, RARE_MIN_TOKENS)
+    while i + min_seed <= n:
+        # the seed window is `seed` tokens when available, else the shorter rare-phrase seed (E-058)
+        s = seed if i + seed <= n else min_seed
+        win = ids[i : i + s]
+        if any(x < 0 for x in win) or all(toks[i + k].loose in _STOP for k in range(s)):
             i += 1
             continue
         cand = _occurs(store, win)
@@ -141,7 +183,7 @@ def detect(store: Store, text: str, *, seed: int = 4, max_cand: int = 4000) -> l
             i += 1
             continue
         # extend while at least one occurrence continues to agree
-        j = i + seed
+        j = i + s
         live = cand
         while j < n and ids[j] >= 0 and live.size:
             nxt = live + (j - i)
@@ -155,16 +197,51 @@ def detect(store: Store, text: str, *, seed: int = 4, max_cand: int = 4000) -> l
                 break
             live = live2
             j += 1
+        # extend BACKWARDS as well: the seed may have started one or more tokens late because the
+        # leading words were all stop-words («ان الله علي كل …» seeds at «الله»); the quote still
+        # begins where the corpus agreement begins, and a verdict on a truncated quote is a worse
+        # verdict (E-058).
+        i0 = i
+        while i0 > 0 and ids[i0 - 1] >= 0 and live.size:
+            prev = live - 1
+            ok = prev >= 0
+            live2 = live[ok][store.G[prev[ok]] == ids[i0 - 1]]
+            if live2.size == 0:
+                break
+            live2 = live2[store.g_doc[live2 - 1] == store.g_doc[live2]]
+            if live2.size == 0:
+                break
+            live = live2 - 1
+            i0 -= 1
+        i = i0
         g = int(live[0])
         corpus = store.record_of_pos(g).corpus
         content = [t.loose for t in toks[i:j] if t.loose not in _STOP and t.loose not in _HONOR]
         need = 4 if corpus == "tanzil" else 6  # hadith prose is far more formulaic → longer seed
-        if (j - i >= need and len(content) >= 3) or _covers_whole_ayah(store, live, j - i):
-            # E-057: a run that IS a complete ayah («قل هو الله أحد», «إن الله مع الصابرين») is a quote however
-            # common its words are — the Mushaf's own ayah boundary is the evidence, not word rarity.
+        if (
+            (j - i >= need and len(content) >= 3)
+            # E-057: a run that IS a complete ayah («قل هو الله أحد») is a quote however common its
+            # words are — the Mushaf's own ayah boundary is the evidence, not word rarity.
+            or _covers_whole_ayah(store, live, j - i)
+            # E-058: a short run that is RARE as a phrase («إنما الأعمال بالنيات», «لا ضرر ولا ضرار») and not isnad-shaped
+            or (
+                j - i >= RARE_MIN_TOKENS
+                and len(content) >= 1
+                and live.size <= RARE_MAX_OCC
+                and not _isnad_shaped(toks[i:j])
+            )
+        ):
             out.append(AnchorSpan(toks[i].start, toks[j - 1].end, corpus, j - i))
         i = j
     return _merge(out, text)
+
+
+def _isnad_shaped(run: list[Token]) -> bool:
+    """True when the run reads like a narrator chain: half or more of its tokens are chain words
+    («عن / بن / حدثنا / قال») or it contains «عن … عن». Names between them are not a matn."""
+    words = [t.loose for t in run]
+    chain = sum(w in _ISNAD for w in words)
+    return chain * 2 >= len(words) or words.count("عن") >= 2
 
 
 def _covers_whole_ayah(store: Store, starts: np.ndarray, n: int) -> bool:

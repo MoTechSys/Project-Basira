@@ -357,8 +357,11 @@ export default function Check({ lang }: { lang: Lang; onLang?: (l: Lang) => void
                 onKeyDown={(e) => {
                   if ((e.ctrlKey || e.metaKey) && e.key === "Enter") onSubmit(e);
                 }}
-                aria-describedby="chars"
+                aria-describedby="chars input-hint"
               />
+              <p id="input-hint" className="composer-lux__hint">
+                {ui(lang, "input_hint")}
+              </p>
               <div className="composer-lux__row">
                 <span id="chars" className="composer-lux__meta">
                   {ui(lang, "chars", { n: nf.format(text.length), max: nf.format(MAX_CHARS) })}

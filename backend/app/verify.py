@@ -49,7 +49,7 @@ from typing import Any
 
 from app.extract.rules import parse_claimed_source
 from app.extract.segments import _NARRATOR  # single source of truth for the isnad shape (read-only use)
-from app.match.rasm import bare, classify_token
+from app.match.rasm import bare, choose_variant, classify_token
 from app.messages import load_messages, scan_forbidden
 from app.normalize import loose_tokens, strict_tokens
 from app.schemas import CheckResponse, Match, QuoteResult
@@ -375,10 +375,9 @@ def _spelling_is_unique(store: Store, starts: list[int], user: list[str]) -> boo
     for g in starts:
         prim = store.strict_tokens_range(g, n)
         altt = store.strict_alt_tokens_range(g, n)
-        # same pick as match/rasm.prove: the rasm variant closest to the user's token
+        # same pick as match/rasm.prove (shared chooser): the twin-rasm spelling closest to the user's token
         chosen = tuple(
-            p if _RANK[classify_token(user[k], p)] <= _RANK[classify_token(user[k], a)] else a
-            for k, (p, a) in enumerate(zip(prim, altt, strict=True))
+            choose_variant(user[k], p, a)[0] for k, (p, a) in enumerate(zip(prim, altt, strict=True))
         )
         spellings.add(chosen)
         if len(spellings) > 1:

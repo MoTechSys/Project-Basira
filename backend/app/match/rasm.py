@@ -63,6 +63,21 @@ _MARKED = frozenset("\u0623\u0625\u0622\u0624\u0626\u0649\u0629")
 _RANK: dict[DiffClass, int] = {"equal": 0, "completion": 1, "swap": 2, "other": 3}
 
 
+def _distance(user: str, corpus: str) -> int:
+    """Letters that differ between two same-skeleton tokens (tie-break between twin rasms)."""
+    return sum(u != c for u, c in zip(user, corpus, strict=False)) + abs(len(user) - len(corpus))
+
+
+def choose_variant(user: str, prim: str, alt: str) -> tuple[str, DiffClass]:
+    """Pick the twin-rasm spelling closest to what the user wrote: by class (equal > completion >
+    swap > other), then by letter distance, then the primary stream. Deterministic, shared by the
+    matcher (``prove``) and the validator (V7) so both always census the same spelling."""
+    cp, ca = classify_token(user, prim), classify_token(user, alt)
+    if (_RANK[cp], _distance(user, prim)) <= (_RANK[ca], _distance(user, alt)):
+        return prim, cp
+    return alt, ca
+
+
 def bare(token: str) -> str:
     return "".join(_BARE.get(c, c) for c in token)
 
@@ -137,9 +152,7 @@ def prove(store: Store, hits: list[ExactHit], user_strict: list[str]) -> RasmPro
         chosen: list[str] = []
         comps: list[Completion] = []
         for i, (u, (p, a)) in enumerate(zip(user_strict, pairs, strict=True)):
-            # pick the rasm variant closest to what the user wrote: equal > completion > swap > other
-            cp, ca = classify_token(u, p), classify_token(u, a)
-            cand, cls = (p, cp) if _RANK[cp] <= _RANK[ca] else (a, ca)
+            cand, cls = choose_variant(u, p, a)
             if cls == "other":
                 return None  # not a rasm question
             if cls == "swap":
