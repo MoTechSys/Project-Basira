@@ -7,8 +7,10 @@ so routing, entity parsing, edits and splitting are exercised exactly as in prod
 from __future__ import annotations
 
 import logging
+import re
 from collections.abc import AsyncIterator, Callable
 from dataclasses import dataclass
+from html import unescape
 from typing import Any
 
 import httpx
@@ -333,3 +335,32 @@ def test_settings_validation_and_repr_hides_secrets() -> None:
         )
     s = Settings.from_env({"TELEGRAM_BOT_TOKEN": TOKEN, "BASIRA_EVAL_KEY": "k", "MAX_TEXT": "100"})
     assert s.max_text == 100 and TOKEN not in repr(s) and "k" not in repr(s).replace("webhook", "")
+
+
+# ------------------------------------------------------------------ E-063 deep link
+async def test_result_button_carries_the_users_text_when_short(make: Factory) -> None:
+    from urllib.parse import parse_qs, urlparse
+
+    h = await make({"/v1/check": "found_quran"})
+    [out] = await h.send(message(QURAN))
+    urls = [unescape(u) for u in re.findall(r'<tg-button type="url"[^>]*url="([^"]+)"', out)]
+    assert urls, "result must end with the site button"
+    url = urls[-1]  # the last url button is «open in Basira»
+    assert url.startswith("https://basirapp.site/check?text=") and len(url) <= 2000
+    assert parse_qs(urlparse(url).query)["text"] == [QURAN]
+
+
+async def test_result_button_is_plain_when_text_is_long(make: Factory) -> None:
+    long_text = "قال تعالى: ﴿إن الله مع الصابرين﴾ " * 12  # ~400 chars → > 2000 once percent-encoded
+    h = await make({"/v1/check": "found_quran"})
+    [out] = await h.send(message(long_text))
+    assert 'url="https://basirapp.site/check"' in out and "?text=" not in out
+
+
+async def test_classic_fallback_button_carries_the_text_too(make: Factory) -> None:
+    h = await make({"/v1/check": "found_quran"}, rich_ok=False)
+    await h.send(message(QURAN))
+    with_button = [c for c in h.tg.calls if c.params.get("reply_markup")]
+    assert with_button
+    url = with_button[-1].params["reply_markup"]["inline_keyboard"][0][0]["url"]
+    assert url.startswith("https://basirapp.site/check?text=")

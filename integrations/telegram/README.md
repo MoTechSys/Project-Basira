@@ -43,6 +43,7 @@ make bot-install && make bot-test                  # from the repo root
 cd integrations/telegram && cp .env.example .env    # fill the token
 set -a; . ./.env; set +a; .venv/bin/python -m bot.main          # long polling
 docker compose --profile bot up -d                   # with the API container (BASIRA_API_URL=http://basira:8000)
+# production (basirapp.site): token in /etc/basira/telegram-bot.env, COMPOSE_PROFILES=bot — docs/DEPLOYMENT.md §3.1
 ```
 Webhook mode: set `TELEGRAM_WEBHOOK_URL` and `TELEGRAM_WEBHOOK_SECRET` (16–256 chars); the bot listens on `PORT`
 at `/telegram`.

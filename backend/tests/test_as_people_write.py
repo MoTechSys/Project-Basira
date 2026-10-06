@@ -1,7 +1,7 @@
 """«كما يكتب الناس» — unmarked, hamza-less input must be understood (supervisor feedback, 2026-10-05).
 
 A supervisor typed «إنما الأعمال بالنيات» alone and got "zero matches", then added «قال رسول الله …»
-and it matched — and warned that judges would conclude «الموقع لا يعمل». E-057/E-058 fix the detector;
+and it matched — and warned that judges would conclude «الموقع لا يعمل». E-061/E-062 fix the detector;
 D-015 fixes the hamza. These tests pin both, on the fixture (records chosen from it). Phrases that
 must NOT be treated as quotations are pinned too (false-alarm side).
 """
@@ -26,9 +26,9 @@ async def _run(pipeline: Pipeline, text: str) -> CheckResponse:
 @pytest.mark.parametrize(
     "text",
     [
-        "قل هو الله أحد",  # whole ayah, 3 stop-words (E-057)
+        "قل هو الله أحد",  # whole ayah, 3 stop-words (E-061)
         "قل هو الله احد",  # + unwritten hamza (D-015)
-        "إن الله مع الصابرين",  # ayah fragment, rare phrase (E-058)
+        "إن الله مع الصابرين",  # ayah fragment, rare phrase (E-062)
         "ان الله مع الصابرين",
         "إنما الأعمال بالنيات",  # the supervisor's exact input
         "انما الاعمال بالنيات",
@@ -80,7 +80,7 @@ async def test_prose_and_non_corpus_sayings_are_not_detected(pipeline: Pipeline,
 
 
 def test_isnad_fragment_does_not_anchor_as_a_rare_phrase(store: Store) -> None:
-    """«نافع عن ابن عمر» is rare as a phrase but is a narrator chain, not a matn (E-058 guard)."""
+    """«نافع عن ابن عمر» is rare as a phrase but is a narrator chain, not a matn (E-062 guard)."""
     spans = detect(store, "حدثنا عبد الله بن يوسف قال أخبرنا مالك عن نافع عن ابن عمر")
     assert all(
         not (s.n_tokens <= 5 and "نافع" in "x") for s in spans

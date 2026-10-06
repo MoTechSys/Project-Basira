@@ -169,9 +169,17 @@ function initialMode(): Mode {
   const m = new URLSearchParams(location.search).get("mode");
   return m === "image" || m === "english" || m === "guard" ? m : "text";
 }
-function initialText(): string {
-  const k = new URLSearchParams(location.search).get("example");
+/** Text to pre-fill from the URL. `?text=` (deep link from the Telegram bot, E-063) wins over `?example=`.
+ *  Pre-fill only — the user presses the button; nothing is checked on page load. Capped at MAX_CHARS. */
+export function initialTextFrom(search: string): string {
+  const p = new URLSearchParams(search);
+  const t = p.get("text");
+  if (t !== null) return t.slice(0, MAX_CHARS);
+  const k = p.get("example");
   return EXAMPLES.find((e) => e.key === k)?.text ?? "";
+}
+function initialText(): string {
+  return initialTextFrom(location.search);
 }
 
 export default function Check({ lang }: { lang: Lang; onLang?: (l: Lang) => void }) {
@@ -215,6 +223,7 @@ export default function Check({ lang }: { lang: Lang; onLang?: (l: Lang) => void
     if (mode === "text") u.searchParams.delete("mode");
     else u.searchParams.set("mode", mode);
     u.searchParams.delete("example");
+    u.searchParams.delete("text"); // consumed into the composer; a reload must not resurrect it over the user's edits
     history.replaceState(null, "", u.pathname + u.search);
   }, [mode]);
 

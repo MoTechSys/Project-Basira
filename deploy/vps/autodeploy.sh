@@ -6,6 +6,7 @@
 set -uo pipefail
 cd /opt/basira
 source /opt/basira/autodeploy.conf
+export COMPOSE_PROFILES="${COMPOSE_PROFILES:-}"   # e.g. "bot" → also build/run the Telegram bot service
 LOG=/var/log/basira-deploy.log
 exec 9>/run/basira-deploy.lock
 flock -n 9 || exit 0                               # a deploy is already running
@@ -31,6 +32,13 @@ if docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
   done
   live=$(curl -s -m 10 "${HEALTH_URL:-https://basirapp.site/health}" | grep -o '"build_sha":"[^"]*"')
   echo "  ✅ DEPLOYED $BUILD_SHA in $(( $(date +%s) - start ))s · health $code · $live"
+  if [[ ",$COMPOSE_PROFILES," == *,bot,* ]]; then      # bot container health (HEALTHCHECK = polling heartbeat < 90 s)
+    for _ in $(seq 1 30); do
+      bot=$(docker inspect --format '{{.State.Health.Status}}' basira-telegram-bot-1 2>/dev/null || echo missing)
+      [ "$bot" = healthy ] && break; sleep 2
+    done
+    echo "  bot: ${bot:-missing}"
+  fi
   docker image prune -f >/dev/null
 else
   echo "  ❌ BUILD FAILED — site still runs the previous version. Details: /root/build.log"

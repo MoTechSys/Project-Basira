@@ -1,3 +1,6 @@
 # Auto-deploy settings. Edit and save — takes effect on the next check (≤ 1 min).
 REPO=https://github.com/MoTechSys/Project-Basira.git
 BRANCH=main
+# Compose profiles to start in addition to the site. "bot" runs the Telegram bot
+# (token in /etc/basira/telegram-bot.env, see deploy/vps/README.md). Leave empty for site only.
+COMPOSE_PROFILES=bot

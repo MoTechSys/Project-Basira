@@ -51,7 +51,7 @@ Full invariants I1–I17 and validator passes V1–V6: [`SAFETY.md`](SAFETY.md).
 | **Verification receipt** — stateless, replayable | `POST /v1/receipt` · `GET /v/{token}?h=` | live |
 | **MCP server** — 6 tools for AI assistants | `/mcp` (`BASIRA_MCP=1`) | live |
 | Developer gate: sources, grounding rules, measured model catalog | `/v1/sources` · `/v1/rules` · `/v1/models` | live |
-| **Telegram bot** — forward a text or image, get the source verbatim | [@BasiraCheckBot](https://t.me/BasiraCheckBot) · `integrations/telegram/` | live |
+| **Telegram bot** — forward a text or image, get the source verbatim; «open in Basira» pre-fills the workspace | [@BasiraCheckBot](https://t.me/BasiraCheckBot) · `integrations/telegram/` · runs on the VPS (DEPLOYMENT §3.1) | live |
 | Model settings — Genspark key saved once on the server | `/settings` · `PUT /v1/models/config` | live |
 
 ## Measured, not claimed
@@ -132,7 +132,7 @@ eval/           150 cases, false-alarm generator, English gate eval, IslamicEval
 messages/       ar.json / en.json — the ONLY source of user-facing prose
 scripts/        bootstrap · smoke · mcp_demo · bench_models · lexicon gate · generators
 docs/           ARCHITECTURE · API · SAFETY-adjacent docs · DECISIONS (E-001…E-054) · STATE · adr/ · KNOWLEDGE
-.github/        GitHub Actions workflow (ci.yml, active — E-058)
+.github/        GitHub Actions workflow (ci.yml, active — E-057)
 ```
 
 ## Documentation map
