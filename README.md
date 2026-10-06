@@ -11,6 +11,15 @@ never generates religious text, and stores nothing.
 
 > Track 4 entry · *AI in Service of Islamic Content Challenge 2026* · Arabic-first, bilingual (AR/EN), RTL.
 
+<div dir="rtl">
+
+**بالعربية:** بصيرة أداة تتحقق من نقل الآيات والأحاديث **قبل النشر**. الصق منشورًا أو مقالًا أو جواب روبوت محادثة أو صورة،
+فتستخرج كل ما قُدِّم على أنه قرآن أو حديث، وتطابقه حرفيًا مع مصادر مرخّصة، وتعرض النص الأصلي من المصدر مع الفرق
+حرفًا بحرف (بما فيه الحركات). لا تحكم على حديث، ولا تعيد كتابة نصك، ولا تولّد نصًا دينيًا، ولا تخزّن شيئًا.
+**الرابط المباشر:** https://basirapp.site · **لا يلزم أي مفتاح للتجربة.**
+
+</div>
+
 [![CI](https://github.com/MoTechSys/Project-Basira/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/MoTechSys/Project-Basira/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-6150EA)](LICENSE)
 [![Determinism](https://img.shields.io/badge/false%20alarms-0%2F500-2EF2C2?labelColor=12183F)](eval/REPORT.md)
@@ -54,18 +63,28 @@ Full invariants I1–I17 and validator passes V1–V6: [`SAFETY.md`](SAFETY.md).
 | **Telegram bot** — forward a text or image, get the source verbatim; «open in Basira» pre-fills the workspace | [@BasiraCheckBot](https://t.me/BasiraCheckBot) · `integrations/telegram/` · runs on the VPS (DEPLOYMENT §3.1) | live |
 | Model settings — Genspark key saved once on the server | `/settings` · `PUT /v1/models/config` | live |
 
+## For judges — try it in 60 seconds
+
+| | |
+|---|---|
+| **Live solution** | https://basirapp.site — no sign-up, no key needed |
+| **Try** | open `/check`, paste `قال تعالى: ﴿إن الله مع الصابرين﴾` → `found` with the verbatim ayah; change one letter → `needs_review` with a letter-level diff |
+| **Telegram** | [@BasiraCheckBot](https://t.me/BasiraCheckBot) — forward any post |
+| **API docs** | https://basirapp.site/docs (OpenAPI) · contract: [`docs/API.md`](docs/API.md) |
+| **Source** | this public repository, Apache-2.0 |
+
 ## Measured, not claimed
 
-| Gate | Result (2026-10-05, full corpus, clean clone) |
+| Gate | Result (re-run 2026-10-06 on `main`, full corpus) |
 |---|---|
-| Evaluation cases | **150/150**, 3 repeats, variance 0 |
+| Evaluation cases | **150/150**, 3 repeats, variance 0 · unsafe verdicts 0 · forbidden vocabulary 0 |
 | False alarms on 500 verbatim corpus segments | **0/500** |
-| Unsafe verdicts / forbidden vocabulary | 0 / 0 |
 | IslamicEval 2025 subtask 1B (public dev) | **78.54 %**, false confirmations **2** of 100 wrong spans ([report](eval/islamiceval/REPORT_1B.md)) |
-| Backend tests | **304** passed, none skipped · ruff + mypy strict clean |
-| Frontend | tsc · oxlint 0 errors · vitest **30/30** · e2e **4/4** (incl. two phone viewports, axe) · **86.7 kB** gzip JS |
-| Dependency audit | pip-audit 0 · npm audit 0 |
-| Boot (snapshot) | **0.78 s** · **314 MB** RSS · 71 987 records |
+| Backend tests | **345** passed · ruff + mypy strict clean |
+| Telegram bot tests | **110** passed |
+| Frontend | tsc · oxlint 0 errors · vitest **32/32** · e2e **4/4** (2026-10-05, two phone viewports, axe) · **87.4 kB** gzip main JS |
+| Dependency audit | pip-audit 0 · npm audit 0 (2026-10-05) |
+| Boot (snapshot) | **0.78 s** · 71 987 records |
 
 Every response carries a `determinism_hash` = sha256(corpus fingerprint + normalized input + ordered verdicts).
 Same input on the same corpus build ⇒ same hash. A judge can re-run and compare. See [`eval/REPORT.md`](eval/REPORT.md)
@@ -73,10 +92,14 @@ and [`docs/MODELS.md`](docs/MODELS.md) for the model benchmark (20 models on the
 
 ## Quick start
 
+**Requirements:** Python ≥ 3.12, Node 22, `make`, ~2 GB free disk (corpora). Or only Docker.
+
 ```bash
 git clone https://github.com/MoTechSys/Project-Basira.git && cd Project-Basira
 bash scripts/bootstrap.sh      # fetch + sha256-verify corpora → venv → build index → lint/types/tests  (~3 min)
+make web-install web-build     # build the UI into frontend/dist (served by the backend at /)
 make smoke                     # 8 canonical cases on the real corpus → must print SMOKE OK
+make eval-full                 # 150 cases ×3 + 500 false-alarm segments → 150/150 · 0/500
 make serve-mcp                 # API + UI + MCP on http://localhost:8000
 ```
 
@@ -86,10 +109,46 @@ curl -s localhost:8000/v1/check -H 'Content-Type: application/json' \
 # "found"
 ```
 
-MCP client config: `{"mcpServers":{"basira":{"type":"http","url":"https://<host>/mcp"}}}`
+MCP client config: `{"mcpServers":{"basira":{"type":"http","url":"https://basirapp.site/mcp"}}}`
 
-Docker: `docker compose up` (multi-stage image, snapshot built at image time, non-root). Deployment details and the
-reverse-proxy variables you **must** set: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
+Docker: `docker compose up` (multi-stage image, snapshot built at image time, non-root, read-only). Deployment details
+and the reverse-proxy variables you **must** set: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
+
+## API keys and environment variables
+
+**No key is required.** Without one, Basira runs fully offline with deterministic rules + corpus anchors, and every
+response says so (`extraction_degraded`). A key only adds an optional model that *proposes* quote positions and reads
+images (OCR); it never decides a state and never writes text the user sees (ADR-005).
+
+No secret is committed. `.env` is git-ignored; [`.env.example`](.env.example) documents every variable.
+
+| Variable | Where to get it | Used for |
+|---|---|---|
+| `LLM_API_KEY` | **Genspark** API key from your Genspark account, with `LLM_BASE_URL=https://www.genspark.ai/api/llm_proxy/v1` — or an OpenAI key from https://platform.openai.com/api-keys with `LLM_BASE_URL=https://api.openai.com/v1` (any OpenAI-compatible endpoint works) | optional span proposals + OCR |
+| `LLM_MODEL` | model id; measured default `gpt-5.4-mini` ([`docs/MODELS.md`](docs/MODELS.md)) | — |
+| `BASIRA_EVAL_KEY` | any random string: `openssl rand -hex 24` | `X-Eval-Key` header bypasses the 30 req/min limit (your own eval runs, the bot) |
+| `TELEGRAM_BOT_TOKEN` | [@BotFather](https://t.me/BotFather) → `/newbot` | bot only, in `integrations/telegram/.env` ([`.env.example`](integrations/telegram/.env.example)) |
+
+Two ways to set the model key:
+
+```bash
+# 1) environment (local / docker)
+cp .env.example .env            # then fill: LLM_PROVIDER=openai-compatible, LLM_BASE_URL, LLM_API_KEY, LLM_MODEL
+                                #            VISION_PROVIDER=openai-compatible
+set -a; . ./.env; set +a; make serve-mcp      # docker compose reads .env automatically
+
+# 2) once from the UI: open /settings, paste the Genspark key, pick a model.
+#    The server verifies it with one 5-token call, stores it in backend/.runtime/model.json (0600, git-ignored),
+#    and never echoes it back (E-051).
+```
+
+## Built with AI
+
+Development used frontier coding models through Genspark — **Claude Opus 5.5**, **Claude Fable 5.1** and
+**GPT-6 Astra** — under the rules in [`AGENTS.md`](AGENTS.md): every invariant has a named test, every number is
+measured, every decision is dated in [`docs/DECISIONS.md`](docs/DECISIONS.md). The same models were benchmarked on
+Basira's real extraction prompt before choosing the runtime default ([`docs/MODELS.md`](docs/MODELS.md)).
+Full disclosure, including what AI is never allowed to do here: [`AI_USAGE.md`](AI_USAGE.md).
 
 ## Architecture in one picture
 
@@ -131,8 +190,10 @@ corpus/         manifest.json (sha256 pins), fetch + index + fixture builders   
 eval/           150 cases, false-alarm generator, English gate eval, IslamicEval 2026 runners, REPORT.md
 messages/       ar.json / en.json — the ONLY source of user-facing prose
 scripts/        bootstrap · smoke · mcp_demo · bench_models · lexicon gate · generators
-docs/           ARCHITECTURE · API · SAFETY-adjacent docs · DECISIONS (E-001…E-054) · STATE · adr/ · KNOWLEDGE
-.github/        GitHub Actions workflow (ci.yml, active — E-057)
+docs/           ARCHITECTURE · API · SAFETY-adjacent docs · DECISIONS (E-001…E-064) · STATE · adr/ · KNOWLEDGE
+integrations/   telegram/ — @BasiraCheckBot, a thin client of the public API (no model, no storage)
+deploy/vps/     Caddy + compose overlay + auto-deploy timer that publishes `main` to basirapp.site
+.github/        GitHub Actions workflow (ci.yml: gates + docker build + /health build_sha check)
 ```
 
 ## Documentation map
@@ -144,6 +205,7 @@ docs/           ARCHITECTURE · API · SAFETY-adjacent docs · DECISIONS (E-001�
 | API / MCP / Guard contracts | [`docs/API.md`](docs/API.md) · [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md) · [`docs/GUARD.md`](docs/GUARD.md) |
 | Safety invariants, security model | [`SAFETY.md`](SAFETY.md) · [`SECURITY.md`](SECURITY.md) · [`docs/RISKS.md`](docs/RISKS.md) |
 | Release history | [`CHANGELOG.md`](CHANGELOG.md) |
+| Sources, licences, AI disclosure | [`SOURCES.md`](SOURCES.md) · [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) · [`AI_USAGE.md`](AI_USAGE.md) |
 
 ## Contributing
 
