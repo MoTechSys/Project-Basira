@@ -2,12 +2,26 @@ services:
   basira:
     ports: !reset []
     expose: ["8000"]
+    env_file:
+      - path: /etc/basira/basira.env        # BASIRA_EVAL_KEY (600 root) — lets the bot bypass the per-IP limit
+        required: false
     environment:
       BASIRA_CORS_ORIGINS: https://basirapp.site,https://www.basirapp.site
       BASIRA_TRUSTED_PROXIES: 172.16.0.0/12
       FORWARDED_ALLOW_IPS: 172.16.0.0/12
       BUILD_SHA: ${BUILD_SHA:-prod}
     mem_limit: 2g
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+  telegram-bot:                             # started only with COMPOSE_PROFILES=bot (autodeploy.conf)
+    env_file: !override [/etc/basira/telegram-bot.env]   # TELEGRAM_BOT_TOKEN + BASIRA_EVAL_KEY (600 root); replaces ./integrations/telegram/.env
+    environment:
+      BASIRA_API_URL: http://basira:8000
+      BASIRA_WEB_URL: https://basirapp.site
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
@@ -17,6 +31,9 @@ services:
       - caddy-data:/data
       - caddy-config:/config
     depends_on: [basira]
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
 volumes:
   caddy-data:
   caddy-config:

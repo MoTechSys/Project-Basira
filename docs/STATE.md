@@ -41,6 +41,10 @@ https://basirapp.site — deployed from `main` of MoTechSys/Project-Basira by `d
 (60 s timer). `/health` reports the deployed commit in `build_sha`. Model providers stay `mock` until a
 key is entered in `/settings` (DEPLOYMENT §3).
 
+Telegram bot [@BasiraCheckBot](https://t.me/BasiraCheckBot) runs on the same host as compose profile `bot`
+(`COMPOSE_PROFILES=bot` in `autodeploy.conf`; token and shared `BASIRA_EVAL_KEY` in `/etc/basira/*.env`,
+600 root). Each deploy logs `bot: healthy`. DEPLOYMENT §3.1, E-059/E-060/E-063.
+
 ## 4. Open items
 
 | Item | Why it is open | Next step |

@@ -31,7 +31,7 @@ CASES = [
     ("إنما الأعمال بالنيات", "found", None),
     ("الدين المعاملة", "not_found", None),
 ]
-# E-057/E-058 + D-015 — «كما يكتب الناس»: no marker, no hamza. The supervisor's exact input first.
+# E-061/E-062 + D-015 — «كما يكتب الناس»: no marker, no hamza. The supervisor's exact input first.
 PEOPLE = [
     ("إنما الأعمال بالنيات", "found"),
     ("انما الاعمال بالنيات", "found"),

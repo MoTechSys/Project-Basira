@@ -4,9 +4,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import ar from "../../messages/ar.json";
 import en from "../../messages/en.json";
 import type { CheckResponse, SourceInfo } from "./api";
-import Check from "./Check";
+import Check, { EXAMPLES, initialTextFrom } from "./Check";
 import { QuoteCard } from "./components/QuoteCard";
-import { UI } from "./i18n";
+import { MAX_CHARS, UI } from "./i18n";
 import { __resetHealth } from "./site/hooks";
 import { SITE } from "./site/strings";
 import fixture from "./__fixtures__/check_response.json";
@@ -225,5 +225,26 @@ describe("Check page — reveal after check (E-UX-01, E-UX-03)", () => {
     const alert = await screen.findByRole("alert");
     expect(document.querySelectorAll(".hl").length).toBe(0);
     expect(document.activeElement).toBe(alert);
+  });
+});
+
+describe("Check page — ?text= deep link (E-063)", () => {
+  it("pre-fills the composer from ?text=, caps at MAX_CHARS, does not check, and drops the param from the URL", async () => {
+    const fetchMock = mockFetch();
+    const long = "ا".repeat(MAX_CHARS + 50);
+    history.replaceState(null, "", `/check?text=${encodeURIComponent(long)}`);
+    render(<Check lang="ar" />);
+    const ta = screen.getByLabelText(UI.ar["input_label"]!) as HTMLTextAreaElement;
+    expect(ta.value.length).toBe(MAX_CHARS);
+    await screen.findByText(UI.ar["status_ok"]!);
+    expect(fetchMock.mock.calls.some(([u]) => String(u).endsWith("/v1/check"))).toBe(false);
+    expect(new URLSearchParams(location.search).has("text")).toBe(false);
+    history.replaceState(null, "", "/check");
+  });
+
+  it("initialTextFrom: ?text= wins over ?example=; a bare ?example= still resolves", () => {
+    expect(initialTextFrom("?text=%D8%A8%D8%B3%D9%85&example=example_mixed")).toBe("بسم");
+    expect(initialTextFrom("?example=example_mixed")).toBe(EXAMPLES.find((e) => e.key === "example_mixed")?.text ?? "");
+    expect(initialTextFrom("")).toBe("");
   });
 });

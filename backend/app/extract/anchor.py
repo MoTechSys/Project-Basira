@@ -125,7 +125,7 @@ def _occurs(store: Store, ids: list[int]) -> np.ndarray:
     return cand
 
 
-# E-058 — phrase-rarity acceptance for short unmarked runs. A run of ≥ RARE_MIN_TOKENS tokens that occurs
+# E-062 — phrase-rarity acceptance for short unmarked runs. A run of ≥ RARE_MIN_TOKENS tokens that occurs
 # verbatim at most RARE_MAX_OCC times in the whole corpus is a quotation, however common its words are
 # taken one by one: «إنما الأعمال بالنيات» occurs 7×, «إن الله مع الصابرين» 2×, «لا ضرر ولا ضرار» 9× — while
 # formulaic prose is three orders of magnitude more frequent («صلى الله عليه وسلم» 92 083×, «حدثنا عبد الله بن»
@@ -172,7 +172,7 @@ def detect(store: Store, text: str, *, seed: int = 4, max_cand: int = 4000) -> l
     i = 0
     min_seed = min(seed, RARE_MIN_TOKENS)
     while i + min_seed <= n:
-        # the seed window is `seed` tokens when available, else the shorter rare-phrase seed (E-058)
+        # the seed window is `seed` tokens when available, else the shorter rare-phrase seed (E-062)
         s = seed if i + seed <= n else min_seed
         win = ids[i : i + s]
         if any(x < 0 for x in win) or all(toks[i + k].loose in _STOP for k in range(s)):
@@ -200,7 +200,7 @@ def detect(store: Store, text: str, *, seed: int = 4, max_cand: int = 4000) -> l
         # extend BACKWARDS as well: the seed may have started one or more tokens late because the
         # leading words were all stop-words («ان الله علي كل …» seeds at «الله»); the quote still
         # begins where the corpus agreement begins, and a verdict on a truncated quote is a worse
-        # verdict (E-058).
+        # verdict (E-062).
         i0 = i
         while i0 > 0 and ids[i0 - 1] >= 0 and live.size:
             prev = live - 1
@@ -220,10 +220,10 @@ def detect(store: Store, text: str, *, seed: int = 4, max_cand: int = 4000) -> l
         need = 4 if corpus == "tanzil" else 6  # hadith prose is far more formulaic → longer seed
         if (
             (j - i >= need and len(content) >= 3)
-            # E-057: a run that IS a complete ayah («قل هو الله أحد») is a quote however common its
+            # E-061: a run that IS a complete ayah («قل هو الله أحد») is a quote however common its
             # words are — the Mushaf's own ayah boundary is the evidence, not word rarity.
             or _covers_whole_ayah(store, live, j - i)
-            # E-058: a short run that is RARE as a phrase («إنما الأعمال بالنيات», «لا ضرر ولا ضرار») and not isnad-shaped
+            # E-062: a short run that is RARE as a phrase («إنما الأعمال بالنيات», «لا ضرر ولا ضرار») and not isnad-shaped
             or (
                 j - i >= RARE_MIN_TOKENS
                 and len(content) >= 1

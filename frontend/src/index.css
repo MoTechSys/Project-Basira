@@ -1183,7 +1183,7 @@ mark.d-source {
   gap: var(--bs-sp-4);
 }
 
-/* E-058 — composer hint: the detector needs no marker, no hamza (supervisor feedback 2026-10-05) */
+/* E-062 — composer hint: the detector needs no marker, no hamza (supervisor feedback 2026-10-05) */
 .composer-lux__hint {
   margin: 0.35rem 0 0;
   font-size: 0.82rem;

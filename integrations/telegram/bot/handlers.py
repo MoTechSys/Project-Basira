@@ -182,15 +182,23 @@ class BasiraBot:
         messages: Mapping[str, Mapping[str, str]],
         *,
         image: bool,
+        text: str = "",
     ) -> None:
-        docs = rich.render_rich(resp, messages, image=image, site_url=self.s.web_url) if self.s.rich else []
+        # «open in Basira» carries the user's own text as ?text= when the URL stays short enough (E-063);
+        # the site pre-fills the composer only. The link lives in the message the user already holds.
+        open_url = rich.check_link(self.s.web_url, text)
+        docs = (
+            rich.render_rich(resp, messages, image=image, site_url=self.s.web_url, open_url=open_url)
+            if self.s.rich
+            else []
+        )
         if docs and await self._rich_edit(sent, docs[0]):
             ok = True
             for doc in docs[1:]:
                 ok = ok and (await self._rich_send(sent, doc)) is not None
             if ok:
                 return
-        await self._deliver(sent, render.render_check(resp, messages, image=image))
+        await self._deliver(sent, render.render_check(resp, messages, image=image), open_url=open_url)
 
     async def _reply_doc(
         self, msg: Message, doc: str, fallback_html: str, *, markup: InlineKeyboardMarkup | None = None
@@ -198,11 +206,13 @@ class BasiraBot:
         if await self._rich_send(msg, doc) is None:
             await self._send(msg, fallback_html, markup=markup)
 
-    def _site_button(self) -> InlineKeyboardMarkup:
-        return InlineKeyboardMarkup([[InlineKeyboardButton(txt.OPEN_SITE, url=f"{self.s.web_url}/check")]])
+    def _site_button(self, url: str = "") -> InlineKeyboardMarkup:
+        return InlineKeyboardMarkup(
+            [[InlineKeyboardButton(txt.OPEN_SITE, url=url or rich.check_link(self.s.web_url))]]
+        )
 
-    async def _deliver(self, sent: Message, pieces: list[str]) -> None:
-        markup = self._site_button()
+    async def _deliver(self, sent: Message, pieces: list[str], *, open_url: str = "") -> None:
+        markup = self._site_button(open_url)
         last = len(pieces) - 1
         await self._edit(sent, pieces[0], markup=markup if last == 0 else None, rich_first=False)
         for i, piece in enumerate(pieces[1:], 1):
@@ -261,9 +271,10 @@ class BasiraBot:
                 "chat=%s input=%s error=%s ms=%d", chat_kind(update), input_kind, type(e).__name__, _ms(t0)
             )
             return
+        try:
+            await self._show_result(sent, resp, messages, image=False, text=text)
         finally:
-            del text
-        await self._show_result(sent, resp, messages, image=False)
+            del text  # the user's text is not kept beyond this request (ADR-004)
         log.info(
             "chat=%s input=%s quotes=%s refusal=%s ms=%d",
             chat_kind(update),

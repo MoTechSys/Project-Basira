@@ -24,6 +24,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from typing import Any
+from urllib.parse import quote
 
 from bot import render
 from bot import strings_ar as txt
@@ -62,6 +63,20 @@ def _diff_marks(match: JSON | None, side: str) -> list[tuple[int, int]]:
 def _https(url: object) -> str:
     u = str(url or "")
     return u if u.startswith("https://") else ""
+
+
+DEEP_LINK_MAX = 2000  # URL length Telegram buttons and browsers handle without truncation
+
+
+def check_link(site_url: str, text: str = "") -> str:
+    """`<site>/check`, with the user's text as `?text=` when the whole URL stays ≤ DEEP_LINK_MAX chars.
+    The site only pre-fills the composer (never checks on load); the text travels in the user's own
+    click, nothing is stored (E-063)."""
+    base = site_url.rstrip("/") + "/check"
+    if not text:
+        return base
+    url = base + "?text=" + quote(text, safe="")
+    return url if len(url) <= DEEP_LINK_MAX else base
 
 
 def _button(label: str, *, url: str = "", copy: str = "", style: str = "") -> str:
@@ -205,15 +220,18 @@ def quote_html(q: JSON, i: int, n: int, m: Messages, *, image: bool) -> str:
     return "".join(p for p in parts if p)
 
 
-def render_rich(resp: JSON, m: Messages, *, image: bool = False, site_url: str = "") -> list[str]:
+def render_rich(
+    resp: JSON, m: Messages, *, image: bool = False, site_url: str = "", open_url: str = ""
+) -> list[str]:
     """One or more rich-message HTML documents (normally exactly one; split only past 30 000 characters)."""
     flags = resp.get("flags") or {}
     quotes = list(resp.get("quotes") or [])
     head: list[str] = [f"<h2>{esc(txt.RESULT_TITLE)}</h2>"]
+    link = open_url or (check_link(site_url) if site_url else "")
 
     if flags.get("refusal"):  # a religious question: the refusal notice only, nothing that reads as an answer
         t = msg(m, "notice", "refusal") or ""
-        return [f"<aside>ℹ️ {esc(t)}</aside>" + _footer(resp, m, site_url)]
+        return [f"<aside>ℹ️ {esc(t)}</aside>" + _footer(resp, m, link)]
 
     if image and resp.get("ocr_text"):
         ocr = str(resp["ocr_text"])
@@ -232,7 +250,7 @@ def render_rich(resp: JSON, m: Messages, *, image: bool = False, site_url: str =
 
     if not quotes:
         t = msg(m, "notice", "no_quotes") or ""
-        return ["".join(head) + f"<p>{esc(t)}</p>" + _footer(resp, m, site_url)]
+        return ["".join(head) + f"<p>{esc(t)}</p>" + _footer(resp, m, link)]
 
     head.append(f"<p>{_status_strip(quotes, m)} · <b>{esc(txt.quotes_count(len(quotes)))}</b></p>")
     docs: list[str] = []
@@ -243,20 +261,20 @@ def render_rich(resp: JSON, m: Messages, *, image: bool = False, site_url: str =
             docs.append(cur)
             cur = ""
         cur += block
-    cur += _footer(resp, m, site_url)
+    cur += _footer(resp, m, link)
     docs.append(cur)
     return docs
 
 
-def _footer(resp: JSON, m: Messages, site_url: str) -> str:
+def _footer(resp: JSON, m: Messages, open_url: str) -> str:
     out = "<hr/>"
     t = msg(m, "fixed", str(resp.get("transparency_key") or "transparency_notice"))
     h = str(resp.get("determinism_hash") or "")
     fp = f"<br/>{esc(txt.FINGERPRINT)}: <code>{esc(h[:16])}</code>" if h else ""
     if t:
         out += f"<footer>{esc(t)}{fp}</footer>"
-    if site_url:
-        out += f"<tg-button-row>{_button(txt.OPEN_SITE, url=site_url.rstrip('/') + '/check', style='success')}</tg-button-row>"
+    if open_url:
+        out += f"<tg-button-row>{_button(txt.OPEN_SITE, url=open_url, style='success')}</tg-button-row>"
     return out
 
 
@@ -274,7 +292,7 @@ def welcome(m: Messages, site_url: str) -> str:
         f"<details><summary>{esc(txt.ABOUT_TITLE)}</summary>"
         f"<p>{esc(fixed.get('transparency_notice', ''))}</p><p>{esc(fixed.get('privacy_notice', ''))}</p></details>"
         f"<hr/><footer>{esc(fixed.get('footer', ''))}</footer>"
-        f"<tg-button-row>{_button(txt.OPEN_SITE, url=site_url.rstrip('/') + '/check', style='success')}</tg-button-row>"
+        f"<tg-button-row>{_button(txt.OPEN_SITE, url=check_link(site_url), style='success')}</tg-button-row>"
     )
 
 

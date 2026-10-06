@@ -40,7 +40,7 @@ Health: `GET /health` → `{"status":"ok","boot":"snapshot","index_sha256":"…"
 | `BASIRA_CORS_ORIGINS` | your public origin(s), comma-separated | Browser calls from the same origin need nothing; set it if the UI is served elsewhere |
 | `BASIRA_TRUSTED_PROXIES` | LB / proxy IP or CIDR | **B12**: `X-Forwarded-For` is honoured only from these peers; empty = never |
 | `FORWARDED_ALLOW_IPS` | **same value** as above | uvicorn's own proxy trust. Never `'*'` |
-| `BASIRA_RATE_LIMIT_PER_MIN` | default 30 | Per client IP, fixed window; `X-Eval-Key` bypass for your own eval runs (`BASIRA_EVAL_KEY`) |
+| `BASIRA_RATE_LIMIT_PER_MIN` | default 30 | Per client IP, fixed window; `X-Eval-Key` bypass for your own eval runs and the Telegram bot (`BASIRA_EVAL_KEY`, §3.1) |
 | `BASIRA_MCP` | `1` (image default) | MCP server at `/mcp`; set `0` to disable |
 | `BASIRA_MODEL_CONFIG` | `/data/model.json` (image default) | Where `/settings` stores the operator's key; must be on a writable volume |
 | `BUILD_SHA` | git short SHA | Shown in `/health` so a judge can tie a deployment to a commit |
@@ -63,6 +63,32 @@ snapshot is prebuilt.
    curl -s $H/v1/receipt -H 'Content-Type: application/json' -d '{"text":"قال تعالى: ﴿إن الله مع الصابرين﴾"}' | jq .receipt_id
    ```
 3. Publish the MCP config for assistants: `{"mcpServers":{"basira":{"type":"http","url":"https://<host>/mcp"}}}`.
+
+### 3.1 Telegram bot on the same host (optional)
+
+The bot (`integrations/telegram`, E-059) is a compose **profile**: nothing starts unless you ask for it.
+
+| Where | What | Mode |
+|---|---|---|
+| `/etc/basira/telegram-bot.env` | `TELEGRAM_BOT_TOKEN=…` (from @BotFather) and `BASIRA_EVAL_KEY=…` | `600 root:root` |
+| `/etc/basira/basira.env` | the **same** `BASIRA_EVAL_KEY=…` (`openssl rand -hex 24`) | `600 root:root` |
+| `/opt/basira/autodeploy.conf` | `COMPOSE_PROFILES=bot` | — |
+
+Why the shared key: the bot reaches the API from one address inside the Docker network, so every Telegram user
+would share the 30 req/min per-IP budget. With `X-Eval-Key` the API skips the per-IP limiter for the bot; the
+bot's own **10 messages/min per user** stays the protection. The production overlay (`deploy/vps/docker-compose.prod.yml`)
+points the `telegram-bot` service at `/etc/basira/telegram-bot.env` and the `basira` service at `/etc/basira/basira.env`.
+Secrets never enter `/opt/basira` or git.
+
+Verify after a deploy:
+```bash
+tail -3 /var/log/basira-deploy.log                       # … ✅ DEPLOYED … / bot: healthy
+docker compose -f docker-compose.yml -f docker-compose.prod.yml ps   # telegram-bot (healthy)
+docker logs basira-telegram-bot-1 2>&1 | grep -E 'basira_api=up|mode=polling'
+docker stats --no-stream basira-telegram-bot-1           # RSS well under mem_limit 128m
+```
+Only **one** poller may hold the token: a second instance anywhere produces `Conflict: terminated by other
+getUpdates request` in both logs — stop the other one, the server copy recovers by itself.
 
 ## 4. Platform notes
 

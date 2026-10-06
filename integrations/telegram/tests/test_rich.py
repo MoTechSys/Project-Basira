@@ -197,3 +197,29 @@ def test_frontend_fixture_renders(m: Mapping[str, Mapping[str, str]]) -> None:
     for d in rich.render_rich(resp, m):
         assert validate_rich(d) is None
         assert scan_forbidden(authored(d, resp)) == []
+
+
+# ------------------------------------------------------------------ E-063 deep link
+def test_check_link_carries_short_text_and_falls_back_when_too_long() -> None:
+    from urllib.parse import parse_qs, urlparse
+
+    base = rich.check_link("https://basirapp.site/")
+    assert base == "https://basirapp.site/check"
+    url = rich.check_link("https://basirapp.site", "قال تعالى: ﴿إن الله مع الصابرين﴾")
+    assert url.startswith("https://basirapp.site/check?text=") and len(url) <= rich.DEEP_LINK_MAX
+    assert parse_qs(urlparse(url).query)["text"] == [
+        "قال تعالى: ﴿إن الله مع الصابرين﴾"
+    ]  # round-trips exactly
+    # Arabic is 6 chars per letter once percent-encoded: 330 letters exceed 2000 → plain /check
+    assert rich.check_link("https://basirapp.site", "ا" * 330) == base
+    # boundary: exactly at the cap stays a deep link
+    pad = rich.DEEP_LINK_MAX - len("https://basirapp.site/check?text=")
+    assert len(rich.check_link("https://basirapp.site", "a" * pad)) == rich.DEEP_LINK_MAX
+    assert rich.check_link("https://basirapp.site", "a" * (pad + 1)) == base
+
+
+def test_render_rich_uses_open_url_for_the_site_button(m: Mapping[str, Mapping[str, str]]) -> None:
+    link = rich.check_link("https://basirapp.site", "نص")
+    [doc] = rich.render_rich(load("found_quran"), m, site_url="https://basirapp.site", open_url=link)
+    assert f'url="{render.attr(link)}"' in doc
+    assert validate_rich(doc) is None
