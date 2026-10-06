@@ -19,6 +19,7 @@ pytest 344 · ruff + mypy strict · eval-full **150/150 · unsafe 0 · 0/500** (
 ## [0.3.1] — 2026-10-05 — publication release
 
 ### Fixed
+- **E-064 favicon after the rebrand**: `favicon.ico`, `sw.js` and the manifest were cached `immutable` for a year, so returning visitors still saw the old eye icon. Only hashed `/assets/*` stay immutable; icon links carry `?v=4`; service-worker cache v3; absolute `og:image` + `og:url` + canonical.
 - Backend package declares every runtime dependency (numpy, rapidfuzz, openpyxl) and targets Python 3.12; a clean install now passes the full suite.
 - `eval/islamiceval/run_1b.py` runs the same stages as `Pipeline.check()` (it crashed with `ValueError`). Re-measured: 1B dev accuracy **78.54 %** (CI 73.0–83.2), false confirmations **2** (was 5); 1A macro-F1 rules 61.76, rules+llm 67.89.
 - Docker: the web stage keeps the repo layout (`../messages`), and `BUILD_SHA` reaches `/health`.

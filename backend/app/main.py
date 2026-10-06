@@ -642,11 +642,20 @@ def create_app(cfg: Settings | None = None) -> FastAPI:
         async def spa(full_path: str) -> Any:
             candidate = (static_dir / full_path).resolve()
             if full_path and candidate.is_file() and static_dir.resolve() in candidate.parents:
-                headers = {"Cache-Control": "public, max-age=31536000, immutable"} if "." in full_path else {}
-                return FileResponse(candidate, headers=headers)
+                return FileResponse(candidate, headers={"Cache-Control": _static_cache(full_path)})
             return FileResponse(static_dir / "index.html", headers={"Cache-Control": "no-cache"})
 
     return app
+
+
+def _static_cache(path: str) -> str:
+    """Cache policy for files served by the SPA catch-all. Only content-hashed bundles are immutable; stable-named
+    files (favicon.ico, sw.js, manifest, fonts) must revalidate, or a rebrand stays invisible for a year (E-064)."""
+    if path.startswith("assets/"):
+        return "public, max-age=31536000, immutable"
+    if path in ("sw.js", "manifest.webmanifest"):
+        return "no-cache"
+    return "public, max-age=3600, must-revalidate"
 
 
 app = create_app()

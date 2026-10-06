@@ -322,3 +322,27 @@ async def test_issue_receipt_tool_errors_use_the_envelope(session: SessionFactor
     async with session() as s:
         body = await _call_err(s, "issue_receipt", {"text": "   "})
         assert body["code"] == "invalid_input" and body["message_ar"] and body["message_en"]
+
+
+async def test_static_cache_policy_lets_a_rebrand_reach_browsers(
+    test_settings: Settings, tmp_path: Path
+) -> None:
+    """Regression (2026-10-06): favicon.ico / sw.js / manifest were served `immutable, max-age=1y`, so browsers kept
+    the pre-v4 favicon after the rebrand. Only content-hashed bundles under /assets may be immutable (E-064)."""
+    (tmp_path / "assets").mkdir()
+    (tmp_path / "assets" / "app-abc123.js").write_text("x", encoding="utf-8")
+    (tmp_path / "index.html").write_text("<html><body>spa</body></html>", encoding="utf-8")
+    for name in ("favicon.ico", "sw.js", "manifest.webmanifest"):
+        (tmp_path / name).write_text("x", encoding="utf-8")
+    app = create_app(replace(test_settings, static_dir=tmp_path))
+    async with (
+        app.router.lifespan_context(app),
+        AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as hc,
+    ):
+        cc = {
+            p: (await hc.get(p)).headers.get("cache-control", "")
+            for p in ("/favicon.ico", "/sw.js", "/manifest.webmanifest", "/")
+        }
+        assert all("immutable" not in v for v in cc.values()), cc
+        assert cc["/sw.js"] == cc["/manifest.webmanifest"] == "no-cache"
+        assert "must-revalidate" in cc["/favicon.ico"]
