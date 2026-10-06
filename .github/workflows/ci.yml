@@ -49,6 +49,15 @@ jobs:
       - run: npm run lint && npm run typecheck && npm test -- --run
       - run: npm run build
       - run: npm audit --omit=dev --audit-level=high
+  bot:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: integrations/telegram } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip }
+      - run: pip install -e '.[dev]' && pip install -e '../../backend'
+      - run: ruff check . && ruff format --check . && mypy --strict . && pytest -q
   secrets:
     runs-on: ubuntu-latest
     steps:

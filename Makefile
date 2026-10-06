@@ -9,7 +9,7 @@ URL ?= http://localhost:8000
 .PHONY: help bootstrap fetch fetch-translations index fixture \
         lint fmt test gates smoke web-install web-lint web-test web-build web-gates \
         serve serve-mcp mcp-demo eval eval-full eval-english eval-english-picker \
-        islamiceval islamiceval-1a scholar docker clean
+        islamiceval islamiceval-1a scholar docker clean bot-install bot-test
 
 help: ## list targets
 	@awk 'BEGIN{FS=":.*## "} /^[a-z0-9-]+:.*## /{printf "  \033[1m%-20s\033[0m %s\n",$$1,$$2}' $(MAKEFILE_LIST)
@@ -78,3 +78,9 @@ scholar: ## scholar-lens probe against a running server (URL=...)
 clean: ## remove caches and build output (keeps corpora and venv)
 	find . -type d \( -name __pycache__ -o -name .pytest_cache -o -name .mypy_cache -o -name .ruff_cache \) -prune -exec rm -rf {} +
 	rm -rf frontend/dist eval/results
+
+# ---- Telegram bot (integrations/telegram) ---------------------------------------------------------
+bot-install: ## venv + deps for the Telegram bot
+	cd integrations/telegram && python3 -m venv .venv && .venv/bin/pip install -q -e '.[dev]'
+bot-test: ## bot gates: ruff + mypy strict + pytest
+	cd integrations/telegram && .venv/bin/ruff check . && .venv/bin/ruff format --check . && .venv/bin/mypy --strict . && .venv/bin/pytest -q

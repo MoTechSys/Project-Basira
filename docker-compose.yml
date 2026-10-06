@@ -29,5 +29,17 @@ services:
       timeout: 5s
       retries: 3
 
+  telegram-bot:            # optional: docker compose --profile bot up
+    profiles: ["bot"]
+    build: ./integrations/telegram
+    env_file: [./integrations/telegram/.env]
+    environment:
+      BASIRA_API_URL: http://basira:8000
+    depends_on: [basira]
+    read_only: true
+    tmpfs: [/tmp]
+    mem_limit: 128m
+    restart: unless-stopped
+
 volumes:
   basira-data:

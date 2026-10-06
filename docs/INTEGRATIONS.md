@@ -120,3 +120,7 @@ is what makes two faithful encodings of the Mushaf agree. `remote returned 1036 
 * OAuth / user accounts (nothing to protect; contradicts «لا نحفظ شيئًا»).
 * Semantic/embedding search as a verification primitive (non-deterministic; I7 reproducibility).
 * Serving tafsir, translations or any interpretive text (red line: never generate or curate religious text beyond the pinned corpora).
+
+## 4. Telegram bot
+
+[@BasiraCheckBot](https://t.me/BasiraCheckBot) — `integrations/telegram/` (README there). Forward any text or image; the bot calls `POST /v1/check` or `POST /v1/check/image` and renders the response with `messages/ar.json` only: status, verbatim `source_text`, reference, bold differences from `diff`, links, transparency line. No model in the bot, nothing stored. Run: `docker compose --profile bot up`. Decision: E-059.
