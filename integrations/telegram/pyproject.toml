@@ -24,7 +24,7 @@ packages = ["bot"]
 line-length = 110
 target-version = "py312"
 src = ["bot", "tests"]
-extend-exclude = ["scripts/live_e2e.py"]
+extend-exclude = ["scripts/"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "N", "W", "RUF", "SIM", "C4", "PL"]

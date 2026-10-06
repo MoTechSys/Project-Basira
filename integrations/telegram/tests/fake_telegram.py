@@ -28,6 +28,7 @@ class FakeTelegram(BaseRequest):
     file_bytes: bytes = DOC_BYTES
     next_message_id: int = 1000
     fail_html_once: bool = False
+    rich_supported: bool = True
 
     async def initialize(self) -> None:
         return None
@@ -43,16 +44,28 @@ class FakeTelegram(BaseRequest):
         return [c for c in self.calls if method is None or c.method == method]
 
     def texts(self) -> list[str]:
-        """Final text of every bot message (edits replace the placeholder)."""
+        """Final content of every bot message (edits replace the placeholder): classic text or rich HTML."""
         out: dict[int, str] = {}
         order: list[int] = []
         for c in self.calls:
-            if c.method == "sendMessage":
+            if c.method in {"sendMessage", "sendRichMessage"}:
                 mid = int(c.params["_id"])
-                out[mid] = str(c.params["text"])
+                out[mid] = _content(c.params)
                 order.append(mid)
             elif c.method == "editMessageText":
-                out[int(c.params["message_id"])] = str(c.params["text"])
+                out[int(c.params["message_id"])] = _content(c.params)
+        return [out[i] for i in order]
+
+    def kinds(self) -> list[str]:
+        """'rich' or 'classic' for the final state of every bot message."""
+        out: dict[int, str] = {}
+        order: list[int] = []
+        for c in self.calls:
+            if c.method in {"sendMessage", "sendRichMessage"}:
+                out[int(c.params["_id"])] = "rich" if "rich_message" in c.params else "classic"
+                order.append(int(c.params["_id"]))
+            elif c.method == "editMessageText":
+                out[int(c.params["message_id"])] = "rich" if "rich_message" in c.params else "classic"
         return [out[i] for i in order]
 
     async def do_request(
@@ -89,6 +102,24 @@ class FakeTelegram(BaseRequest):
                 "file_size": len(self.file_bytes),
                 "file_path": "photos/file_0.png",
             }
+        elif endpoint in {"sendRichMessage", "editMessageText"} and "rich_message" in params:
+            problem = None if self.rich_supported else "Not Found: method not found"
+            problem = problem or validate_rich(str(params["rich_message"].get("html", "")))
+            if problem:
+                self.calls.append(Call(endpoint + ":rejected", params))
+                return 400, json.dumps({"ok": False, "error_code": 400, "description": problem}).encode()
+            if endpoint == "sendRichMessage":
+                self.next_message_id += 1
+                params["_id"] = self.next_message_id
+                mid = self.next_message_id
+            else:
+                mid = int(params["message_id"])
+            result = {
+                "message_id": mid,
+                "date": 0,
+                "chat": {"id": int(params["chat_id"]), "type": "private"},
+                "from": {"id": BOT_ID, "is_bot": True, "first_name": "B"},
+            }
         elif endpoint in {"sendMessage", "editMessageText"}:
             if self.fail_html_once and params.get("parse_mode") == "HTML":
                 self.fail_html_once = False
@@ -112,6 +143,107 @@ class FakeTelegram(BaseRequest):
             result = True
         self.calls.append(Call(endpoint, params))
         return 200, json.dumps({"ok": True, "result": result}).encode()
+
+
+def _content(params: dict[str, Any]) -> str:
+    if "rich_message" in params:
+        return str(params["rich_message"]["html"])
+    return str(params["text"])
+
+
+# Rich HTML subset accepted by the Bot API (core.telegram.org/bots/api#rich-html-style) — the tags this bot emits.
+RICH_TAGS = {
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "p",
+    "b",
+    "i",
+    "u",
+    "s",
+    "code",
+    "mark",
+    "sup",
+    "sub",
+    "a",
+    "br",
+    "hr",
+    "footer",
+    "blockquote",
+    "cite",
+    "aside",
+    "table",
+    "caption",
+    "tr",
+    "th",
+    "td",
+    "details",
+    "summary",
+    "ul",
+    "ol",
+    "li",
+    "tg-button",
+    "tg-button-row",
+}
+VOID = {"br", "hr"}
+INLINE_ONLY = {"th", "td", "summary", "cite", "caption", "h1", "h2", "h3", "h4", "p", "footer", "tg-button"}
+BLOCK = {
+    "p",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "blockquote",
+    "aside",
+    "table",
+    "details",
+    "ul",
+    "ol",
+    "hr",
+    "footer",
+    "tg-button-row",
+}
+
+
+def validate_rich(doc: str) -> str | None:
+    """Telegram-like strictness: known tags, balanced, no block inside inline-only containers, size limit."""
+    from html.parser import HTMLParser
+
+    if len(doc) > 32768:
+        return "Bad Request: rich message is too long"
+    errors: list[str] = []
+    stack: list[str] = []
+
+    class P(HTMLParser):
+        def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+            if tag not in RICH_TAGS:
+                errors.append(f"unsupported tag {tag}")
+            if tag in BLOCK and any(t in INLINE_ONLY for t in stack):
+                errors.append(f"block {tag} inside {stack[-1]}")
+            if tag == "tg-button":
+                kind = dict(attrs).get("type")
+                if kind == "copy_text" and not (1 <= len(dict(attrs).get("text") or "") <= 256):
+                    errors.append("copy_text length")
+                if kind == "url" and not str(dict(attrs).get("url", "")).startswith(
+                    ("https://", "http://", "tg://")
+                ):
+                    errors.append("button url")
+            if tag not in VOID:
+                stack.append(tag)
+
+        def handle_endtag(self, tag: str) -> None:
+            if tag in VOID:
+                return
+            if not stack or stack.pop() != tag:
+                errors.append(f"unbalanced {tag}")
+
+    p = P(convert_charrefs=True)
+    p.feed(doc)
+    p.close()
+    if stack:
+        errors.append(f"unclosed {stack}")
+    return f"Bad Request: can't parse rich message: {errors[0]}" if errors else None
 
 
 def _decode(v: str) -> Any:

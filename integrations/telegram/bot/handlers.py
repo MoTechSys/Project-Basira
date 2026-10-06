@@ -13,6 +13,7 @@ import html
 import logging
 import re
 import time
+import warnings
 from collections import deque
 from collections.abc import Mapping
 from io import BytesIO
@@ -23,7 +24,7 @@ from telegram.constants import ChatType, MessageEntityType, ParseMode
 from telegram.error import BadRequest, Forbidden, TelegramError
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 
-from bot import render
+from bot import render, rich
 from bot import strings_ar as txt
 from bot.client import ApiError, ApiTimeoutError, BasiraClient, BasiraError, UnreachableError
 from bot.config import IMAGE_MIME, MAX_IMAGE_BYTES, Settings
@@ -112,8 +113,15 @@ class BasiraBot:
             return await msg.reply_text(plain(html_text), parse_mode=None, reply_markup=markup, do_quote=True)
 
     async def _edit(
-        self, sent: Message, html_text: str, *, markup: InlineKeyboardMarkup | None = None
+        self,
+        sent: Message,
+        html_text: str,
+        *,
+        markup: InlineKeyboardMarkup | None = None,
+        rich_first: bool = True,
     ) -> None:
+        if rich_first and markup is None and await self._rich_edit(sent, rich.paragraph(html_text)):
+            return
         try:
             await sent.edit_text(html_text, parse_mode=ParseMode.HTML, reply_markup=markup)
         except BadRequest as e:
@@ -124,13 +132,79 @@ class BasiraBot:
             except TelegramError:
                 await sent.reply_text(plain(html_text), parse_mode=None, reply_markup=markup)
 
+    # ---- Rich Messages (Bot API 10.3). Every rich call has a classic-HTML fallback: a reply is never lost.
+    async def _rich_send(self, msg: Message, doc: str) -> Message | None:
+        if not self.s.rich:
+            return None
+        params: dict[str, Any] = {
+            "chat_id": msg.chat_id,
+            "rich_message": {"html": doc, "is_rtl": True},
+            "reply_parameters": {"message_id": msg.message_id, "allow_sending_without_reply": True},
+        }
+        if msg.is_topic_message and msg.message_thread_id:
+            params["message_thread_id"] = msg.message_thread_id
+        try:
+            out = await msg.get_bot().do_api_request(
+                "sendRichMessage", api_kwargs=params, return_type=Message
+            )
+        except TelegramError as e:
+            log.warning("rich_send_rejected error=%s", type(e).__name__)
+            return None
+        return out if isinstance(out, Message) else None
+
+    async def _rich_edit(self, sent: Message, doc: str) -> bool:
+        if not self.s.rich:
+            return False
+        params = {
+            "chat_id": sent.chat_id,
+            "message_id": sent.message_id,
+            "rich_message": {"html": doc, "is_rtl": True},
+        }
+        try:
+            with warnings.catch_warnings():  # PTB 22 has no typed wrapper for the rich_message parameter yet
+                warnings.simplefilter("ignore")
+                await sent.get_bot().do_api_request("editMessageText", api_kwargs=params)
+        except TelegramError as e:
+            log.warning("rich_edit_rejected error=%s", type(e).__name__)
+            return False
+        return True
+
+    async def _placeholder(self, msg: Message, *, image: bool) -> Message:
+        sent = await self._rich_send(msg, rich.thinking(image))
+        if sent is not None:
+            return sent
+        return await self._send(msg, render.esc(txt.CHECKING_IMAGE if image else txt.CHECKING))
+
+    async def _show_result(
+        self,
+        sent: Message,
+        resp: Mapping[str, Any],
+        messages: Mapping[str, Mapping[str, str]],
+        *,
+        image: bool,
+    ) -> None:
+        docs = rich.render_rich(resp, messages, image=image, site_url=self.s.web_url) if self.s.rich else []
+        if docs and await self._rich_edit(sent, docs[0]):
+            ok = True
+            for doc in docs[1:]:
+                ok = ok and (await self._rich_send(sent, doc)) is not None
+            if ok:
+                return
+        await self._deliver(sent, render.render_check(resp, messages, image=image))
+
+    async def _reply_doc(
+        self, msg: Message, doc: str, fallback_html: str, *, markup: InlineKeyboardMarkup | None = None
+    ) -> None:
+        if await self._rich_send(msg, doc) is None:
+            await self._send(msg, fallback_html, markup=markup)
+
     def _site_button(self) -> InlineKeyboardMarkup:
         return InlineKeyboardMarkup([[InlineKeyboardButton(txt.OPEN_SITE, url=f"{self.s.web_url}/check")]])
 
     async def _deliver(self, sent: Message, pieces: list[str]) -> None:
         markup = self._site_button()
         last = len(pieces) - 1
-        await self._edit(sent, pieces[0], markup=markup if last == 0 else None)
+        await self._edit(sent, pieces[0], markup=markup if last == 0 else None, rich_first=False)
         for i, piece in enumerate(pieces[1:], 1):
             await self._send(sent, piece, markup=markup if i == last else None)
 
@@ -176,7 +250,7 @@ class BasiraBot:
                 await self._send(msg, await self._error_text(e))
             log.info("chat=%s input=%s refused=too_long", chat_kind(update), input_kind)
             return
-        sent = await self._send(msg, render.esc(txt.CHECKING))
+        sent = await self._placeholder(msg, image=False)
         try:
             async with self.inflight:
                 resp = await self.api.check(text)
@@ -189,7 +263,7 @@ class BasiraBot:
             return
         finally:
             del text
-        await self._deliver(sent, render.render_check(resp, messages))
+        await self._show_result(sent, resp, messages, image=False)
         log.info(
             "chat=%s input=%s quotes=%s refusal=%s ms=%d",
             chat_kind(update),
@@ -220,7 +294,7 @@ class BasiraBot:
             await self._send(msg, await self._too_large())
             log.info("chat=%s input=image refused=too_large", chat_kind(update))
             return
-        sent = await self._send(msg, render.esc(txt.CHECKING_IMAGE))
+        sent = await self._placeholder(msg, image=True)
         buf = BytesIO()
         try:
             tg_file = await ctx.bot.get_file(file_id)
@@ -241,7 +315,7 @@ class BasiraBot:
             return
         finally:
             buf.close()  # the bytes are released here; nothing was written to disk
-        await self._deliver(sent, render.render_check(resp, messages, image=True))
+        await self._show_result(sent, resp, messages, image=True)
         log.info(
             "chat=%s input=image quotes=%s ms=%d", chat_kind(update), render.status_counts(resp), _ms(t0)
         )
@@ -259,8 +333,10 @@ class BasiraBot:
         if msg is None:
             return
         parts = [txt.WELCOME]
+        messages: Mapping[str, Mapping[str, str]] = {}
         try:
-            fixed = (await self._messages()).get("fixed", {})
+            messages = await self._messages()
+            fixed = messages.get("fixed", {})
             parts += [
                 f"<i>{render.esc(fixed[k])}</i>"
                 for k in ("transparency_notice", "privacy_notice")
@@ -268,7 +344,9 @@ class BasiraBot:
             ]
         except BasiraError:
             pass
-        await self._send(msg, "\n\n".join(parts), markup=self._site_button())
+        await self._reply_doc(
+            msg, rich.welcome(messages, self.s.web_url), "\n\n".join(parts), markup=self._site_button()
+        )
 
     async def cmd_help(self, update: Update, ctx: ContextTypes.DEFAULT_TYPE) -> None:
         msg = update.effective_message
@@ -300,8 +378,9 @@ class BasiraBot:
             cut = cut[: cut.rfind("\n")] if "\n" in cut else cut
             cut += "\n" + txt.ELLIPSIS
         more = render.fill(txt.LIMITS_MORE, {"url": f"{self.s.api_url}/v1/rules?ui_lang=ar"})
-        await self._send(
+        await self._reply_doc(
             msg,
+            rich.limits(cut, self.s.api_url),
             f"{txt.LIMITS_HEADING}\n<blockquote expandable>{render.esc(cut)}</blockquote>\n{render.esc(more)}",
         )
 
@@ -328,6 +407,8 @@ class BasiraBot:
                     },
                 )
             )
+        if await self._rich_send(msg, rich.sources(items, self.s.api_url)) is not None:
+            return
         for piece in render.pack([[render.Block(html=line) for line in lines]]):
             await self._send(msg, piece)
 

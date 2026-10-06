@@ -1,8 +1,28 @@
 # Basira Telegram bot
 
 A thin client over the public Basira API. Send or forward a text or an image that quotes the Quran or Hadith; the
-bot replies with the status, the source text **verbatim**, its reference, the differing words in **bold** (from the
-API `diff`), source/search links and the transparency line. Live: **[@BasiraCheckBot](https://t.me/BasiraCheckBot)**.
+bot replies with the status, the source text **verbatim**, its reference, the differing letters **marked** (from the
+API `diff`), source/search buttons and the transparency line. Live: **[@BasiraCheckBot](https://t.me/BasiraCheckBot)**.
+
+## Layout — Telegram Rich Messages (Bot API 10.3)
+Each result is **one** right-to-left rich message (`sendRichMessage`, then `editMessageText.rich_message` over a
+«جارٍ الفحص…» placeholder), up to 32 768 characters instead of 4 096:
+
+| Block | Content (all from the API or `messages/ar.json`) |
+|---|---|
+| `<h2>` + status strip | 🔎 نتيجة الفحص · ✅ 1 وُجد · ⚠️ 1 يحتاج مراجعة · اقتباسان |
+| `<h3>` per quote | state icon + label + kind, `1/2` counter |
+| paragraph | `messages.status[message_key]` |
+| `<blockquote>` + cite «نصك — كما كتبته» | the user's quote, differing words `<mark>`ed |
+| `<aside>` pull-quote + credit = `ref_label_ar` | `source_text` verbatim (one per ayah for multi-ayah quotes), differences `<mark>`ed |
+| `<details>` 📜 | the full record when only the matched window is shown |
+| compact bordered `<table>` | source · collection · positions · diff kind · review reason · claimed reference |
+| `<details>` ℹ️ / 📍 | notices; other positions as links |
+| `<tg-button-row>` | 📖 المصدر (primary) · search links · 📋 copy source text (≤ 256 chars, never for images) |
+| `<footer>` | transparency notice + determinism fingerprint, «افتح موقع بصيرة» (success) |
+
+If a rich call is rejected (older Bot API, unexpected markup) the same content is sent as classic HTML split under
+4 096 characters — a reply is never lost (`BOT_RICH=0` forces classic). Evidence: `docs/design/evidence/telegram/`.
 
 ## What the bot does not do
 - It holds no model and writes no religious text. Every sentence about a quotation is a template from
@@ -31,7 +51,7 @@ at `/telegram`.
 | Input | Behaviour |
 |---|---|
 | `/start`, `/help` | welcome, transparency and privacy lines from `messages/ar.json`, site button |
-| text / forward | `POST /v1/check` → one reply per result, split on block boundaries under 4096 chars |
+| text / forward | `POST /v1/check` → one rich message per result (classic fallback split under 4096 chars) |
 | photo or PNG/JPEG/WebP document ≤ 6 MB | `POST /v1/check/image` (field `image`) → OCR text, then results |
 | `/limits`, `/sources` | `GET /v1/rules?ui_lang=ar` (first 1500 chars), `GET /v1/sources` |
 | groups | `/check <text>` or `/check` as a reply to a text/photo; plain messages are ignored |
@@ -44,8 +64,10 @@ to bots (measured: 0 updates), so in groups use `/check`; mentions work only if 
 an admin.
 
 ## Measured (2026-10-06)
-- `ruff check . && ruff format --check . && mypy --strict . && pytest -q` → **73 passed**, 0 lint/type errors.
-- Live, real account → @BasiraCheckBot → https://basirapp.site (`scripts/live_e2e.py`): 11/11 private scenarios
-  (start, found, needs_review with bold «علي»/«عَلَىٰ», not_found + links, partial_match, refusal, no quotes,
-  sources, limits, unsupported file, image → `needs_review/image_unconfirmed`), plus channel forward (2 × found),
-  group `/check` reply, group plain text ignored, group `/check` usage. Bot latency 1.9–9.0 s per check.
+- `ruff check . && ruff format --check . && mypy --strict . && pytest -q` → **105 passed**, 0 lint/type errors
+  (rich documents validated against the Rich-HTML tag rules, lexicon-scanned, size-checked; classic fallback tested).
+- Live, real account → @BasiraCheckBot → https://basirapp.site, rich path (`scripts/live_e2e.py`): **11/11** private
+  scenarios (start, found, needs_review with «علي»/«عَلَىٰ» marked, not_found + search buttons, partial_match,
+  refusal, no quotes, sources, limits, unsupported file, image → `needs_review/image_unconfirmed`) and **5/5** channel /
+  group scenarios (forward from a channel, plain text ignored, `/check` reply, `/check <text>`, `/check` usage);
+  0 rich calls rejected by Telegram.

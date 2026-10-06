@@ -12,9 +12,9 @@ from typing import Final
 # State markers (shape only); the label next to each comes from messages ``labels.<status>``.
 STATUS_ICON: Final[dict[str, str]] = {
     "found": "✅",
-    "partial_match": "◐",
+    "partial_match": "🔶",
     "needs_review": "⚠️",
-    "not_found": "○",
+    "not_found": "⭕",
 }
 
 WELCOME: Final = (
@@ -74,6 +74,80 @@ BOOK_NAMES: Final[dict[str, str]] = {
     "sunan_al-darimi": "سنن الدارمي",
 }
 HADEETHENC_NAME: Final = "موسوعة الأحاديث النبوية"
+
+# ---- rich layout (Bot API 10.3 Rich Messages) — chrome only, same wording as the web UI where it exists
+RESULT_TITLE: Final = "🔎 نتيجة الفحص"
+QUOTES_1: Final = "اقتباس واحد"
+QUOTES_2: Final = "اقتباسان"
+QUOTES_FEW: Final = "{n} اقتباسات"
+QUOTES_MANY: Final = "{n} اقتباسًا"
+YOUR_TEXT_CITE: Final = "نصك — كما كتبته"
+SOURCE_TEXT_CITE: Final = "حرفيًا من المصدر"
+FULL_RECORD: Final = "📜 النص الكامل للسجل"
+NOTES: Final = "ℹ️ ملاحظات ({n})"
+POSITIONS: Final = "📍 مواضع أخرى ({n})"
+META_REF: Final = "الموضع"
+META_SOURCE: Final = "المصدر"
+META_TIER: Final = "المجموعة"
+META_POSITIONS: Final = "عدد المواضع"
+META_DIFF: Final = "نوع الاختلاف"
+META_REASON: Final = "سبب المراجعة"
+META_CLAIMED: Final = "المرجع المذكور في نصك"
+OCR_TITLE: Final = "🖼️ النص كما قُرئ من الصورة — راجعه"
+FINGERPRINT: Final = "بصمة الفحص"
+COPY_SOURCE: Final = "📋 نسخ نص المصدر"
+OPEN_SOURCE: Final = "📖 المصدر"
+THINKING: Final = "جارٍ الفحص في المصادر…"
+THINKING_IMAGE: Final = "جارٍ قراءة الصورة وفحصها…"
+WELCOME_TITLE: Final = "بصيرة · Basira"
+WELCOME_LEAD: Final = "تحقق من نقل الآيات والأحاديث قبل النشر."
+WELCOME_LEAD_EN: Final = "Check Quran and Hadith quotations against their sources before you share them."
+HOW_TITLE: Final = "طريقة الاستخدام"
+HOW_1: Final = "أرسل نصًا أو صورة فيها آية أو حديث."
+HOW_2: Final = "أو أعد توجيه (Forward) رسالة من أي محادثة أو قناة."
+HOW_3: Final = "في المجموعات: ردّ على الرسالة بالأمر /check."
+WHAT_YOU_GET: Final = "ما ستراه"
+WYG_1: Final = "حالة الاقتباس ومرجعه."
+WYG_2: Final = "نص المصدر حرفيًا، والكلمات المختلفة مظلّلة."
+WYG_3: Final = "روابط المصدر والبحث في المراجع المختصة."
+ABOUT_TITLE: Final = "الشفافية والخصوصية"
+SOURCES_TITLE: Final = "📚 المصادر"
+SOURCE_VERSION: Final = "الإصدار"
+SOURCE_RECORDS: Final = "السجلات"
+SOURCE_LICENSE: Final = "الرخصة"
+LIMITS_TITLE: Final = "حدود ما تفحصه بصيرة"
+LIMITS_FULL: Final = "النص الكامل"
+STATE_LEGEND: Final = "الحالات الأربع"
+
+TIER: Final[dict[str, str]] = {
+    "quran": "المصحف",
+    "sahihain": "الصحيحان",
+    "other_nine": "كتب السنة التسعة",
+    "hadeethenc": "الموسوعة الحديثية",
+}
+REASON: Final[dict[str, str]] = {
+    "near_miss": "اختلاف في الكلمات",
+    "diacritic_difference": "اختلاف في التشكيل",
+    "orthographic_difference": "اختلاف إملائي",
+    "short_quote": "اقتباس قصير",
+    "stage_failure": "تعطّل مرحلة",
+    "validator_reject": "رفض المدقق",
+    "non_arabic": "نص غير عربي",
+    "image_unconfirmed": "نص من صورة",
+    "diacritic_unverified": "حركات لم تُتحقق",
+    "foreign_material": "مادة دخيلة في الاقتباس",
+    "validator_unproven": "لم يُثبت المدقّق المستقل التطابق",
+    "attribution_only": "عزو أو إسناد بلا متن",
+}
+
+
+def quotes_count(n: int) -> str:
+    """Arabic number agreement for «اقتباس»."""
+    if n == 1:
+        return QUOTES_1
+    if n == 2:
+        return QUOTES_2
+    return (QUOTES_FEW if 3 <= n % 100 <= 10 else QUOTES_MANY).replace("{n}", str(n))
 
 
 def all_strings() -> list[tuple[str, str]]:

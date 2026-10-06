@@ -10,7 +10,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versions are git
 - **E-057 whole-ayah anchor**: a complete ayah typed with no marker is detected whatever its words' frequency.
 - **E-058 phrase-rarity anchor**: short famous texts typed with no marker («إنما الأعمال بالنيات», «لا ضرر ولا ضرار», «إن الله مع الصابرين») are detected; runs extend backwards over leading particles; isnad fragments never anchor. Composer hint: no marker, no hamza needed. 15 tests + 7 smoke cases «as people write».
 - Evaluation: category B expectations are now resolved *by construction* from the corpus (`eval/materialize.rasm_expectation`).
-- Telegram bot `integrations/telegram` (@BasiraCheckBot): thin client over `/v1/check` and `/v1/check/image`; no model, no storage, texts from `messages/*.json`; 73 tests; optional compose profile `bot`; CI job `bot` (E-059).
+- Telegram bot `integrations/telegram` (@BasiraCheckBot): thin client over `/v1/check` and `/v1/check/image`; no model, no storage, texts from `messages/*.json`; optional compose profile `bot`; CI job `bot` (E-059). Replies are Telegram Rich Messages — headings, verbatim pull-quotes, marked differences, tables, collapsible sections, buttons — with a classic-HTML fallback (E-060).
 
 ### Verified
 pytest 344 · ruff + mypy strict · eval-full **150/150 · unsafe 0 · 0/500** (fixture and full index) · IslamicEval 1B unchanged **78.54 %, false confirmations 2**.

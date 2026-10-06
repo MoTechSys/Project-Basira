@@ -56,6 +56,7 @@ class Settings:
     webhook_secret: str = ""
     port: int = 8080
     heartbeat_file: str = DEFAULT_HEARTBEAT
+    rich: bool = True  # Bot API 10.3 Rich Messages; classic HTML when off or when a rich call is rejected
 
     def __repr__(self) -> str:  # never print secrets
         return f"Settings(api_url={self.api_url!r}, webhook={'on' if self.webhook_url else 'off'})"
@@ -85,4 +86,5 @@ class Settings:
             webhook_secret=secret,
             port=_int(e, "PORT", 8080, 1, 65535),
             heartbeat_file=e.get("BOT_HEARTBEAT_FILE", "").strip() or DEFAULT_HEARTBEAT,
+            rich=e.get("BOT_RICH", "1").strip().lower() not in {"0", "false", "no", "off"},
         )

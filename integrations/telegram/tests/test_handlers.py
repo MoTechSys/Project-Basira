@@ -51,9 +51,9 @@ async def make() -> AsyncIterator[Factory]:
     apps: list[Application[Any, Any, Any, Any, Any, Any]] = []
 
     async def factory(
-        routes: dict[str, Any] | None = None, *, rate: int = 10, max_text: int = 5000
+        routes: dict[str, Any] | None = None, *, rate: int = 10, max_text: int = 5000, rich_ok: bool = True
     ) -> Harness:
-        tg = FakeTelegram()
+        tg = FakeTelegram(rich_supported=rich_ok)
         log: list[httpx.Request] = []
         settings = Settings(token=TOKEN, user_rate_per_min=rate, max_text=max_text)
         client = BasiraClient("https://api.test", transport=api_transport(routes or {}, log=log))
@@ -72,33 +72,37 @@ async def make() -> AsyncIterator[Factory]:
 async def test_start_has_welcome_transparency_privacy_and_site_button(make: Factory) -> None:
     h = await make()
     [out] = await h.send(message("/start"))
-    assert "بصيرة" in out and "Forward" in out
+    assert h.tg.kinds() == ["rich"]
+    assert "<h1>" in out and "Forward" in out and "<ol>" in out
     assert render.esc(M["fixed"]["transparency_notice"]) in out
     assert render.esc(M["fixed"]["privacy_notice"]) in out
-    markup = h.tg.sent("sendMessage")[0].params["reply_markup"]
-    assert markup["inline_keyboard"][0][0]["url"] == "https://basirapp.site/check"
+    assert 'url="https://basirapp.site/check"' in out
 
 
 async def test_text_found_flow_placeholder_then_edit(make: Factory) -> None:
     h = await make({"/v1/check": "found_quran"})
     [out] = await h.send(message(QURAN))
-    assert h.tg.sent("sendMessage")[0].params["text"] == txt.CHECKING
+    placeholder = h.tg.sent("sendRichMessage")[0]
+    assert txt.THINKING in placeholder.params["rich_message"]["html"]
+    assert placeholder.params["rich_message"]["is_rtl"] is True
+    assert placeholder.params["reply_parameters"]["message_id"] > 0  # replies to the user
     assert h.tg.sent("editMessageText"), "placeholder must be edited with the result"
-    assert "✅" in out and M["labels"]["found"] in out
+    assert h.tg.kinds() == ["rich"]
+    assert "✅" in out and M["labels"]["found"] in out and "<aside>" in out
     assert load("found_quran")["quotes"][0]["matches"][0]["source_text"] in out
-    assert h.tg.sent("sendMessage")[0].params["reply_parameters"]["message_id"] > 0  # replies to the user
 
 
 async def test_forwarded_text_is_checked(make: Factory) -> None:
     h = await make({"/v1/check": "needs_review_quran"})
     [out] = await h.send(message("قال تعالى: ﴿إن الله علي كل شيء قدير﴾", forward=True))
-    assert "<b>علي</b>" in out and "⚠️" in out
+    assert "<mark>علي</mark>" in out and "<mark>عَلَىٰ</mark>" in out and "⚠️" in out
 
 
 async def test_refusal_shows_only_the_refusal_notice(make: Factory) -> None:
     h = await make({"/v1/check": "refusal"})
     [out] = await h.send(message("ما حكم صلاة الجمعة؟"))
-    assert out == f"ℹ️ {render.esc(M['notice']['refusal'])}"
+    assert out.startswith(f"<aside>ℹ️ {render.esc(M['notice']['refusal'])}</aside>")
+    assert "<h3>" not in out and "<blockquote>" not in out  # no quote card that could read as an answer
 
 
 async def test_no_quotes(make: Factory) -> None:
@@ -127,8 +131,8 @@ async def test_api_errors_use_message_ar_verbatim(make: Factory, status: int, co
     body = {"error": {"code": code, "message_ar": M["errors"][code], "message_en": "x"}}
     h = await make({"/v1/check": (status, body)})
     [out] = await h.send(message(QURAN))
-    assert out.startswith(render.esc(M["errors"][code]))
-    assert (extra in out) if extra else out == render.esc(M["errors"][code])
+    assert out.startswith("<p>" + render.esc(M["errors"][code]))
+    assert (extra in out) if extra else out == f"<p>{render.esc(M['errors'][code])}</p>"
 
 
 async def test_api_down_and_timeout_are_reported_honestly(make: Factory) -> None:
@@ -139,9 +143,9 @@ async def test_api_down_and_timeout_are_reported_honestly(make: Factory) -> None
         raise httpx.ReadTimeout("x")
 
     h = await make({"/v1/check": down})
-    assert (await h.send(message(QURAN))) == [render.esc(txt.UNREACHABLE)]
+    assert (await h.send(message(QURAN))) == [f"<p>{render.esc(txt.UNREACHABLE)}</p>"]
     h = await make({"/v1/check": slow})
-    assert (await h.send(message(QURAN))) == [render.esc(txt.TIMEOUT)]
+    assert (await h.send(message(QURAN))) == [f"<p>{render.esc(txt.TIMEOUT)}</p>"]
 
 
 async def test_whitespace_only_message_is_not_sent(make: Factory) -> None:
@@ -153,11 +157,12 @@ async def test_whitespace_only_message_is_not_sent(make: Factory) -> None:
 async def test_photo_goes_to_image_endpoint_ocr_shown_never_found(make: Factory) -> None:
     h = await make({"/v1/check/image": "image_hadith"})
     [out] = await h.send(message(photo=True))
-    assert h.tg.sent("sendMessage")[0].params["text"] == txt.CHECKING_IMAGE
+    assert txt.THINKING_IMAGE in h.tg.sent("sendRichMessage")[0].params["rich_message"]["html"]
     assert h.api_paths() == ["/v1/check/image"]
     req = next(r for r in h.api_log if r.url.path == "/v1/check/image")
     assert h.tg.file_bytes in req.content and b'filename="image.jpg"' in req.content
-    assert txt.OCR_HEADING in out and "⚠️" in out and "✅" not in out
+    assert txt.OCR_TITLE in out and "⚠️" in out and "✅" not in out
+    assert "copy_text" not in out  # OCR results are not offered for copying as if confirmed
 
 
 async def test_image_document_png_and_unsupported_document(make: Factory) -> None:
@@ -186,26 +191,46 @@ async def test_sticker_or_voice_gets_unsupported(make: Factory) -> None:
 async def test_limits_and_sources(make: Factory) -> None:
     h = await make({"/v1/rules": "rules", "/v1/sources": "sources"})
     [lim] = await h.send(message("/limits"))
-    assert txt.LIMITS_HEADING in lim and "expandable" in lim
-    assert render.u16(lim) < 4096
+    assert txt.LIMITS_TITLE in lim and "<details open>" in lim
     [src] = await h.send(message("/sources"))
     for s in load("sources"):
         assert render.esc(s["name"]) in src and render.esc(s["license"]) in src
     assert "Tanzil" in src and "Open-Hadith-Data" in src and "HadeethEnc" in src and "62,169" in src
+    assert "<table" in src and h.tg.kinds() == ["rich", "rich"]
 
 
 async def test_long_result_is_split_and_button_only_on_last(make: Factory) -> None:
     resp = load("partial_hadith")
     resp["quotes"] = resp["quotes"] * 12
-    h = await make({"/v1/check": (200, resp)})
+    h = await make({"/v1/check": (200, resp)}, rich_ok=False)  # classic path: 4096-char messages
     outs = await h.send(message("طلب العلم فريضة"))
     assert len(outs) > 1 and all(render.u16(o) <= 4096 for o in outs)
     with_button = [c for c in h.tg.calls if c.params.get("reply_markup")]
     assert len(with_button) == 1 and with_button[0] is h.tg.calls[-1]
 
 
+async def test_rich_fits_twelve_quotes_in_one_message(make: Factory) -> None:
+    resp = load("partial_hadith")
+    resp["quotes"] = resp["quotes"] * 12
+    h = await make({"/v1/check": (200, resp)})
+    outs = await h.send(message("طلب العلم فريضة"))
+    assert h.tg.kinds() == ["rich"] * len(outs) and len(outs) == 1
+    assert outs[0].count("<h3>") == 12 and "12 اقتباسًا" in outs[0]
+
+
+async def test_rich_unavailable_falls_back_to_classic_everywhere(make: Factory) -> None:
+    h = await make({"/v1/check": "found_quran", "/v1/sources": "sources"}, rich_ok=False)
+    [out] = await h.send(message(QURAN))
+    assert h.tg.kinds() == ["classic"] and "✅" in out and "<blockquote>" in out
+    assert h.tg.sent("sendMessage")[0].params["text"] == txt.CHECKING
+    [start] = await h.send(message("/start"))
+    assert "Forward" in start and h.tg.kinds()[-1] == "classic"
+    [src] = await h.send(message("/sources"))
+    assert "Tanzil" in src and h.tg.kinds()[-1] == "classic"
+
+
 async def test_html_rejected_by_telegram_falls_back_to_plain(make: Factory) -> None:
-    h = await make({"/v1/check": "found_quran"})
+    h = await make({"/v1/check": "found_quran"}, rich_ok=False)
     h.tg.fail_html_once = True  # Telegram refuses the first HTML message (the placeholder)
     [out] = await h.send(message(QURAN))
     rejected = h.tg.sent("sendMessage:rejected")
@@ -250,7 +275,7 @@ async def test_group_check_command_with_argument_and_as_reply(make: Factory) -> 
     assert "✅" in b
     photo = message(photo=True, kind="supergroup", uid=7)
     [c] = await h.send(message("/check", kind="supergroup", reply_to=photo))
-    assert txt.OCR_HEADING in c
+    assert txt.OCR_TITLE in c
     [d] = await h.send(message("/check", kind="supergroup"))
     assert d == render.esc(txt.USAGE_GROUP)
 
@@ -269,7 +294,7 @@ async def test_group_photo_only_with_mention_in_caption(make: Factory) -> None:
     h = await make({"/v1/check/image": "image_hadith"})
     assert (await h.send(message(photo=True, kind="supergroup"))) == []
     [out] = await h.send(message(photo=True, kind="supergroup", caption=f"@{BOT_USERNAME}"))
-    assert txt.OCR_HEADING in out
+    assert txt.OCR_TITLE in out
 
 
 # ------------------------------------------------------------------ robustness

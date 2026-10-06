@@ -24,6 +24,25 @@ from telethon.sessions import StringSession
 PLACEHOLDERS = ("⏳",)
 
 
+def _flatten(obj: object) -> str:
+    """All visible text of a Telethon rich_message (PageBlock tree) — headings, quotes, tables, buttons."""
+    if isinstance(obj, str):
+        return obj
+    if isinstance(obj, list):
+        return "".join(_flatten(x) for x in obj)
+    if isinstance(obj, dict):
+        parts = [_flatten(v) for k, v in obj.items() if k not in {"_", "url", "webpage_id"}]
+        return " ".join(p for p in parts if p)
+    return ""
+
+
+def text_of(m: object) -> str:
+    rm = getattr(m, "rich_message", None)
+    if rm is not None:
+        return _flatten(rm.to_dict())
+    return getattr(m, "message", "") or ""
+
+
 @dataclass
 class Case:
     name: str
@@ -38,8 +57,8 @@ CASES = [
     Case("start", "/start", ("بصيرة", "لا يكتب الذكاء الاصطناعي")),
     Case("found_quran", "قال تعالى: ﴿إن الله مع الصابرين﴾", ("✅", "وُجد", "سورة البقرة، الآية 153")),
     Case("needs_review_quran", "قال تعالى: ﴿إن الله علي كل شيء قدير﴾", ("⚠️", "يحتاج مراجعة", "علي")),
-    Case("not_found_hadith", "قال ﷺ: «الدين المعاملة»", ("○", "لم يوجد في مصادرنا", "ابحث في الدرر السنية")),
-    Case("partial_hadith", "قال ﷺ: «طلب العلم فريضة على كل مسلم ومسلمة»", ("◐", "مطابقة جزئية", "سنن ابن ماجه")),
+    Case("not_found_hadith", "قال ﷺ: «الدين المعاملة»", ("⭕", "لم يوجد في مصادرنا", "ابحث في الدرر السنية")),
+    Case("partial_hadith", "قال ﷺ: «طلب العلم فريضة على كل مسلم ومسلمة»", ("🔶", "مطابقة جزئية", "سنن ابن ماجه")),
     Case("refusal", "ما حكم صلاة الجمعة؟", ("لا تجيب عن الأسئلة الشرعية",), ("✅", "⚠️")),
     Case("no_quotes", "اليوم طقس جميل", ("لم نعثر في هذا النص على آية أو حديث",)),
     Case("sources", "/sources", ("Tanzil", "Open-Hadith-Data", "HadeethEnc")),
@@ -57,10 +76,8 @@ async def final_reply(client: TelegramClient, bot: str, after_id: int, timeout: 
     while time.monotonic() < deadline:
         await asyncio.sleep(1.5)
         msgs = [m for m in await client.get_messages(bot, limit=10) if m.id > after_id and not m.out]
-        text = "\n---\n".join((m.message or "") for m in reversed(msgs))
-        done = bool(msgs) and not any(text.lstrip().startswith(p) for p in PLACEHOLDERS) and all(
-            not (m.message or "").startswith(PLACEHOLDERS) for m in msgs
-        )
+        text = "\n---\n".join(text_of(m) for m in reversed(msgs))
+        done = bool(msgs) and all(not text_of(m).lstrip().startswith(PLACEHOLDERS) for m in msgs)
         if done and text == last:
             stable_since = stable_since or time.monotonic()
             if time.monotonic() - stable_since >= 2:
