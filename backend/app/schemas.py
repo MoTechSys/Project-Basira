@@ -37,6 +37,7 @@ ReviewReason = Literal[
     "foreign_material",
     "validator_unproven",
     "attribution_only",
+    "rasm_ambiguous",
 ]
 CorpusName = Literal["tanzil", "ohd", "hadeethenc"]
 
@@ -144,6 +145,30 @@ class EnglishCandidate(BaseModel):
     selected: bool = False  # chosen by the picker (rule or model); at most one per quote
 
 
+class RasmCompletion(BaseModel):
+    """One token the user typed bare (no hamza / ى / ة) that the corpus spells with the mark (I18)."""
+
+    index: int  # token index inside the quote
+    user: str  # strict form the user wrote
+    corpus: str  # strict form in the Mushaf / record
+    quote_chars: list[int]  # [start, end) in the user's text, for highlighting
+
+
+class RasmAlternative(BaseModel):
+    spelling: str  # strict tokens joined by spaces
+    count: int  # how many corpus positions carry this spelling
+
+
+class RasmInfo(BaseModel):
+    """D-015 rasm-uniqueness proof. ``unique`` → completions explain a `found`; ``ambiguous`` → the
+    alternatives are the corpus spellings the bare text could stand for (user chooses)."""
+
+    verdict: Literal["unique", "ambiguous"]
+    spelling: str = ""
+    completions: list[RasmCompletion] = Field(default_factory=list)
+    alternatives: list[RasmAlternative] = Field(default_factory=list)
+
+
 class QuoteResult(BaseModel):
     id: str
     span: Span
@@ -167,6 +192,7 @@ class QuoteResult(BaseModel):
     picker: Literal["", "rule", "model", "none"] = (
         ""  # how `selected` was decided ("" = not an English quote)
     )
+    rasm: RasmInfo | None = None  # I18/I19 — present only when the rasm layer decided
 
 
 class Flags(BaseModel):

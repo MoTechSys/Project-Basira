@@ -159,10 +159,26 @@ def detect(store: Store, text: str, *, seed: int = 4, max_cand: int = 4000) -> l
         corpus = store.record_of_pos(g).corpus
         content = [t.loose for t in toks[i:j] if t.loose not in _STOP and t.loose not in _HONOR]
         need = 4 if corpus == "tanzil" else 6  # hadith prose is far more formulaic → longer seed
-        if j - i >= need and len(content) >= 3:
+        if (j - i >= need and len(content) >= 3) or _covers_whole_ayah(store, live, j - i):
+            # E-057: a run that IS a complete ayah («قل هو الله أحد», «إن الله مع الصابرين») is a quote however
+            # common its words are — the Mushaf's own ayah boundary is the evidence, not word rarity.
             out.append(AnchorSpan(toks[i].start, toks[j - 1].end, corpus, j - i))
         i = j
     return _merge(out, text)
+
+
+def _covers_whole_ayah(store: Store, starts: np.ndarray, n: int) -> bool:
+    """True iff some occurrence of the run spans an entire Quran ayah (after the basmala offset),
+    i.e. the run starts at the ayah's first indexed token and ends at its last. Quran only: a
+    complete ayah is a self-delimiting unit; a hadith matn has no such boundary."""
+    for g in starts.tolist()[:64]:  # the run is short by construction; cap the scan
+        rec = store.record_of_pos(g)
+        if rec.corpus != "tanzil":
+            continue
+        for base, length in ((rec.g_start, rec.g_len), (rec.g2_start, rec.g2_len)):
+            if length > 0 and g == base + rec.offset and n == length - rec.offset:
+                return True
+    return False
 
 
 def _merge(spans: list[AnchorSpan], text: str) -> list[AnchorSpan]:

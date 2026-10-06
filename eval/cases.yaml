@@ -380,14 +380,12 @@
   category: B
   wrapper: 'في خطبة الجمعة ذكر الإمام قوله تعالى: {q}.'
   expect:
-    status: needs_review
-    review_reason: orthographic_difference
+    rasm: by_construction
     corpus: tanzil
     ref:
       surah: 55
       ayah: 54
     never:
-    - found
     - partial_match
   source:
     corpus: tanzil
@@ -401,14 +399,12 @@
   category: B
   wrapper: 'قرأت هذا الصباح: «{q}» [آية]'
   expect:
-    status: needs_review
-    review_reason: orthographic_difference
+    rasm: by_construction
     corpus: tanzil
     ref:
       surah: 2
       ayah: 96
     never:
-    - found
     - partial_match
   source:
     corpus: tanzil
@@ -422,14 +418,12 @@
   category: B
   wrapper: 'قال تعالى: ﴿{q}﴾'
   expect:
-    status: needs_review
-    review_reason: orthographic_difference
+    rasm: by_construction
     corpus: tanzil
     ref:
       surah: 55
       ayah: 74
     never:
-    - found
     - partial_match
   source:
     corpus: tanzil
@@ -443,14 +437,12 @@
   category: B
   wrapper: 'قرأت هذا الصباح: «{q}» [آية]'
   expect:
-    status: needs_review
-    review_reason: orthographic_difference
+    rasm: by_construction
     corpus: tanzil
     ref:
       surah: 2
       ayah: 8
     never:
-    - found
     - partial_match
   source:
     corpus: tanzil
@@ -464,14 +456,12 @@
   category: B
   wrapper: 'في خطبة الجمعة ذكر الإمام قوله تعالى: {q}.'
   expect:
-    status: needs_review
-    review_reason: orthographic_difference
+    rasm: by_construction
     corpus: tanzil
     ref:
       surah: 2
       ayah: 54
     never:
-    - found
     - partial_match
   source:
     corpus: tanzil
@@ -485,14 +475,12 @@
   category: B
   wrapper: 'قرأت هذا الصباح: «{q}» [آية]'
   expect:
-    status: needs_review
-    review_reason: orthographic_difference
+    rasm: by_construction
     corpus: tanzil
     ref:
       surah: 2
       ayah: 15
     never:
-    - found
     - partial_match
   source:
     corpus: tanzil
@@ -506,14 +494,12 @@
   category: B
   wrapper: 'قال تعالى: ﴿{q}﴾'
   expect:
-    status: needs_review
-    review_reason: orthographic_difference
+    rasm: by_construction
     corpus: tanzil
     ref:
       surah: 2
       ayah: 157
     never:
-    - found
     - partial_match
   source:
     corpus: tanzil
@@ -527,14 +513,12 @@
   category: B
   wrapper: 'قرأت هذا الصباح: «{q}» [آية]'
   expect:
-    status: needs_review
-    review_reason: orthographic_difference
+    rasm: by_construction
     corpus: tanzil
     ref:
       surah: 2
       ayah: 152
     never:
-    - found
     - partial_match
   source:
     corpus: tanzil
@@ -548,14 +532,12 @@
   category: B
   wrapper: 'تذكير اليوم: قال الله تعالى {q}. لا تنسوا الأذكار.'
   expect:
-    status: needs_review
-    review_reason: orthographic_difference
+    rasm: by_construction
     corpus: tanzil
     ref:
       surah: 2
       ayah: 82
     never:
-    - found
     - partial_match
   source:
     corpus: tanzil
@@ -569,14 +551,12 @@
   category: B
   wrapper: 'تذكير اليوم: قال الله تعالى {q}. لا تنسوا الأذكار.'
   expect:
-    status: needs_review
-    review_reason: orthographic_difference
+    rasm: by_construction
     corpus: tanzil
     ref:
       surah: 2
       ayah: 136
     never:
-    - found
     - partial_match
   source:
     corpus: tanzil
@@ -590,14 +570,12 @@
   category: B
   wrapper: 'قال تعالى: ﴿{q}﴾'
   expect:
-    status: needs_review
-    review_reason: orthographic_difference
+    rasm: by_construction
     corpus: tanzil
     ref:
       surah: 2
       ayah: 79
     never:
-    - found
     - partial_match
   source:
     corpus: tanzil
@@ -611,14 +589,12 @@
   category: B
   wrapper: 'في خطبة الجمعة ذكر الإمام قوله تعالى: {q}.'
   expect:
-    status: needs_review
-    review_reason: orthographic_difference
+    rasm: by_construction
     corpus: tanzil
     ref:
       surah: 2
       ayah: 86
     never:
-    - found
     - partial_match
   source:
     corpus: tanzil
