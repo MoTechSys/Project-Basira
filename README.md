@@ -51,6 +51,7 @@ Full invariants I1–I17 and validator passes V1–V6: [`SAFETY.md`](SAFETY.md).
 | **Verification receipt** — stateless, replayable | `POST /v1/receipt` · `GET /v/{token}?h=` | live |
 | **MCP server** — 6 tools for AI assistants | `/mcp` (`BASIRA_MCP=1`) | live |
 | Developer gate: sources, grounding rules, measured model catalog | `/v1/sources` · `/v1/rules` · `/v1/models` | live |
+| **Telegram bot** — forward a text or image, get the source verbatim | [@BasiraCheckBot](https://t.me/BasiraCheckBot) · `integrations/telegram/` | live |
 | Model settings — Genspark key saved once on the server | `/settings` · `PUT /v1/models/config` | live |
 
 ## Measured, not claimed
