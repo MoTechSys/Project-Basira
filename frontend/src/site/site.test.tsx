@@ -13,6 +13,7 @@ import { LensDemo, pieces } from "./LensDemo";
 import { routeOf } from "./router";
 import { SERVICES } from "./services";
 import { SITE } from "./strings";
+import { useReveal } from "./hooks";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, "../../..");
@@ -100,5 +101,55 @@ describe("services & routing", () => {
     expect(routeOf("/check/")).toBe("check");
     expect(routeOf("/limits")).toBe("trust");
     expect(routeOf("/nope")).toBe("notfound");
+  });
+});
+
+describe("useReveal — content below the fold can never stay hidden (E-065)", () => {
+  function Probe({ tick }: { tick: number }) {
+    useReveal();
+    return (
+      <div>
+        <p data-reveal data-testid="a">above {tick}</p>
+        <p data-reveal data-testid="b">below {tick}</p>
+      </div>
+    );
+  }
+  const rect = (top: number) => ({ top, bottom: top + 10, left: 0, right: 10, width: 10, height: 10, x: 0, y: top, toJSON: () => ({}) }) as DOMRect;
+  class IO {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+
+  it("re-rendering after mount (Starfield/theme/lang) does not strand elements at data-in=0", () => {
+    vi.stubGlobal("IntersectionObserver", IO); // never fires: worst case
+    vi.stubGlobal("matchMedia", () => ({ matches: false, addEventListener: () => undefined, removeEventListener: () => undefined }));
+    const spy = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
+      return rect(this.dataset["testid"] === "b" ? 5000 : 10);
+    });
+    vi.useFakeTimers();
+    const { rerender } = render(<Probe tick={0} />);
+    expect(screen.getByTestId("a").dataset["in"]).toBe("1");
+    expect(screen.getByTestId("b").dataset["in"]).toBe("0");
+    rerender(<Probe tick={1} />);
+    rerender(<Probe tick={2} />);
+    vi.advanceTimersByTime(4100);
+    expect(screen.getByTestId("b").dataset["in"]).toBe("1");
+    vi.useRealTimers();
+    spy.mockRestore();
+    vi.unstubAllGlobals();
+  });
+
+  it("unmount reveals everything", () => {
+    vi.stubGlobal("IntersectionObserver", IO);
+    vi.stubGlobal("matchMedia", () => ({ matches: false, addEventListener: () => undefined, removeEventListener: () => undefined }));
+    const spy = vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue(rect(5000));
+    const { unmount, container } = render(<Probe tick={0} />);
+    const b = container.querySelector('[data-testid="b"]') as HTMLElement;
+    expect(b.dataset["in"]).toBe("0");
+    unmount();
+    expect(b.dataset["in"]).toBe("1");
+    spy.mockRestore();
+    vi.unstubAllGlobals();
   });
 });

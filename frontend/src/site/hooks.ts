@@ -100,16 +100,24 @@ export function capableDevice(): boolean {
 }
 
 /** Reveal-on-scroll. Elements already in view stay untouched (no flash, no CLS); elements below the fold get
- *  data-in="0" (hidden) and switch to "1" when they intersect. A 4 s safety timer reveals everything. */
+ *  data-in="0" (hidden) and switch to "1" when they intersect. A 4 s safety timer reveals everything.
+ *
+ *  Runs once per mount (empty deps). The earlier version re-ran on every render: when the page re-rendered
+ *  ~1 s later (Starfield mounting, language or theme toggle) the cleanup disconnected the observer and
+ *  cancelled the safety timer, and the new run selected `[data-reveal]:not([data-in])` — zero elements,
+ *  because all had been marked "0" already — so everything below the fold stayed at opacity 0 for ever
+ *  (measured live: 18/18 hidden after a full scroll). Now hidden elements are re-adopted, and cleanup
+ *  reveals everything so nothing can be left invisible (E-065). */
 export function useReveal(): void {
   useEffect(() => {
-    const els = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]:not([data-in])"));
+    const els = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]"));
+    const showAll = () => els.forEach((e) => (e.dataset["in"] = "1"));
     if (!("IntersectionObserver" in window) || prefersReducedMotion()) {
-      els.forEach((e) => (e.dataset["in"] = "1"));
+      showAll();
       return;
     }
     const vh = window.innerHeight;
-    const below = els.filter((e) => e.getBoundingClientRect().top > vh * 0.92);
+    const below = els.filter((e) => e.dataset["in"] !== "1" && e.getBoundingClientRect().top > vh * 0.92);
     els.filter((e) => !below.includes(e)).forEach((e) => (e.dataset["in"] = "1"));
     below.forEach((e) => (e.dataset["in"] = "0"));
     const io = new IntersectionObserver(
@@ -123,10 +131,11 @@ export function useReveal(): void {
       { rootMargin: "0px 0px -6% 0px" },
     );
     below.forEach((e) => io.observe(e));
-    const safety = window.setTimeout(() => below.forEach((e) => (e.dataset["in"] = "1")), 4000);
+    const safety = window.setTimeout(showAll, 4000);
     return () => {
       io.disconnect();
       clearTimeout(safety);
+      showAll(); // never leave content hidden behind a torn-down observer
     };
-  });
+  }, []);
 }
