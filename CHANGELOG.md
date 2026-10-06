@@ -5,6 +5,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/); versions are git
 
 ## [Unreleased]
 
+### Fixed
+- Home page: sections below the hero were permanently hidden on capable devices (reveal effect torn down by the backdrop's re-render) — E-065. 2 regression tests.
+
 ### Added
 - **D-015 rasm-uniqueness proof (I18/I19)**: bare-typed quotes («قل هو الله احد») are `found` with notice `rasm_completed` and the completed letters when the corpus spells the span one way; competing spellings («إن/أن الله على كل شيء قدير») → `needs_review/rasm_ambiguous` with alternatives + counts. Validator **V7** re-derives the proof. `QuoteResult.rasm` exposes it. 25 new tests.
 - **E-061 whole-ayah anchor**: a complete ayah typed with no marker is detected whatever its words' frequency.

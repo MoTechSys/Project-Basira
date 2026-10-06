@@ -184,7 +184,7 @@ Full register: [`SOURCES.md`](SOURCES.md) · [`THIRD_PARTY_NOTICES.md`](THIRD_PA
 ## Repository layout
 
 ```
-backend/        FastAPI service (Python 3.13) — app/{extract,match,retrieve,providers}, verify.py, devgate.py, mcp_server.py
+backend/        FastAPI service (Python ≥ 3.12) — app/{extract,match,retrieve,providers}, verify.py, devgate.py, mcp_server.py
 frontend/       React 19 · Vite · TypeScript — multi-page PWA, RTL-first
 corpus/         manifest.json (sha256 pins), fetch + index + fixture builders   (data/ and index/ are git-ignored)
 eval/           150 cases, false-alarm generator, English gate eval, IslamicEval 2026 runners, REPORT.md
