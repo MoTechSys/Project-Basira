@@ -36,11 +36,16 @@ async def test_exact_quran_found_with_verbatim_source(pipeline: Pipeline) -> Non
 
 
 async def test_adversarial_typo_is_never_found(pipeline: Pipeline) -> None:
+    # «علي» for «على» is a *written* ya where the Mushaf has alef maqsura — a swap, not an unwritten
+    # mark — and «ان» stands for both «إن» and «أن» in this very sentence. D-015 (I19): never `found`;
+    # the rasm layer names the reason and exposes both Mushaf spellings.
     r = await run(pipeline, "قال تعالى: إن الله علي كل شيء قدير")
     q = r.quotes[0]
     assert q.status == "needs_review"
-    assert q.review_reason == "orthographic_difference"
-    assert q.message_key == "needs_review_quran"
+    assert q.review_reason == "rasm_ambiguous"
+    assert q.message_key == "needs_review_rasm_ambiguous"
+    assert q.rasm is not None and q.rasm.verdict == "ambiguous"
+    assert {a.spelling for a in q.rasm.alternatives} >= {"إن الله على كل شيء قدير", "أن الله على كل شيء قدير"}
     assert q.matches and all("word_replaced" in m.diff_kinds for m in q.matches)
     # the diff must point at the user's «علي» (chars 8..11 of the quote)
     rep = [o for o in q.matches[0].diff if o.op == "replace"]

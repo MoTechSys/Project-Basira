@@ -22,7 +22,7 @@ import json
 import logging
 import time
 import uuid
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 from app.config import Settings
@@ -45,6 +45,8 @@ from app.links import hadeethenc_url, hadith_search_links, ohd_url, quran_search
 from app.match.diff import DiffOp, diff_kinds, letter_diff, word_diff
 from app.match.exact import ExactHit, dedupe_hits, find_exact, mixed_rasm_hit, records_covering
 from app.match.harakat import LetterDiff, compare_words, skeleton, user_vocalised
+from app.match.rasm import RasmProof
+from app.match.rasm import prove as prove_rasm
 from app.match.window import WindowHit, fuzzy_search, fuzzy_search_surah_stream
 from app.messages import Messages, load_messages
 from app.normalize import tokenize
@@ -61,6 +63,9 @@ from app.schemas import (
     Link,
     Match,
     QuoteResult,
+    RasmAlternative,
+    RasmCompletion,
+    RasmInfo,
     SegmentModel,
     SourceSegment,
     Span,
@@ -131,6 +136,7 @@ class _Quote:
     text: str
     tokens: list[Any]  # normalize.Token
     language: str
+    rasm_proofs: dict[str, RasmProof | None] = field(default_factory=dict)  # I18/I19, per corpus
 
 
 class Pipeline:
@@ -344,13 +350,26 @@ class Pipeline:
         rasm0_only = self._rasm0_only(raw_hits)
         hits = dedupe_hits(raw_hits)
         if hits:
+            # I18/I19 (D-015): when NO position passes the strict gate, ask the corpus whether the
+            # bare spelling the user typed has exactly one strict spelling. Per corpus, so a Quran
+            # proof is never diluted by a hadith that happens to quote the ayah.
+            rasm_by_corpus: dict[str, RasmProof | None] = {}
+            if not any(h.strict_ok for h in hits):
+                for corpus_key in {h.rec.corpus for h in hits}:
+                    group = [h for h in hits if h.rec.corpus == corpus_key]
+                    rasm_by_corpus[corpus_key] = prove_rasm(self.store, group, strict)
             for h in hits:
                 if self.settings.ohd_mode == "off" and h.rec.corpus == "ohd":
                     continue
+                proof = rasm_by_corpus.get(h.rec.corpus)
+                rasm = "" if proof is None else ("unique" if proof.unique else "ambiguous")
                 evidence.append(
-                    Evidence(h.rec.corpus, h.rec.idx, 1.0, h.strict_ok, book=h.rec.book, is_exact=True)
+                    Evidence(
+                        h.rec.corpus, h.rec.idx, 1.0, h.strict_ok, book=h.rec.book, is_exact=True, rasm=rasm
+                    )
                 )
                 carriers.setdefault(h.rec.idx, h)
+            q.rasm_proofs = rasm_by_corpus
             if evidence:
                 self._order(evidence)
                 return evidence, carriers, 0.0, rasm0_only
@@ -585,6 +604,36 @@ class Pipeline:
             matches=matches,
             total_positions=total,
             external_search_links=ext,
+            rasm=self._rasm_model(q, d),
+        )
+
+    def _rasm_model(self, q: _Quote, d: Decision) -> RasmInfo | None:
+        """I18/I19 — expose the corpus proof (what was completed, or which spellings compete)."""
+        if "rasm_completed" not in d.notice_keys and d.review_reason != "rasm_ambiguous":
+            return None
+        scope = "tanzil" if d.corpus_scope == "quran" else None
+        proof: RasmProof | None = None
+        if scope is not None:
+            proof = q.rasm_proofs.get(scope)
+        else:
+            proof = next((p for k, p in q.rasm_proofs.items() if k != "tanzil" and p is not None), None)
+        if proof is None:
+            return None
+        return RasmInfo(
+            verdict="unique" if proof.unique else "ambiguous",
+            spelling=proof.spelling,
+            completions=[
+                RasmCompletion(
+                    index=c.index,
+                    user=c.user,
+                    corpus=c.corpus,
+                    quote_chars=[q.tokens[c.index].start, q.tokens[c.index].end]
+                    if c.index < len(q.tokens)
+                    else [-1, -1],
+                )
+                for c in proof.completions
+            ],
+            alternatives=[RasmAlternative(spelling=a.spelling, count=a.count) for a in proof.alternatives],
         )
 
     def _foreign_gate(self, q: _Quote, d: Decision) -> Decision:

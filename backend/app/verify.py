@@ -23,6 +23,13 @@ the closest record). Both increment ``validator_rejections``. Nothing is logged 
       the basmala offset is honoured). The proof uses only the Store's token streams, never the
       matcher's hits, scores or carriers. A quote of a vocalised text is compared on letters only
       (tashkeel is V-independent and handled by I14 upstream).
+  V7  (D-015, I18) **independent proof of every rasm-completed ``found``** (notice
+      ``rasm_completed``): the user's strict tokens are NOT a window of the record (that is why the
+      rasm layer fired), so V6 would reject them. Instead V7 re-derives, from the Store alone, that
+      (a) the user's tokens are a contiguous window of the record under the *bare* fold (hamza /
+      ى / ة unwritten), (b) every differing token is a pure completion (the user wrote no marked
+      form of their own), and (c) across **all** positions in the corpus where the bare window
+      occurs, the strict spelling is unique. Failure → ``needs_review`` / ``validator_unproven``.
 
 B05 (wording, not a check): a quote that is only an attribution («رواه البخاري», «متفق عليه») or only
 a narration chain that stops before any matn is never reported ``not_found`` / ``partial_match`` —
@@ -42,6 +49,7 @@ from typing import Any
 
 from app.extract.rules import parse_claimed_source
 from app.extract.segments import _NARRATOR  # single source of truth for the isnad shape (read-only use)
+from app.match.rasm import bare, choose_variant, classify_token
 from app.messages import load_messages, scan_forbidden
 from app.normalize import loose_tokens, strict_tokens
 from app.schemas import CheckResponse, Match, QuoteResult
@@ -318,6 +326,92 @@ def prove_found(store: Store, q: QuoteResult) -> bool:
     return any(_contains_window(stream, alt, needle) for stream, alt in _proof_streams(store, rec))
 
 
+_RANK = {"equal": 0, "completion": 1, "swap": 2, "other": 3}
+
+
+def _best_class(user: str, prim: str, alt: str | None) -> str:
+    a = classify_token(user, prim)
+    if alt is None:
+        return a
+    b = classify_token(user, alt)
+    return a if _RANK[a] <= _RANK[b] else b
+
+
+def _bare_window_is_completion(stream: list[str], alt: list[str] | None, user: list[str]) -> bool:
+    """(a)+(b) of V7: the user's tokens occur as a contiguous window of ``stream`` under the bare
+    fold and every differing token is a pure completion (never a swap or another letter)."""
+    n = len(user)
+    user_bare = [bare(t) for t in user]
+    for i in range(len(stream) - n + 1):
+        hit = all(
+            bare(stream[i + k]) == user_bare[k] or (alt is not None and bare(alt[i + k]) == user_bare[k])
+            for k in range(n)
+        )
+        if hit and all(
+            _best_class(user[k], stream[i + k], alt[i + k] if alt is not None else None)
+            in ("equal", "completion")
+            for k in range(n)
+        ):
+            return True
+    return False
+
+
+def _loose_window_starts(store: Store, quoted_text: str, n: int) -> list[int] | None:
+    """Every global start position of the quote's LOOSE token sequence, inside one stream document."""
+    ids = [store.token_id(t) for t in loose_tokens(quoted_text)]
+    if len(ids) != n or any(i < 0 for i in ids):
+        return None
+    cand = store.postings(ids[0]).astype("int64")
+    for j in range(1, n):
+        cand = cand[cand + j < len(store.G)]
+        cand = cand[store.G[cand + j] == ids[j]]
+    return [g for g in cand.tolist() if int(store.g_doc[g]) == int(store.g_doc[g + n - 1])]
+
+
+def _spelling_is_unique(store: Store, starts: list[int], user: list[str]) -> bool:
+    """(c) of V7: across every corpus position of the bare window, exactly one strict spelling."""
+    n = len(user)
+    spellings: set[tuple[str, ...]] = set()
+    for g in starts:
+        prim = store.strict_tokens_range(g, n)
+        altt = store.strict_alt_tokens_range(g, n)
+        # same pick as match/rasm.prove (shared chooser): the twin-rasm spelling closest to the user's token
+        chosen = tuple(
+            choose_variant(user[k], p, a)[0] for k, (p, a) in enumerate(zip(prim, altt, strict=True))
+        )
+        spellings.add(chosen)
+        if len(spellings) > 1:
+            return False
+    return len(spellings) == 1
+
+
+def prove_rasm_found(store: Store, q: QuoteResult) -> bool:
+    """V7: re-derive the rasm-uniqueness proof from the Store alone (see module docstring).
+
+    Uses the loose positional index for the window census (the same primitive as the matcher, on
+    ids only) and the strict streams for the spelling census. No pipeline object is consulted.
+    """
+    if not q.matches:
+        return False
+    user = strict_tokens(q.quoted_text)
+    if not user:
+        return False
+    rec = _lookup(store, q.matches[0])
+    if rec is None or not any(
+        _bare_window_is_completion(stream, alt, user) for stream, alt in _proof_streams(store, rec)
+    ):
+        return False
+    starts = _loose_window_starts(store, q.quoted_text, len(user))
+    return bool(starts) and _spelling_is_unique(store, starts or [], user)
+
+
+def _proven(store: Store, q: QuoteResult) -> bool:
+    """V7 for a rasm-completed `found` (its strict tokens are not a window by construction), V6 otherwise."""
+    if "rasm_completed" in q.notice_keys:
+        return prove_rasm_found(store, q)
+    return prove_found(store, q)
+
+
 def _unproven(q: QuoteResult) -> None:
     q.status = "needs_review"
     q.review_reason = "validator_unproven"
@@ -355,7 +449,7 @@ def validate_response(
         if bad:
             _reject(q)
             rejections += 1
-        elif q.status == "found" and not prove_found(store, q):  # V6
+        elif q.status == "found" and not _proven(store, q):  # V6 / V7
             _unproven(q)
             rejections += 1
         elif q.status != "found" and attribution_only_kind(q.quoted_text) is not None:  # B05

@@ -7,7 +7,8 @@ fixture (CI) and on the full corpus (release eval). Wrappers are engineer-writte
 
 Categories (eval/PLAN.md):
   A  Quran verbatim (incl. 5 cross-ayah)                       → found
-  B  Quran orthographic fold (strict-breaking)                  → needs_review / orthographic_difference
+  B  Quran orthographic fold (strict-breaking)                  → D-015: found+rasm_completed (unique rasm)
+                                                                   or needs_review/rasm_ambiguous — by construction
   C  Quran near-miss (1 edit in ≥6 tokens, 16)                      → needs_review / near_miss, never partial
   D  Quran-attributed prose not in corpus                       → not_found, no candidates
   E  Hadith verbatim (OHD matn / HadeethEnc)                    → found
@@ -207,7 +208,13 @@ def main() -> int:  # noqa: PLR0912  (one generator per category, kept linear fo
             note="cross-ayah: window + first 2 tokens of next ayah",
         )
 
-    # B — orthographic (12)
+    # B — orthographic fold (12). D-015 splits the old single verdict in two, each known BY
+    # CONSTRUCTION from the corpus (eval.materialize.rasm_expectation re-derives the proof with
+    # the full index at eval time, so generation and judging can never disagree):
+    #   bare omission (hamza_drop / ta2ha) on a span the Mushaf spells ONE way
+    #       → found + notice rasm_completed  (I18)                       — the «قل هو الله احد» case
+    #   bare omission on a span spelled >1 way, or a WRITTEN different form (ha2ta / ya2alef_maqsura)
+    #       → needs_review / rasm_ambiguous, never found  (I19)          — the «ان الله علي» case
     kinds = ["ya2alef_maqsura", "ta2ha", "hamza_drop", "ha2ta"]
     made = 0
     for r in rng.sample(q_long, len(q_long)):
@@ -226,11 +233,10 @@ def main() -> int:  # noqa: PLR0912  (one generator per category, kept linear fo
                     "B",
                     rng.choice(W_QURAN),
                     {
-                        "status": "needs_review",
-                        "review_reason": "orthographic_difference",
+                        "rasm": "by_construction",  # resolved at eval time: see materialize.rasm_expectation
                         "corpus": "tanzil",
                         "ref": {"surah": r.surah, "ayah": r.ayah},
-                        "never": ["found", "partial_match"],
+                        "never": ["partial_match"],
                     },
                     source={**_q_ref(r), "tokens": [a, a + n]},
                     mutation=f"ortho:{k}",

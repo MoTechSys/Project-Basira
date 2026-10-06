@@ -29,7 +29,7 @@ from typing import Any
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "backend"))
 
-from app.normalize import strict_tokens, tokenize  # noqa: E402
+from app.normalize import loose_tokens, strict_tokens, tokenize  # noqa: E402
 from app.store import Record, Store  # noqa: E402
 
 _ORTHO = {
@@ -187,6 +187,29 @@ def mutate(  # noqa: PLR0911
     raise ValueError(f"unknown mutation {mutation!r}")
 
 
+def rasm_expectation(store: Store, quote: str) -> dict[str, Any]:
+    """D-015 — resolve a category-B expectation BY CONSTRUCTION from the corpus the eval runs on.
+
+    Uses the engine's own primitives (``find_exact`` + ``match.rasm.prove``), so the expectation is
+    the corpus's answer, not the generator's guess:
+      * unique spelling, pure completions → ``found`` with notice ``rasm_completed``;
+      * otherwise (several spellings, or a written different mark) → ``needs_review/rasm_ambiguous``.
+    Both branches forbid ``partial_match`` (I1) and the ambiguous branch forbids ``found`` (I19).
+    """
+    from app.match.exact import dedupe_hits, find_exact  # noqa: PLC0415
+    from app.match.rasm import prove  # noqa: PLC0415
+
+    hits = [
+        h
+        for h in dedupe_hits(find_exact(store, loose_tokens(quote), strict_tokens(quote)))
+        if h.rec.corpus == "tanzil"
+    ]
+    proof = prove(store, hits, strict_tokens(quote)) if hits else None
+    if proof is not None and proof.unique:
+        return {"status": "found", "notice_any": ["rasm_completed"], "never": ["partial_match"]}
+    return {"status": "needs_review", "review_reason": "rasm_ambiguous", "never": ["found", "partial_match"]}
+
+
 def materialize(store: Store, case: dict[str, Any]) -> Materialized:
     notes: list[str] = []
     if "source" in case:
@@ -205,4 +228,9 @@ def materialize(store: Store, case: dict[str, Any]) -> Materialized:
     else:
         quote = case.get("literal", "")  # only for non-religious literals (category J/K/L wrappers)
     text = case["wrapper"].replace("{q}", quote)
-    return Materialized(case["id"], case["category"], text, quote, dict(case.get("expect", {})), notes)
+    expect = dict(case.get("expect", {}))
+    if expect.pop("rasm", None) == "by_construction":
+        resolved = rasm_expectation(store, quote)
+        notes.append(f"rasm by construction: {resolved['status']}")
+        expect = {**expect, **resolved}
+    return Materialized(case["id"], case["category"], text, quote, expect, notes)

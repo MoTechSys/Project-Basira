@@ -14,7 +14,8 @@
     "needs_review_image": "Needs review. The text was extracted automatically from an image; please confirm the extracted text first.",
     "not_found_any": "We did not find this text in the Mushaf or in the hadith collections we hold. This is not a judgment on it; consult an approved Mushaf or specialised hadith references.",
     "needs_review_unproven": "Needs review. A preliminary match was found, but the independent validator could not prove that the words of your text occur contiguously in the source text; compare the source text shown yourself or consult a specialist.",
-    "needs_review_attribution_only": "This is an attribution or a narration chain without a text (e.g. \"narrated by al-Bukhari\" or the chain of narrators alone). No text was checked and nothing is judged here; enter the text itself to have it checked."
+    "needs_review_attribution_only": "This is an attribution or a narration chain without a text (e.g. \"narrated by al-Bukhari\" or the chain of narrators alone). No text was checked and nothing is judged here; enter the text itself to have it checked.",
+    "needs_review_rasm_ambiguous": "Needs review. Your text is written without hamza marks (or without ى/ي distinction), and in our sources this wording occurs in more than one spelling (e.g. «إنّ» and «أنّ»), each a distinct text. Choose the spelling you meant to see its position, or paste the text with hamza."
   },
   "notice": {
     "hadith_variant": "Hadiths are transmitted with close wordings across different books; the highlighted difference may be a wording in another transmission our sources do not cover.",
@@ -52,7 +53,8 @@
     "waqf_note": "The last word of your text ends with a sukun (pausal form) where the Mushaf writes the connecting vowel. This is a spelling convention, not a transmission difference.",
     "diacritic_unverified": "We could not compare the vowel marks letter by letter at this position (the rasm differs in letter count); the letters match, the marks were not machine-verified.",
     "foreign_material": "The quote contains words, digits or symbols that are not part of the text (highlighted in your text). Remove them and check again.",
-    "english_candidates": "This quote is not in Arabic. We show the closest positions in the approved translations (QuranEnc / HadeethEnc) with their verbatim Arabic original; this is an approximate lexical match, not a letter-exact verification."
+    "english_candidates": "This quote is not in Arabic. We show the closest positions in the approved translations (QuranEnc / HadeethEnc) with their verbatim Arabic original; this is an approximate lexical match, not a letter-exact verification.",
+    "rasm_completed": "Your text omitted some hamza marks or the ى/ي · ة/ه distinction. Nothing was corrected by us: our sources carry exactly one spelling for these words, shown with the completed letters highlighted."
   },
   "labels": {
     "found": "Found",
@@ -75,7 +77,11 @@
     "diff_diacritic_conflict": "diacritic difference",
     "diff_diacritic_missing": "missing marks",
     "diff_waqf": "pausal sukun",
-    "diff_foreign_material": "foreign material"
+    "diff_foreign_material": "foreign material",
+    "rasm_completed_title": "Letters completed from the source",
+    "rasm_alternatives_title": "Two spellings in the sources — which did you mean?",
+    "rasm_positions": "{n} positions",
+    "reason_rasm_ambiguous": "more than one possible spelling"
   },
   "fixed": {
     "footer": "Basira is an automated aid for checking how verses and hadiths are quoted. It does not evaluate hadiths or issue religious rulings, and does not replace review by qualified scholars.",

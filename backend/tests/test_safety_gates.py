@@ -150,8 +150,12 @@ async def test_each_occurrence_gets_its_own_verdict(pipeline: Pipeline) -> None:
     assert len(r.quotes) == 2, [q.status for q in r.quotes]
     by_text = {q.quoted_text: q for q in r.quotes}
     assert by_text["قل هو الله أحد"].status == "found"
-    assert by_text["قل هو الله احد"].status == "needs_review"
-    assert by_text["قل هو الله احد"].review_reason == "orthographic_difference"
+    assert "rasm_completed" not in by_text["قل هو الله أحد"].notice_keys
+    # D-015 (I18): «احد» is the bare form of «أحد» and the Mushaf spells this ayah one way only →
+    # `found`, but as a DISTINCT verdict that names the completed letter (never silently merged).
+    bare = by_text["قل هو الله احد"]
+    assert bare.status == "found" and "rasm_completed" in bare.notice_keys
+    assert bare.rasm is not None and [c.corpus for c in bare.rasm.completions] == ["أحد"]
 
 
 async def test_identical_repeats_are_still_merged(pipeline: Pipeline) -> None:

@@ -30,6 +30,15 @@ Religious-safety invariants enforced here (each has a test in tests/test_state.p
   I13 Attribution cross-notice: a strict-exact QURAN hit introduced as a hadith («قال رسول الله»,
       «رواه …») adds ``attribution_quran_not_hadith``; a strict-exact HADITH hit introduced as Quran
       («قال تعالى», ﴿…﴾) adds ``attribution_hadith_not_quran``. Descriptive, never a judgment.
+  I18 Rasm-uniqueness (D-015). A loose-exact hit whose only differences are UNWRITTEN hamza / ى / ة
+      (the user typed the bare form, never a different marked form) and whose span has exactly ONE
+      strict spelling across every position in the corpus → ``found`` with notice ``rasm_completed``
+      and the completed letters listed. The proof comes from the corpus (``match/rasm.py``) and is
+      re-derived by the validator (V7); the machine never guesses a hamza.
+  I19 Rasm-ambiguity. If the same bare span is spelled more than one way in the corpus («إن الله على
+      كل شيء قدير» / «أن الله على كل شيء قدير») or the user wrote a *different* marked form («علي»
+      for «على», «أن» for «إن») → ``needs_review`` with reason ``rasm_ambiguous`` and the alternatives
+      (with counts) exposed so the user chooses. Never ``found``.
 """
 
 from __future__ import annotations
@@ -53,6 +62,11 @@ class Evidence:
     strict_ok: bool  # exact hit AND strict tokens equal
     book: str = ""  # ohd book key (for claimed-source comparison)
     is_exact: bool = False
+    # I18/I19 — set by the pipeline on loose-exact hits that failed the strict gate:
+    #   "unique"    → every difference is an unwritten hamza/ى/ة AND the corpus has one spelling
+    #   "ambiguous" → a rasm difference, but >1 corpus spelling or the user wrote a different marked form
+    #   ""          → not a rasm difference (keep orthographic_difference)
+    rasm: str = ""
 
 
 @dataclass(frozen=True, slots=True)
@@ -137,9 +151,37 @@ def decide(facts: QuoteFacts, evidence: list[Evidence], th: Thresholds) -> Decis
             d.notice_keys.append("attribution_hadith_not_quran")
         return _apply_claim_checks(d, facts)
 
-    # I2 — loose-exact but strict-different: an orthographic difference, never `found`
+    # I18 — rasm-uniqueness: the corpus proves the unwritten hamza; `found` with the completion shown
     quran_loose = [e for e in quran_ev if e.is_exact and not e.strict_ok]
     hadith_loose = [e for e in hadith_ev if e.is_exact and not e.strict_ok]
+    for scope, loose_ev in (("quran", quran_loose), ("hadith", hadith_loose)):
+        if loose_ev and all(e.rasm == "unique" for e in loose_ev):
+            d = Decision(
+                "found",
+                1.0,
+                "found",
+                scope,  # type: ignore[arg-type]
+                winners=loose_ev,
+                notice_keys=["rasm_completed"],
+                attach_grade=scope == "hadith",
+            )
+            if scope == "quran" and facts.asserted == "hadith":  # I13 still applies
+                d.notice_keys.append("attribution_quran_not_hadith")
+            if scope == "hadith" and facts.asserted == "quran":
+                d.notice_keys.append("attribution_hadith_not_quran")
+            return _apply_claim_checks(d, facts)
+        if loose_ev and any(e.rasm == "ambiguous" for e in loose_ev):  # I19
+            d = Decision(
+                "needs_review",
+                1.0,
+                "needs_review_rasm_ambiguous",
+                scope,  # type: ignore[arg-type]
+                winners=loose_ev,
+                review_reason="rasm_ambiguous",
+            )
+            return _apply_claim_checks(d, facts) if scope == "hadith" else d
+
+    # I2 — loose-exact but strict-different: an orthographic difference, never `found`
     if quran_loose:
         return Decision(
             "needs_review",
